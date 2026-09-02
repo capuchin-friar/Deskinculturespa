@@ -1,12 +1,12 @@
 /**
  * 
- * Admin Delete Products API Route
- * @module app/api/admin/products/add/route
+ * Admin Delete Appointments API Route
+ * @module app/api/admin/appointments/add/route
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { ProductModel } from "@/app/api/lib/models/product";
+import { AppointmentModel } from "@/app/api/lib/models/appointment";
 
 
 export const DELETE = async (req: NextRequest) => {
@@ -14,13 +14,13 @@ export const DELETE = async (req: NextRequest) => {
     try {
         const body = await req.json();
         const {
-            product_id
+            appointment_id
         } = body;
 
         // Validate all fields
-        if (!product_id) {
+        if (!appointment_id) {
             return NextResponse.json(
-                { message: "Product ID is required" },
+                { message: "Appointment ID is required" },
                 { status: 400 }
             );
         }
@@ -41,19 +41,19 @@ export const DELETE = async (req: NextRequest) => {
 
 
         // Final validation 
-        if (product_id && admin_id) {
-            // Create product
-            await ProductModel.deleteProductDoc({
-                id: product_id
+        if (appointment_id && admin_id) {
+            // Create appointment
+            await AppointmentModel.deleteAppointmentDoc({
+                id: appointment_id
             });
 
             return NextResponse.json({
                 success: true,
-                message: "Product deleted successfully",
+                message: "Appointment deleted successfully",
             });
         } else {
             return NextResponse.json(
-                { success: false, data: "Product deleting validation!" },
+                { success: false, data: "Appointment failed validation!" },
                 { status: 500 }
             );
         }
@@ -61,7 +61,6 @@ export const DELETE = async (req: NextRequest) => {
 
 
     } catch (err) {
-        console.log("err: ", err)
         return NextResponse.json(
             { success: false, data: err },
             { status: 500 }

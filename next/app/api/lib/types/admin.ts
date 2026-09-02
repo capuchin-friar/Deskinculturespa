@@ -102,3 +102,10 @@ export interface NewServiceDoc {
     image_url: string,
     admin_id: string | number
 }
+
+export interface NewAppointmentDoc {
+    mode: string,
+    duration_minutes: number,
+    price: number,
+    admin_id: string | number
+}
