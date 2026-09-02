@@ -2,21 +2,21 @@
  * USER MODEL
  * 
  * Handles all database operations related to users:
- * - Admin creation and authentication
+ * - User creation and authentication
  * - Profile information updates (email, phone, password, photo)
- * - Admin data retrieval and validation
+ * - User data retrieval and validation
  * 
  * @module app/api/lib/models/user
  */
 
 import { query } from "../database";
-import type { NewAdminDocument, Admin } from "../types/admin";
+import type { NewUserDocument, User } from "../types/user";
 import { withErrorHandling } from "../utils/errHandler";
 
-export class AdminModel {
-  static createAdminDoc = withErrorHandling(
+export class UserModel {
+  static createUserDoc = withErrorHandling(
     async (
-      payload: NewAdminDocument
+      payload: NewUserDocument
     ) => {
       const { role, fname, lname, email, password, phone } = payload;
 
@@ -34,7 +34,7 @@ export class AdminModel {
     }
   );
 
-  static findAdminByEmail = withErrorHandling(async (email: string): Promise<Admin[]> => {
+  static findUserByEmail = withErrorHandling(async (email: string): Promise<User[]> => {
     const { rows } = await query(
       `SELECT * FROM users WHERE email = $1`,
       [email]
@@ -43,7 +43,7 @@ export class AdminModel {
   });
 
   /** Case-insensitive match (avoids 401 when DB email casing differs from login input). */
-  static findAdminByEmailNormalized = withErrorHandling(async (email: string): Promise<Admin[]> => {
+  static findUserByEmailNormalized = withErrorHandling(async (email: string): Promise<User[]> => {
     const { rows } = await query(
       `SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))`,
       [email]
@@ -67,7 +67,7 @@ export class AdminModel {
     return parseInt(rows[0].count);
   });
 
-  static findAdminById = withErrorHandling(async (id: number): Promise<Admin[]> => {
+  static findUserById = withErrorHandling(async (id: number): Promise<User[]> => {
     const { rows } = await query(
       `SELECT * FROM users WHERE id = $1`,
       [id]
@@ -75,7 +75,7 @@ export class AdminModel {
     return rows;
   });
 
-  static updateAdminPhoneById = withErrorHandling(async (id: number, phone: string) => {
+  static updateUserPhoneById = withErrorHandling(async (id: number, phone: string) => {
     const { rows } = await query(
       `UPDATE users SET phone = $1 WHERE id = $2 RETURNING *`,
       [phone, id]
@@ -83,7 +83,7 @@ export class AdminModel {
     return rows;
   });
 
-  static updateAdminRoleById = withErrorHandling(async (id: number, role: string) => {
+  static updateUserRoleById = withErrorHandling(async (id: number, role: string) => {
     const { rows } = await query(
       `UPDATE users SET role = $1 WHERE id = $2 RETURNING *`,
       [role, id]
@@ -91,7 +91,7 @@ export class AdminModel {
     return rows;
   });
 
-  static updateAdminEmailById = withErrorHandling(async (id: number, email: string) => {
+  static updateUserEmailById = withErrorHandling(async (id: number, email: string) => {
     const { rows } = await query(
       `UPDATE users SET email = $1 WHERE id = $2 RETURNING *`,
       [email, id]
@@ -100,7 +100,7 @@ export class AdminModel {
   });
 
   static updateProfile = withErrorHandling(
-    async (payload: Partial<NewAdminDocument> & { id: number }) => {
+    async (payload: Partial<NewUserDocument> & { id: number }) => {
       const { fname, lname, id } = payload;
 
       const { rows } = await query(
@@ -253,7 +253,7 @@ export class AdminModel {
   /**
    * Find or create user for OAuth providers (Google, Apple, Facebook)
    */
-  static findOrCreateOAuthAdmin = withErrorHandling(
+  static findOrCreateOAuthUser = withErrorHandling(
     async (payload: {
       email: string;
       fname: string;
@@ -264,20 +264,20 @@ export class AdminModel {
       const { email, fname, lname, provider, role } = payload;
 
       // Check if user exists
-      const existingAdmins = await AdminModel.findAdminByEmail(email);
+      const existingUsers = await UserModel.findUserByEmail(email);
 
-      if (existingAdmins.length > 0) {
-        const user = existingAdmins[0];
+      if (existingUsers.length > 0) {
+        const user = existingUsers[0];
         
         // If user was deleted, reactivate
         if (user.accountStatus === "deleted") {
-          await AdminModel.recreateProfile({ id: user.id });
-          const updatedAdmins = await AdminModel.findAdminById(user.id);
-          return updatedAdmins[0];
+          await UserModel.recreateProfile({ id: user.id });
+          const updatedUsers = await UserModel.findUserById(user.id);
+          return updatedUsers[0];
         }
         
         // Update last login
-        await AdminModel.updateLastLogin(user.id);
+        await UserModel.updateLastLogin(user.id);
         return user;
       }
 

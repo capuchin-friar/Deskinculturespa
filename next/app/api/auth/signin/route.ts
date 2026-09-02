@@ -1,15 +1,15 @@
 /**
  * 
- * Admin Signin API Route
+ * User Signin API Route
  * 
- * @module app/api/admin/auth/signin/route
+ * @module app/api/user/auth/signin/route
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { AdminModel } from "../../../lib/models/admin";
-import { getJwtSecret } from "../../../lib/jwt";
+import { UserModel } from "../../lib/models/user";
+import { getJwtSecret } from "../../lib/jwt";
 
 
 export const POST = async (req: NextRequest) => {
@@ -35,23 +35,23 @@ export const POST = async (req: NextRequest) => {
             );
         }
 
-        // Find admin by email
-        const admins =
+        // Find user by email
+        const users =
             email.length > 0
-                ? await AdminModel.findAdminByEmailNormalized(email)
+                ? await UserModel.findUserByEmailNormalized(email)
                 : [];
 
-        if (admins.length === 0) {
+        if (users.length === 0) {
             return NextResponse.json(
                 { success: false, data: "invalid credentials" },
                 { status: 401 }
             );
         }
 
-        const admin = admins[0];
+        const user = users[0];
 
         // Local authentication — bcrypt, or legacy plain-text (upgrade to hash on success)
-        const stored = admin.password as string;
+        const stored = user.password as string;
         let passwordMatch = false;
         if (stored && typeof stored === "string" && stored.startsWith("$2")) {
             passwordMatch = await bcrypt.compare(password, stored);
@@ -63,13 +63,13 @@ export const POST = async (req: NextRequest) => {
             );
         }
 
-        const displayName = [admin.fname, admin.lname].filter(Boolean).join(" ").trim();
+        const displayName = [user.fname, user.lname].filter(Boolean).join(" ").trim();
 
         // Generate JWT token
         const token = jwt.sign(
             {
-                id: admin.id,
-                email: admin.email,
+                id: user.id,
+                email: user.email,
                 ...(displayName ? { name: displayName } : {}),
             },
             secret,
@@ -77,13 +77,13 @@ export const POST = async (req: NextRequest) => {
         );
 
         // Remove password from response
-        const { password: _, ...adminWithoutPassword } = admin;
+        const { password: _, ...userWithoutPassword } = user;
 
         return NextResponse.json({
             success: true,
             message: "Login successful",
             cookie: token,
-            admin: adminWithoutPassword,
+            user: userWithoutPassword,
         });
     } catch (err) {
         return NextResponse.json(

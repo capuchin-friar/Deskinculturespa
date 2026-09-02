@@ -1,16 +1,16 @@
 /**
- * Admin Signup API Route
+ * User Signup API Route
  * 
- * Handles admin registration for both local and OAuth providers.
+ * Handles user registration for both local and OAuth providers.
  * 
- * @module app/api/admin/signup/route
+ * @module app/api/user/signup/route
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { AdminModel } from "../../../lib/models/admin";
-import { getJwtSecret } from "../../../lib/jwt";
+import { UserModel } from "../../lib/models/user";
+import { getJwtSecret } from "../../lib/jwt";
 
 const SALT_ROUNDS = 10;
 
@@ -23,14 +23,14 @@ export async function POST(request: NextRequest) {
             email,
             phone,
             password,
-            role = "admin",
+            role,
         } = body;
 
         // Local registration
-        // Check if admin exists with deleted account
-        const existingAdmins = await AdminModel.findAdminByEmail(email);
+        // Check if user exists with deleted account
+        const existingUsers = await UserModel.findUserByEmail(email);
 
-        if (existingAdmins.length > 0) {
+        if (existingUsers.length > 0) {
             return NextResponse.json(
                 { success: false, data: { mssg: "email exists" } },
                 { status: 400 }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
         // Check if phone already exists
         if (phone && phone !== "null") {
-            const phoneExists = await AdminModel.countPhone(phone);
+            const phoneExists = await UserModel.countPhone(phone);
             if (phoneExists > 0) {
                 return NextResponse.json(
                     { success: false, data: { mssg: "phone exists" } },
@@ -51,8 +51,8 @@ export async function POST(request: NextRequest) {
         // Hash password
         const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
 
-        // Create admin
-        const admin = await AdminModel.createAdminDoc({
+        // Create user
+        const user = await UserModel.createUserDoc({
             fname,
             lname,
             email,
@@ -61,28 +61,28 @@ export async function POST(request: NextRequest) {
             role
         });
 
-        if (!admin) {
+        if (!user) {
             return NextResponse.json(
-                { success: false, data: { mssg: "Failed to create admin" } },
+                { success: false, data: { mssg: "Failed to create user" } },
                 { status: 400 }
             );
         }
 
         // Generate JWT token
         const token = jwt.sign(
-            { id: admin.id, email: admin.email },
+            { id: user.id, email: user.email },
             getJwtSecret(process.env.ADMIN_JWT_SECRET as string),
             { expiresIn: "7d" }
         );
 
         // Remove password from response
-        const { password: _, ...adminWithoutPassword } = admin;
+        const { password: _, ...userWithoutPassword } = user;
 
         return NextResponse.json({
             success: true,
-            message: "Admin created successfully",
+            message: "User created successfully",
             cookie: token,
-            admin: adminWithoutPassword,
+            user: userWithoutPassword,
         });
     } catch (err) {
         return NextResponse.json(
