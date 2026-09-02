@@ -145,7 +145,7 @@ export const POST = async (req: NextRequest) => {
             { status: 201 }
         );
     } catch (err) {
-        console.error("Add blog error:", err);
+        console.error("Get metrics error:", err);
 
         return NextResponse.json(
             {

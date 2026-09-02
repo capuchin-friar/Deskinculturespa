@@ -20,7 +20,7 @@ CREATE TABLE products (
     status VARCHAR(20) DEFAULT 'draft'
         CHECK (status IN ('draft','active','archived')),
 
-    is_published BOOLEAN DEFAULT false,
+    is_published BOOLEAN DEFAULT true,
     published_at TIMESTAMP,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
