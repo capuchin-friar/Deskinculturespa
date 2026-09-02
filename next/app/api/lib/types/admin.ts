@@ -109,3 +109,13 @@ export interface NewAppointmentDoc {
     price: number,
     admin_id: string | number
 }
+
+export interface NewBlogDoc {
+    title: string,
+    summary: string,
+    content: string,
+    image_urls: string[],
+    thumbnail_url: string,
+    category: string,
+    admin_id: string | number
+}
