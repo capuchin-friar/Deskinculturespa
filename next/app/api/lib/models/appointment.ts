@@ -20,7 +20,7 @@ export class AppointmentModel {
             const {
                 admin_id, mode, price, duration_minutes
             } = payload;
-            const columns = ["admin_id", "mode", "duration_minutes", "price", "is_active", "created_at"];
+            const columns = ["consultant_id", "mode", "duration_minutes", "price", "is_active", "created_at"];
             const values = [admin_id, mode, duration_minutes,  price, true, new Date()];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
