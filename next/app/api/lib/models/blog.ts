@@ -55,6 +55,20 @@ export class BlogModel {
 
             return rows;
         }
-    )
+    );
+
+    static getAllBlogtDoc = withErrorHandling(
+        async (payload: { id: string }) => {
+            const {
+                id
+            } = payload;
+            const { rows } = await query(
+                `SELECT * FROM blogs WHERE admin_id = $1`,
+                [id]
+            );
+
+            return rows;
+        }
+    );
 
 }

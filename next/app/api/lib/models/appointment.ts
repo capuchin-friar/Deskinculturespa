@@ -21,7 +21,7 @@ export class AppointmentModel {
                 admin_id, mode, price, duration_minutes
             } = payload;
             const columns = ["consultant_id", "mode", "duration_minutes", "price", "is_active", "created_at"];
-            const values = [admin_id, mode, duration_minutes,  price, true, new Date()];
+            const values = [admin_id, mode, duration_minutes, price, true, new Date()];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
             const sql = `INSERT INTO consultation_offerings (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;
@@ -44,7 +44,7 @@ export class AppointmentModel {
 
             return rowCount;
         }
-    )
+    );
 
     static updateAppointmentDoc = withErrorHandling(
         async (payload: Omit<NewAppointmentDoc, "admin_id"> & { appointment_id: string }) => {
@@ -59,6 +59,20 @@ export class AppointmentModel {
 
             return rows;
         }
-    )
+    );
+
+    static getAllAppointmentDoc = withErrorHandling(
+        async (payload: { id: string }) => {
+            const {
+                id
+            } = payload;
+            const { rows } = await query(
+                `SELECT * FROM consultation_offerings WHERE consultant_id = $1`,
+                [id]
+            );
+
+            return rows;
+        }
+    );
 
 }

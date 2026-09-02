@@ -59,6 +59,20 @@ export class ServiceModel {
 
             return rows;
         }
+    );
+
+    static getAllServiceDoc = withErrorHandling(
+        async (payload: { id: string }) => {
+            const {
+                id
+            } = payload;
+            const { rows } = await query(
+                `SELECT * FROM services WHERE admin_id = $1`,
+                [id]
+            );
+
+            return rows;
+        }
     )
 
 }

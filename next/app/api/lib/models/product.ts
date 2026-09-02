@@ -62,6 +62,20 @@ export class ProductModel {
 
             return rows;
         }
+    );
+
+    static getAllProducttDoc = withErrorHandling(
+        async (payload: { id: string }) => {
+            const {
+                id
+            } = payload;
+            const { rows } = await query(
+                `SELECT * FROM products WHERE admin_id = $1`,
+                [id]
+            );
+
+            return rows;
+        }
     )
 
 }
