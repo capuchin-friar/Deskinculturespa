@@ -33,10 +33,12 @@ export function Aside() {
                     navs.map(({ name, path, svg: Icon }, i) =>
 
                         <Link key={i} href={`/admin/${path}`}>
-                            <span>{name}</span>
                             <span>
                                 <Icon />
                             </span>
+                            &nbsp;
+                            &nbsp;
+                            <span>{name}</span>
                         </Link>
                     )
                 }
@@ -47,18 +49,21 @@ export function Aside() {
     return (
         <>
             <aside>
-                <div>
+                <section>
                     <span>
-                        <img src={null} alt="DeskincultureSpa logo" />
+                        <img src={null} alt="logo" />
                     </span>
                     <span>
-                        <h5>DeskincultureSpa</h5>
+                        <p>Deskinculture</p>
                         <small>Admin</small>
                     </span>
-                </div>
-                {
-                    renderAsideOptions(navs)
-                }
+                </section>
+                <br />
+                <section>
+                    {
+                        renderAsideOptions(navs)
+                    }
+                </section>
             </aside>
         </>
     )

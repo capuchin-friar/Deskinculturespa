@@ -8,8 +8,8 @@ export function Header(){
         <>
             <header>
                 <div className="welcome-box">
-                    <h3>Welcome back, Admin</h3>
-                    <h6>Here's what's happening with your spa <b>business</b> today!</h6>
+                    <h3><b>Welcome back, Admin</b> 👋</h3>
+                    <small>Here's what's happening with your spa <b>business</b> today!</small>
                 </div>
 
                 <div className="right">

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import {
     IoPeopleOutline,
     IoCartOutline,
-    IoCashOutline,
+    IoTrendingUpOutline,
     IoEyeOutline,
     IoBagHandleOutline,
     IoSparklesOutline,
@@ -42,34 +42,17 @@ const renderOverviewCards = ((overview) => {
 
     return (
         <>
-            {
-                overview.map(({ name, value, svg }, index) =>
-                    <div key={index}>
-                        <MetricCard name={name} svg={svg} value={value} />
-                    </div>
-                )
-            }
+            <div className="overview-cnt">
+                {
+                    overview.map(({ name, value, svg }, index) =>
+                        <MetricCard key={index} name={name} svg={svg} value={value} />
+                    )
+                }
+            </div>
 
         </>
     )
 });
-
-const renderCatalogCards = ((catalog) => {
-
-    return (
-        <>
-            {
-                catalog.map(({ name, value, svg }, index) =>
-                    <div key={index}>
-                        <MetricCard name={name} svg={svg} value={value} />
-                    </div>
-                )
-            }
-
-        </>
-    )
-});
-
 
 
 
@@ -93,14 +76,7 @@ export function Body() {
         {
             name: "Revenue",
             value: 0,
-            svg: IoCashOutline,
-            duration: "",
-            conversion: ""
-        },
-        {
-            name: "Views",
-            value: 0,
-            svg: IoEyeOutline,
+            svg: IoTrendingUpOutline,
             duration: "",
             conversion: ""
         }
@@ -124,7 +100,7 @@ export function Body() {
             summary: "Total services in catalog"
         },
         {
-            name: "Appointments offered",
+            name: "Appointments",
             value: 0,
             svg: IoCalendarOutline,
             summary: "Total appointment offers"
@@ -138,14 +114,13 @@ export function Body() {
             <main>
                 {
                     [
-                        { title: "Bussiness Overview", jsx: renderOverviewCards(overview) },
+                        { title: "Bussiness Overview", jsx: renderOverviewCards([...overview, ...catalog]) },
                         { title: "Order Breakdown", jsx: <OrderBreakdown /> },
-                        { title: "Catalog / Operations", jsx: renderCatalogCards(catalog) }
                     ].map((content, i) =>
                         <div key={i}>
                             <Headline title={`${i + 1}. ${content.title}`} />
 
-                            {content.jsx}
+                            <div>{content.jsx}</div>
                         </div>
                     )
                 }
@@ -160,14 +135,14 @@ function MetricCard({
     svg: Icon
 }) {
     return (
-        <div>
+        <div className="admin-metric-card">
             <span>
                 <Icon size={35} />
             </span>
 
             <span>
                 <p>{name}</p>
-                <h3>{value}</h3>
+                <h3><b>{value}</b></h3>
             </span>
         </div>
     );
@@ -208,7 +183,7 @@ function OrderBreakdown({
     return (
         <>
             <div>
-                <div style={{ width: "40%", height: 250 }}>
+                <div style={{ width: "50%", height: 300 }}>
                     <ResponsiveContainer width="70%" height="100%">
                         <PieChart>
                             <Pie
@@ -217,8 +192,8 @@ function OrderBreakdown({
                                 nameKey="name"
                                 cx="50%"
                                 cy="50%"
-                                innerRadius={40}
-                                outerRadius={80}
+                                innerRadius={80}
+                                outerRadius={120}
                                 paddingAngle={0}
                                 stroke="none"
                             >
@@ -239,8 +214,8 @@ function OrderBreakdown({
                     </ResponsiveContainer>
                     {/* Center text */}
                     <div>
-                        <strong>{totalOrders}</strong>
-                        <span>Total Orders</span>
+                        {/* <span>{totalOrders}</span> */}
+                        {/* <span>Total Orders</span> */}
                     </div>
                 </div>
 
@@ -249,9 +224,9 @@ function OrderBreakdown({
                         {`Recent ${''}`}
                     </div>
 
-                    {
+                    {/* {
                         renderOrdersCards([...products, ...services, ...appointments])
-                    }
+                    } */}
                 </div>
             </div>
         </>
