@@ -135,3 +135,38 @@ main {
     align-items: flex-start;
     justify-content: space-between;
 }
+
+.summary-cnt{
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.chart-cnt{
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0px;
+    width: 40%;
+    background-color: #fff;
+    gap: 10;
+}
+
+.chart-cnt div:nth-child(1){
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-cnt div:nth-child(2){
+    display: flex;
+    flex-direction: column;
+}
+
+
+.activity-cnt{
+    display: flex;
+    flex-direction: column;
+    margin: 10px 0px;
+    width: 58%;
+    background-color: #fff;
+    gap: 10;
+}

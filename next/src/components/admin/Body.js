@@ -6,6 +6,7 @@ import {
     IoEyeOutline,
     IoBagHandleOutline,
     IoSparklesOutline,
+    IoArrowForward,
     IoCalendarOutline
 } from "react-icons/io5";
 import {
@@ -115,7 +116,7 @@ export function Body() {
                 {
                     [
                         { title: "Bussiness Overview", jsx: renderOverviewCards([...overview, ...catalog]) },
-                        { title: "Order Breakdown", jsx: <OrderBreakdown /> },
+                        { title: "Business Summary", jsx: <OrderBreakdown /> },
                     ].map((content, i) =>
                         <div key={i}>
                             <Headline title={`${i + 1}. ${content.title}`} />
@@ -182,53 +183,105 @@ function OrderBreakdown({
 
     return (
         <>
-            <div>
-                <div style={{ width: "50%", height: 300 }}>
-                    <ResponsiveContainer width="70%" height="100%">
-                        <PieChart>
-                            <Pie
-                                data={data}
-                                dataKey="value"
-                                nameKey="name"
-                                cx="50%"
-                                cy="50%"
-                                innerRadius={80}
-                                outerRadius={120}
-                                paddingAngle={0}
-                                stroke="none"
-                            >
-                                {data.map((entry, index) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={COLORS[index]}
-                                    />
-                                ))}
-                            </Pie>
-                            <Tooltip />
-                            <Legend
-                                verticalAlign="middle"
-                                align="right"
-                                layout="vertical"
-                            />
-                        </PieChart>
-                    </ResponsiveContainer>
-                    {/* Center text */}
-                    <div>
-                        {/* <span>{totalOrders}</span> */}
-                        {/* <span>Total Orders</span> */}
+            <div className="summary-cnt">
+                <section className="chart-cnt">
+                    <div style={{ width: "80%", height: 200, background: '#fff' }}>
+                        <div style={{ margin: "15px 0px 0px 15px" }}>
+                            <Headline title={"Order Breakdown"} />
+                        </div>
+                        <ResponsiveContainer width="90%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={data}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={35}
+                                    outerRadius={55}
+                                    paddingAngle={0}
+                                    stroke="none"
+                                >
+                                    {data.map((entry, index) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={COLORS[index]}
+                                        />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend
+                                    verticalAlign="middle"
+                                    align="right"
+                                    layout="vertical"
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        {/* Center text */}
+                        <div>
+                            {/* <span>{totalOrders}</span> */}
+                            {/* <span>Total Orders</span> */}
+                        </div>
                     </div>
-                </div>
-
-                <div style={{ width: "55%", height: 200 }}>
-                    <div className="headline">
-                        {`Recent ${''}`}
+                    <div style={{ width: "80%", height: 200, background: '#fff' }}>
+                        <div style={{ margin: "15px 0px 0px 15px" }}>
+                            <Headline title={"Revenue Breakdown"} />
+                        </div>
+                        <ResponsiveContainer width="90%" height="100%">
+                            <PieChart>
+                                <Pie
+                                    data={data}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={35}
+                                    outerRadius={55}
+                                    paddingAngle={0}
+                                    stroke="none"
+                                >
+                                    {data.map((entry, index) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={COLORS[index]}
+                                        />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend
+                                    verticalAlign="middle"
+                                    align="right"
+                                    layout="vertical"
+                                />
+                            </PieChart>
+                        </ResponsiveContainer>
+                        {/* Center text */}
+                        <div>
+                            {/* <span>{totalOrders}</span> */}
+                            {/* <span>Total Orders</span> */}
+                        </div>
                     </div>
-
-                    {/* {
-                        renderOrdersCards([...products, ...services, ...appointments])
-                    } */}
-                </div>
+                </section>
+                <section className="activity-cnt">
+                    <div className="activity-headline">
+                        <div className="input-cnt">
+                            <select name="" id="">
+                                <option value="">Select activity</option>
+                                <option value="products">Products</option>
+                                <option value="services">Services</option>
+                                <option value="appointments">Appointments</option>
+                            </select>
+                        </div>
+                        <button>
+                            <span>View {""}</span>
+                            <span>
+                                <IoArrowForward />
+                            </span>
+                        </button>
+                    </div>
+                </section>
             </div>
+
         </>
     )
 }
