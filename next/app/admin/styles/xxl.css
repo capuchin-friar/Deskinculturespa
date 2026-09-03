@@ -147,7 +147,7 @@ main {
     flex-direction: column;
     margin: 10px 0px;
     width: 40%;
-    background-color: #fff;
+    /* background-color: #fff; */
     gap: 10;
 }
 
@@ -167,6 +167,32 @@ main {
     flex-direction: column;
     margin: 10px 0px;
     width: 58%;
+    align-items: center;
+    justify-content: flex-start;
     background-color: #fff;
     gap: 10;
 }
+
+.activity-headline{
+    height: 50px;
+    width: 100%;
+    padding: 0px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #d8d8d8;
+}
+
+.view-all{
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.activity-card-cnt{
+    height: 350px;
+    overflow: auto;
+    padding: 10px;
+}
+

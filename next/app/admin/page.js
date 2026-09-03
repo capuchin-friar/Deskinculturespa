@@ -9,6 +9,7 @@ import { Header } from "../../src/components/admin/Header"
  * @Styles import
  */
 import "./styles/xxl.css";
+import "./styles/paidItem.css";
 
 
 
