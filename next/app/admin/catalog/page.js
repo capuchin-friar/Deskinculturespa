@@ -8,7 +8,11 @@ import { useDispatch, useSelector } from "react-redux"
 import "./styles/xxl.css"
 import "./styles/s.css"
 import api from "../../api/config"
-
+import {
+  IoVideocamOutline,
+  IoLocationOutline
+} from "react-icons/io5";
+import "./appointment.css";
 function shopRowId(s) {
   return s?.id ?? s?.shop_id
 }
@@ -72,6 +76,7 @@ function ProductTableRow({
   const productId = item?.id ?? item?.product_id
   const name = item?.name ?? item?.mode ?? "—"
   const status = item?.status ?? item?.is_active ? "active" : "inactive" ?? "_"
+  const duration = item?.duration_minutes ?? "_"
   const createdAt = item?.created_at ?? item?.createdAt
   const totalSales = item?.total_sales ?? item?.totalSales
   const price = item?.price ?? "_"
@@ -93,10 +98,29 @@ function ProductTableRow({
           ) : (
             <span className="product-list-thumb-placeholder" aria-hidden />
           )}
-          <span className="product-list-title">{name.charAt(0).toUpperCase()}{name.slice(1)}</span>
+          <span className="product-list-title">
+            <span>{name.charAt(0).toUpperCase()}{name.slice(1)}</span>
+            &nbsp;
+            <span
+              className={`appointment-mode-label ${name === "video" ? "online" : "in-person"
+                }`}
+            >
+              {name === "video" ? (
+                <>
+                  <IoVideocamOutline />
+                  Online
+                </>
+              ) : (
+                <>
+                  <IoLocationOutline />
+                  In-person
+                </>
+              )}
+            </span>
+          </span>
         </div>
       </td>
-      <td>{status}</td>
+      <td>{type === "appointment" ? `${duration} minutes` : status}</td>
       <td className="product-list-num">{formatSalesCount(totalSales)}</td>
       <td className="product-list-num">{formatRevenue(price, "NGN")}</td>
       <td className="product-list-num">{formatCreatedAt(createdAt)}</td>
@@ -278,7 +302,7 @@ export default function ProductListPage() {
                 value: "services"
               },
               {
-                name: "Appointment",
+                name: "Appointments",
                 value: "appointment",
               }
             ].map(({ name, value }, index) => {
@@ -308,7 +332,7 @@ export default function ProductListPage() {
           <thead>
             <tr>
               <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
-              <th scope="col">Status</th>
+              <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
               <th scope="col">Total sales</th>
               <th scope="col">Total revenue</th>
               <th scope="col">Created</th>

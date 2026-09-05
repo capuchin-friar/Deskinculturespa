@@ -1,0 +1,29 @@
+.appointment-mode-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    padding: 4px 9px;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+
+    white-space: nowrap;
+}
+
+.appointment-mode-label svg {
+    font-size: 14px;
+}
+
+.appointment-mode-label.online {
+    color: #2563eb;
+    background: #eff6ff;
+}
+
+.appointment-mode-label.in-person {
+    color: #16a34a;
+    background: #f0fdf4;
+}
