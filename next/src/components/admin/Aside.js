@@ -16,10 +16,9 @@ export function Aside() {
 
     const navs = [
         { name: "Dashboard", svg: IoGridOutline, path: "/" },
-        { name: "Catalog", svg: IoBagHandleOutline, path: "/catalog" },
+        { name: "Catalog", svg: IoPricetagsOutline, path: "/catalog" },
         { name: "Orders", svg: IoCartOutline, path: "/orders" },
         { name: "Customers", svg: IoPeopleOutline, path: "/customers" },
-        { name: "Catalog", svg: IoPricetagsOutline, path: "/catalog" },
         { name: "Settings", svg: IoSettingsOutline, path: "/settings" }
     ];
 
