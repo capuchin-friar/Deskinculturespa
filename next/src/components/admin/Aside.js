@@ -15,12 +15,10 @@ import {
 export function Aside() {
 
     const navs = [
-        { name: "Dashboard", svg: IoGridOutline, path: "/dashboard" },
-        { name: "Customers", svg: IoPeopleOutline, path: "/customers" },
+        { name: "Dashboard", svg: IoGridOutline, path: "/" },
+        { name: "Catalog", svg: IoBagHandleOutline, path: "/catalog" },
         { name: "Orders", svg: IoCartOutline, path: "/orders" },
-        { name: "Appointments", svg: IoCalendarOutline, path: "/appointments" },
-        { name: "Services", svg: IoSparklesOutline, path: "/services" },
-        { name: "Products", svg: IoBagHandleOutline, path: "/products" },
+        { name: "Customers", svg: IoPeopleOutline, path: "/customers" },
         { name: "Catalog", svg: IoPricetagsOutline, path: "/catalog" },
         { name: "Settings", svg: IoSettingsOutline, path: "/settings" }
     ];
