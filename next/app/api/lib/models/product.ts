@@ -18,11 +18,12 @@ export class ProductModel {
     static createProductDoc = withErrorHandling(
         async (payload: NewProductDoc) => {
             const {
-                admin_id, name, description,
+                admin_id, name, price, description,
                 category, subcategory, brand, images, thumbnail_url, specifications
             } = payload;
-            const columns = ["admin_id", "name", "description", "category", "subcategory", "brand", "images", "thumbnail_url", "specifications", "status", "created_at"];
-            const values = [admin_id, name, description,
+            console.log("price: ", price)
+            const columns = ["admin_id", "name",  "price", "description", "category", "subcategory", "brand", "images", "thumbnail_url", "specifications", "status", "created_at"];
+            const values = [admin_id, name, price, description, 
                 category, subcategory, brand, (images), thumbnail_url, specifications, "active", new Date()];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
@@ -51,13 +52,13 @@ export class ProductModel {
     static updateProductDoc = withErrorHandling(
         async (payload: Omit<NewProductDoc, "admin_id"> & { product_id: string }) => {
             const {
-                product_id, name, description,
+                product_id, name, price, description,
                 category, subcategory, brand, images, thumbnail_url, specifications,
             } = payload;
 
             const { rows } = await query(
-                `UPDATE products SET name=$1, description=$2, category=$3, subcategory=$4, brand=$5, images=$6, thumbnail_url=$7, specifications=$8, updated_at=NOW()  WHERE id = $9 RETURNING *`,
-                [name, description, category, subcategory, brand, images, thumbnail_url, specifications, product_id]
+                `UPDATE products SET name=$1, price=$2, description=$3, category=$4, subcategory=$5, brand=$6, images=$7, thumbnail_url=$8, specifications=$9, updated_at=NOW()  WHERE id = $10 RETURNING *`,
+                [name, price, description, category, subcategory, brand, images, thumbnail_url, specifications, product_id]
             );
 
             return rows;

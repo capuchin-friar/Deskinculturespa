@@ -101,28 +101,31 @@ function ProductTableRow({
           <span className="product-list-title">
             <span>{name.charAt(0).toUpperCase()}{name.slice(1)}</span>
             &nbsp;
-            <span
-              className={`appointment-mode-label ${name === "video" ? "online" : "in-person"
-                }`}
-            >
-              {name === "video" ? (
-                <>
-                  <IoVideocamOutline />
-                  Online
-                </>
-              ) : (
-                <>
-                  <IoLocationOutline />
-                  In-person
-                </>
-              )}
-            </span>
+            {
+              type === "appointment" &&
+              <span
+                className={`appointment-mode-label ${name === "video" ? "online" : "in-person"
+                  }`}
+              >
+                {name === "video" ? (
+                  <>
+                    <IoVideocamOutline />
+                    Online
+                  </>
+                ) : (
+                  <>
+                    <IoLocationOutline />
+                    In-person
+                  </>
+                )}
+              </span>
+            }
           </span>
         </div>
       </td>
       <td>{type === "appointment" ? `${duration} minutes` : status}</td>
-      <td className="product-list-num">{formatSalesCount(totalSales)}</td>
       <td className="product-list-num">{formatRevenue(price, "NGN")}</td>
+      <td className="product-list-num">{formatSalesCount(totalSales)}</td>
       <td className="product-list-num">{formatCreatedAt(createdAt)}</td>
       <td className="product-list-actions-cell">
         <div className="product-list-actions">
@@ -333,8 +336,8 @@ export default function ProductListPage() {
             <tr>
               <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
               <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
+              <th scope="col">Price</th>
               <th scope="col">Total sales</th>
-              <th scope="col">Total revenue</th>
               <th scope="col">Created</th>
               <th scope="col" className="product-list-actions-th">
                 Actions

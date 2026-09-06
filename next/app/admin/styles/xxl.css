@@ -39,15 +39,6 @@ header {
     padding: 0px 25px;
 }
 
-header div:nth-child(1) {
-    height: 60px;
-    width: 100%;
-    display: flex;
-    color: #000;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
-}
 
 /**
 * - Aside 

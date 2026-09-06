@@ -17,6 +17,7 @@ export const POST = async (req: NextRequest) => {
             name,
             description,
             category,
+            price,
             subcategory,
             brand,
             images,
@@ -28,6 +29,9 @@ export const POST = async (req: NextRequest) => {
 
         const productName =
             typeof name === "string" ? name.trim() : false;
+
+        const productPrice =
+            typeof price === "number" ? price : false;
 
         const productDescription =
             typeof description === "string" ? description.trim() : "";
@@ -58,6 +62,10 @@ export const POST = async (req: NextRequest) => {
             throw new Error("Product name is required");
         }
 
+        if(!productPrice){
+            throw new Error("Product price is required");
+        }
+
         if (!thumbnailUrl) {
             throw new Error("Product thumbnail is required");
         }
@@ -72,27 +80,28 @@ export const POST = async (req: NextRequest) => {
 
         // Extract the admin id from the JWT
         const getCookie = req.cookies.get("admin_token");
-        if(!getCookie || !getCookie.value){
+        if (!getCookie || !getCookie.value) {
             return NextResponse.json(
                 { success: false, data: "Server error, cookie is missing!" },
                 { status: 500 }
             );
         }
-        const token = typeof(getCookie.value) === "string" ? getCookie.value :  "";
+        const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);  
+        const decoded = jwt.decode(token);
 
         const admin_id = decoded.id;
 
 
         // Final validation 
-        if (productName && thumbnailUrl && productImages && productCategory) {
+        if (productName && productPrice && thumbnailUrl && productImages && productCategory) {
             // Create product
             const response = await ProductModel.createProductDoc({
                 name: productName,
                 description: productDescription,
                 category: productCategory,
                 subcategory: productSubcategory,
+                price: productPrice,
                 brand: productBrand,
                 images: (productImages),
                 thumbnail_url: thumbnailUrl,

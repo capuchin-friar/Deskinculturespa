@@ -9,6 +9,7 @@
 export interface NewProductDoc {
     name: string,
     description: string,
+    price: number,
     category: string,
     subcategory: string,
     brand: string,
