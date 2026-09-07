@@ -4,16 +4,13 @@ import './styles/s.css'
 import './styles/xxl.css'
 import Link from 'next/link'
 import { useDispatch } from 'react-redux'
-// import { set_entrepreneur_data_to } from '../../../redux/entrepreneur/entrepreneur_data'
-
-const API_PROXY = "/api/backend"
+import location from "../../../json/location.json"
+import axios from 'axios'
 
 const GENDER_SELECT_OPTIONS = [
   { value: "", label: "Prefer not to say" },
   { value: "female", label: "Female" },
-  { value: "male", label: "Male" },
-  { value: "non-binary", label: "Non-binary" },
-  { value: "other", label: "Other" },
+  { value: "male", label: "Male" }
 ]
 
 function genderValueFromProfile(raw) {
@@ -26,35 +23,32 @@ function genderValueFromProfile(raw) {
 }
 
 function normalizeUserRow(u) {
-  if (!u || typeof u !== "object") return null
+  if (!u || typeof u !== "object") return null;
+
+  
+  let l = u.location;
+
   return {
     id: u.id,
     fname: u.fname ?? "",
     lname: u.lname ?? "",
     email: u.email ?? "",
+    city: l.city ?? "",
+    state: l.state ?? "",
     phone: u.phone != null ? String(u.phone) : "",
     gender: u.gender ?? null,
-    preferredLanguage: u.preferredLanguage ?? u.preferredlanguage ?? "en",
-    timezone: u.timezone ?? "UTC",
     isEmailVerified: Boolean(u.isEmailVerified ?? u.isemailverified),
     isPhoneVerified: Boolean(u.isPhoneVerified ?? u.isphoneverified),
-    lastLogin: u.lastLogin ?? u.lastlogin ?? null,
   }
 }
 
-async function backendPut(path, body) {
-  const res = await fetch(`${API_PROXY}${path}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(body),
-  })
-  const data = await res.json().catch(() => ({}))
-  if (!res.ok) {
-    throw new Error(data.error || data.message || `Request failed (${res.status})`)
-  }
-  return data
-}
+const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api/",
+  withCredentials: true,
+  headers: {
+    Cookie: "admin_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJha3B1bHVmYWJpYW5AZ21haWwuY29tIiwibmFtZSI6IkFrcHVsdSBGYWJpYW4ifQ.1xDUorMOsEs6HYnDLZwOvvJrTax00bCzdWilOr01eIU; Path=/; Expires=Wed, 06 Sep 2027 16:52:47 GMT;",
+  },
+});
 
 export default function UserProfile() {
   const dispatch = useDispatch()
@@ -67,27 +61,23 @@ export default function UserProfile() {
     set_profileLoading(true)
     set_profileError("")
     try {
-      const res = await fetch(`${API_PROXY}/user/authorization`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({}),
-      })
-      const response = await res.json().catch(() => ({}))
-      if (response.bool && response.data) {
-        const normalized = normalizeUserRow(response.data)
+      const { data: res } = await api.get("/user");
+      let user = res.data[0];
+      if (user) {
+        const normalized = normalizeUserRow(user);
         set_profile(normalized)
-        if (normalized) {
-          dispatch(
-            set_entrepreneur_data_to({
-              id: normalized.id,
-              email: normalized.email,
-              fname: normalized.fname,
-              lname: normalized.lname,
-              name: [normalized.fname, normalized.lname].filter(Boolean).join(" ").trim() || normalized.email,
-            })
-          )
-        }
+        // if (normalized) {
+        //   dispatch(
+        //     set_entrepreneur_data_to({
+        //       id: normalized.id,
+        //       email: normalized.email,
+        //       fname: normalized.fname,
+        //       lname: normalized.lname,
+        //       name: [normalized.fname, normalized.lname].filter(Boolean).join(" ").trim() || normalized.email,
+        //     })
+        //   );
+        // }
+        set_profileError("")
       } else {
         set_profile(null)
         set_profileError(
@@ -114,7 +104,7 @@ export default function UserProfile() {
     <div className="up-page">
       <header className="up-header shadow-sm">
         <section>
-          <span className="up-header__brand">Shopiva</span>
+          <span className="up-header__brand">Deskinculture</span>
         </section>
         <section>
           <span className="up-avatar" aria-hidden>
@@ -171,16 +161,16 @@ export default function UserProfile() {
 }
 
 function Genenral({ profile, profileLoading, onProfileRefresh }) {
-  const [lang, set_lang] = useState([])
-  const [time_zone, set_time_zone] = useState([])
 
   const [fname, set_fname] = useState("")
   const [lname, set_lname] = useState("")
   const [email, set_email] = useState("")
+  const [city, set_city] = useState("")
+  const [state, set_state] = useState("")
   const [phone, set_phone] = useState("")
   const [gender, set_gender] = useState("")
-  const [preferredLanguage, set_preferredLanguage] = useState("en")
-  const [timezone, set_timezone] = useState("UTC")
+  const [state_list, set_state_list] = useState([])
+  const [city_list, set_city_list] = useState([])
 
   const [detailSaving, set_detailSaving] = useState(false)
   const [detailErr, set_detailErr] = useState("")
@@ -196,14 +186,26 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
   const [prefsOk, set_prefsOk] = useState(false)
 
   useEffect(() => {
+    let states = location.map((data, index) => data.name);
+    set_state_list(states);
+  }, [])
+
+  useEffect(() => {
+    if (!state) return;
+    let locale = location.filter((data, index) => data.name.toLowerCase() === state.toLowerCase());
+    set_city("");
+    set_city_list(locale[0].cities);
+  }, [state])
+
+  useEffect(() => {
     if (!profile) return
     set_fname(profile.fname ?? "")
     set_lname(profile.lname ?? "")
     set_email(profile.email ?? "")
     set_phone(profile.phone ?? "")
+    set_city(profile.city ?? "")
+    set_state(profile.state ?? "")
     set_gender(genderValueFromProfile(profile.gender))
-    set_preferredLanguage(profile.preferredLanguage?.trim() || "en")
-    set_timezone(profile.timezone?.trim() || "UTC")
     set_detailErr("")
     set_emailErr("")
     set_phoneErr("")
@@ -212,25 +214,9 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_phoneOk(false)
     set_prefsErr("")
     set_prefsOk(false)
+
   }, [profile])
 
-  useEffect(() => {
-    fetch(`${API_PROXY}/entrepreneur/lang`)
-      .then(async (result) => {
-        const response = await result.json()
-        set_lang(response.data ?? [])
-      })
-      .catch(() => set_lang([]))
-  }, [])
-
-  useEffect(() => {
-    fetch(`${API_PROXY}/entrepreneur/timezones`)
-      .then(async (result) => {
-        const response = await result.json()
-        set_time_zone(response.data ?? [])
-      })
-      .catch(() => set_time_zone([]))
-  }, [])
 
   const userId = profile?.id
   const formDisabled = profileLoading || !userId
@@ -244,11 +230,12 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_detailErr("")
     set_detailOk(false)
     try {
-      await backendPut(`/user/profile/update/${userId}`, {
+      await api.patch(`/user/edit`, {
         fname: fname.trim(),
         lname: lname.trim(),
+        location: ({ state: state, city: city, zipcode: "" }),
         gender: gender.trim() || null,
-      })
+      });
       await onProfileRefresh?.()
       set_detailOk(true)
       window.setTimeout(() => set_detailOk(false), 2800)
@@ -256,6 +243,8 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
       set_detailErr(e instanceof Error ? e.message : "Could not save.")
     } finally {
       set_detailSaving(false)
+      alert("User details updated successfully!")
+
     }
   }
 
@@ -265,7 +254,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_emailErr("")
     set_emailOk(false)
     try {
-      await backendPut(`/user/email/update/${userId}`, { email: email.trim() })
+      await api.patch(`/user/email/`, { email: email.trim() })
       await onProfileRefresh?.()
       set_emailOk(true)
       window.setTimeout(() => set_emailOk(false), 2800)
@@ -273,6 +262,8 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
       set_emailErr(e instanceof Error ? e.message : "Could not update email.")
     } finally {
       set_emailSaving(false)
+      alert("Email updated successfully!")
+
     }
   }
 
@@ -282,7 +273,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_phoneErr("")
     set_phoneOk(false)
     try {
-      await backendPut(`/user/phone/update/${userId}`, { phone: phone.trim() })
+      await api.patch(`/user/phone`, { phone: phone.trim() })
       await onProfileRefresh?.()
       set_phoneOk(true)
       window.setTimeout(() => set_phoneOk(false), 2800)
@@ -290,6 +281,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
       set_phoneErr(e instanceof Error ? e.message : "Could not update phone.")
     } finally {
       set_phoneSaving(false)
+      alert("Phone updated successfully!")
     }
   }
 
@@ -356,6 +348,54 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
                   autoComplete="family-name"
                 />
               </div>
+
+              {/* Location */}
+
+              <div className="up-input-cnt">
+                <label htmlFor="up-state">State (optional)</label>
+                <select
+                  id="up-state"
+                  name="state"
+                  value={state}
+                  onChange={(e) => set_state(e.target.value)}
+                  // disabled={formDisabled}
+                  autoComplete="sex"
+                >
+                  {state_list.map((opt) => (
+                    <option key={opt || "unset"} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                  {state &&
+                    !state_list.some((opt) => opt === state) ? (
+                    <option selected value={state}>{state}</option>
+                  ) : null}
+                </select>
+              </div>
+
+              <div className="up-input-cnt">
+                <label htmlFor="up-city">City (optional)</label>
+                <select
+                  id="up-city"
+                  name="city"
+                  value={city}
+                  onChange={(e) => set_city(e.target.value)}
+                  // disabled={formDisabled}
+                  autoComplete="sex"
+                >
+                  {city_list.map((opt) => (
+                    <option key={opt || "unset"} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                  {city &&
+                    !city_list.some((opt) => opt === city) ? (
+                    <option value={city}>{city}</option>
+                  ) : null}
+                </select>
+              </div>
+              {/* Location */}
+
               <div className="up-input-cnt">
                 <label htmlFor="up-gender">Gender (optional)</label>
                 <select
@@ -363,7 +403,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
                   name="gender"
                   value={gender}
                   onChange={(e) => set_gender(e.target.value)}
-                  disabled={formDisabled}
+                  // disabled={formDisabled}
                   autoComplete="sex"
                 >
                   {GENDER_SELECT_OPTIONS.map((opt) => (
@@ -372,11 +412,12 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
                     </option>
                   ))}
                   {gender &&
-                  !GENDER_SELECT_OPTIONS.some((opt) => opt.value === gender) ? (
+                    !GENDER_SELECT_OPTIONS.some((opt) => opt.value === gender) ? (
                     <option value={gender}>{gender}</option>
                   ) : null}
                 </select>
               </div>
+
             </div>
 
             {detailErr ? (
@@ -415,7 +456,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
                   />
                 </div>
                 <div className="up-inline-actions">
-                  <span
+                  <span style={{ fontSize: "small", fontWeight: "500", color: profile?.isEmailVerified ? "greenyellow" : "red" }}
                     className={`up-badge${profile?.isEmailVerified ? "" : " up-badge--muted"}`}
                   >
                     {profile?.isEmailVerified ? "Verified" : "Unverified"}
@@ -457,7 +498,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
                   />
                 </div>
                 <div className="up-inline-actions">
-                  <span
+                  <span style={{ fontSize: "small", fontWeight: "500", color: profile?.isEmailVerified ? "greenyellow" : "red" }}
                     className={`up-badge${profile?.isPhoneVerified ? "" : " up-badge--muted"}`}
                   >
                     {profile?.isPhoneVerified ? "Verified" : "Unverified"}
@@ -487,136 +528,6 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
         </div>
       </div>
 
-      <hr className="up-divider" />
-
-      <div className="up-description">
-        <section className="up-section-intro">
-          <h2 className="up-section-intro__title">Stores</h2>
-          <p className="up-section-intro__text">View and access stores connected to your Shopify account.</p>
-        </section>
-        <div className="up-content-cnt">
-          <section>
-            <Link className="up-link-card" href="/entrepreneur">
-              View all stores
-            </Link>
-          </section>
-        </div>
-      </div>
-
-      <hr className="up-divider" />
-
-      <div className="up-description">
-        <section className="up-section-intro">
-          <h2 className="up-section-intro__title">Preferred language</h2>
-          <p className="up-section-intro__text">
-            When you&apos;re logged in, this is the language you will see in admin. It doesn&apos;t affect the language
-            your customers see on your store.
-          </p>
-        </section>
-        <div className="up-content-cnt">
-          <section>
-            <div className="up-input-cnt up-field--block">
-              <label htmlFor="up-lang">Language</label>
-              <select
-                id="up-lang"
-                name="language"
-                value={preferredLanguage}
-                onChange={(e) => set_preferredLanguage(e.target.value)}
-                disabled={formDisabled}
-              >
-                <option value="" disabled>
-                  Select language
-                </option>
-                {preferredLanguage &&
-                !lang.some((item) => String(item.code || item.name) === String(preferredLanguage)) ? (
-                  <option value={preferredLanguage}>{preferredLanguage}</option>
-                ) : null}
-                {lang.map((item, index) => {
-                  const optVal = item.code || item.name || String(index)
-                  const label = item.code ? `${item.code} · ${item.name}` : item.name
-                  return (
-                    <option key={`${optVal}-${index}`} value={optVal}>
-                      {label}
-                    </option>
-                  )
-                })}
-              </select>
-            </div>
-            <hr className="up-divider up-divider--in-card" />
-            <div className="up-help">
-              <p className="up-help__title">Regional format</p>
-              <p>
-                <small>
-                  Number, date, and currency formatting follow your selected language and timezone.
-                </small>
-              </p>
-            </div>
-          </section>
-        </div>
-      </div>
-      <hr className="up-divider" />
-
-      <div className="up-description">
-        <section className="up-section-intro">
-          <h2 className="up-section-intro__title">Timezone</h2>
-          <p className="up-section-intro__text">Choose the timezone used for your account activity and notifications.</p>
-        </section>
-        <div className="up-content-cnt">
-          <section>
-            <div className="up-input-cnt up-field--block">
-              <label htmlFor="up-tz">Timezone</label>
-              <select
-                id="up-tz"
-                name="timezone"
-                value={timezone}
-                onChange={(e) => set_timezone(e.target.value)}
-                disabled={formDisabled}
-              >
-                <option value="" disabled>
-                  Select timezone
-                </option>
-                {timezone &&
-                !time_zone.some((item) => String(item.timezone) === String(timezone)) ? (
-                  <option value={timezone}>{timezone}</option>
-                ) : null}
-                {time_zone.map((item, index) => (
-                  <option key={index} value={item.timezone}>
-                    {item.utc_offset ? `${item.utc_offset} · ${item.timezone}` : item.timezone}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {prefsErr ? (
-              <p className="up-msg up-msg--error" role="alert">
-                {prefsErr}
-              </p>
-            ) : null}
-            {prefsOk ? (
-              <p className="up-msg up-msg--success" role="status">
-                Language and timezone saved.
-              </p>
-            ) : null}
-            <div className="up-form-actions up-form-actions--row">
-              <button
-                type="button"
-                className="up-btn up-btn--update"
-                disabled={formDisabled || prefsSaving}
-                onClick={savePreferences}
-              >
-                {prefsSaving ? "Saving…" : "Save language & timezone"}
-              </button>
-            </div>
-            <div className="up-help">
-              <p>
-                <small>
-                  This is the timezone for your Shopiva account. To set the timezone for your Shopify admin, use
-                  Settings → General in Shopify.
-                </small>
-              </p>
-            </div>
-          </section>
-        </div>
-      </div>
     </>
   )
 }
@@ -625,15 +536,15 @@ function Security({ profile, profileLoading }) {
   const lastSeen =
     profile?.lastLogin != null
       ? (() => {
-          try {
-            return new Date(profile.lastLogin).toLocaleString(undefined, {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })
-          } catch {
-            return null
-          }
-        })()
+        try {
+          return new Date(profile.lastLogin).toLocaleString(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          })
+        } catch {
+          return null
+        }
+      })()
       : null
 
   return (

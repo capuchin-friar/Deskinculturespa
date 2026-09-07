@@ -10,6 +10,7 @@
  */
 
 import { query } from "../database";
+import { NewBlogDoc } from "../types/admin";
 import type { NewUserDocument, User } from "../types/user";
 import { withErrorHandling } from "../utils/errHandler";
 
@@ -100,12 +101,12 @@ export class UserModel {
   });
 
   static updateProfile = withErrorHandling(
-    async (payload: Partial<NewUserDocument> & { id: number }) => {
-      const { fname, lname, id } = payload;
+    async (payload: Partial<NewUserDocument> & { id: number, location: string, gender: string}) => {
+      const { fname, lname, location, gender, id } = payload;
 
       const { rows } = await query(
-        `UPDATE users SET fname=$1, lname=$2 WHERE id = $3 RETURNING *`,
-        [fname, lname, id]
+        `UPDATE users SET fname=$1, lname=$2, location=$3, gender=$4 WHERE id = $5 RETURNING *`,
+        [ fname, lname, location, gender, id]
       );
 
       return rows;

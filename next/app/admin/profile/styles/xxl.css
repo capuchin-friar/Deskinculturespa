@@ -1,5 +1,9 @@
 /* Entrepreneur user profile — laptop / large screens (scoped) */
 @media screen and (min-width: 1200px) {
+    .up-msg--error{
+        color: red;
+        font-size: small;
+      }
     .up-page .up-header {
         height: 60px;
         padding: 0 28px;
@@ -52,6 +56,7 @@
         display: flex;
         flex-direction: row;
         align-items: stretch;
+        padding: 0;
     }
 
     .up-page .up-nav-wrap {
@@ -152,6 +157,7 @@
         flex: 0 0 240px;
         max-width: 280px;
         display: flex;
+        flex-direction: column;
         align-items: flex-start;
         justify-content: flex-start;
         padding: 4px 0 0;
@@ -314,6 +320,12 @@
 
     .up-page .up-btn {
         min-height: 42px;
+        background-color: black;
+        color: #fff;
+        font-size: small;
+        border-radius: 5px;
+        padding: 10px 15px;
+        cursor: pointer;
     }
 
     .up-page .up-btn--small {
@@ -322,6 +334,12 @@
 
     .up-page .up-divider--in-card {
         margin: 18px 0;
+    }
+
+    .up-divider{
+        margin-bottom: 20px;
+        color: #acacac;
+        background-color: #f9f9f9;
     }
 
     .up-page .up-device-card {
