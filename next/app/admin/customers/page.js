@@ -30,7 +30,9 @@ function jsAgo(value) {
 
 export default function InventoryPage() {
     const dispatch = useDispatch()
+    const [data, setData] = useState([])
     const [rows, setRows] = useState([])
+    const [role, setRole] = useState("customer")
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
 
@@ -40,8 +42,8 @@ export default function InventoryPage() {
             setError("")
             try {
                 const { data: users } = await api.get("/users");
-                console.log(users.data)
-                setRows(Array.isArray(users.data) ? users.data : [])
+                
+                setData(Array.isArray(users.data) ? users.data : [])
                 setLoading(false);
             } catch (e) {
                 setRows([])
@@ -55,6 +57,10 @@ export default function InventoryPage() {
             // cancelled = true
         }
     }, []);
+
+    useEffect(() => {
+        setRows(Array.isArray(data) ? data.filter(u => u.role.toLowerCase() === role.toLowerCase()) : [])
+    }, [role, data])
 
     function formatLocation(obj){
         let city;
@@ -80,7 +86,7 @@ export default function InventoryPage() {
                 <h5>Users</h5>
                 {["customer", "admin"].length > 0 ? (
                     <div className="inventory-shop-select">
-                        <select aria-label="Role" value={""} onChange={() => {}}>
+                        <select aria-label="Role" value={role} onChange={(e) => {setRole(e.target.value)}}>
                             {["customer", "admin"].map((role, index) => {
                                 return (
                                     <option key={index} value={role}>
