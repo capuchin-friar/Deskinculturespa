@@ -7,7 +7,7 @@ export function Main({children}) {
 
     return (
         <>
-            <main className="admin-main">
+            <main className="customer-main">
                 {
                     children
                 }

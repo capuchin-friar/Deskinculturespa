@@ -1,0 +1,241 @@
+:root {
+    /* Brand */
+    --brand-green: #278A3D;
+    --brand-dark: #0B3B1A;
+    --brand-light: #63D94F;
+
+    /* Neutrals */
+    --white: #FFFFFF;
+    --off-white: #F8FAF7;
+    --text-dark: #172019;
+    --text-muted: #66736A;
+    --border: #E1E8E2;
+
+    /* Supporting */
+    --soft-green: #EEF7EF;
+    --sage: #8BA98F;
+
+    /* Border Radius */
+    --radius: 5px;
+    --family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.customer-hero-section {
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    font-family: var(--family);
+
+    justify-content: space-between;
+}
+
+.customer-hero-section .right {
+    height: calc(100vh - 60px);
+    width: 50%;
+
+    background-image: url('/bg.jpeg');
+
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.customer-hero-section .left {
+    height: calc(100vh - 60px);
+    width: 50%;
+    padding: 25px 25px;
+    background-color: #fff;
+    background-repeat: no-repeat;
+    background-size: cover;
+    font-family: var(--family);
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.hero-tagline {
+    width: 100%;
+    display: flex;
+    font-family: var(--family);
+    justify-content: space-between;
+    width: 60%;
+}
+
+.hero-slogan h1 {
+    font-size: 7.5vh;
+    font-family: var(--family);
+    font-weight: bold;
+}
+
+.hero-writeup {}
+
+.customer-products-section {
+    height: 100vh;
+    width: 100%;
+    padding: 20px;
+    display: flex;
+    font-family: var(--family);
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: #fff;
+    align-items: center;
+    /* background-color: var(--sage); */
+}
+
+.customer-product-tag {
+    font-size: 7vh;
+    font-weight: lighter;
+    font-family: var(--family);
+
+}
+
+.customer-product-view-btn {
+    background-color: var(--brand-green);
+    color: #fff;
+    padding: 10px 145px;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: var(--radius);
+}
+
+.customer-product-cnt {
+    height: 500px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    overflow: auto;
+}
+
+.customer-product-card {
+    height: 400px;
+    width: calc((100% / 4) - 10px);
+    background-color: #fff;
+    position: relative;
+}
+
+.customer-product-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.card-button {
+    position: absolute;
+
+    left: 50%;
+    bottom: 0;
+
+    transform: translate(-50%, 100%);
+
+    opacity: 0;
+
+    background-color: var(--brand-green);
+    width: 100%;
+    padding: 10px 10px;
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--family);
+    text-transform: uppercase;
+    font-size: 15px;
+
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.customer-product-card:hover .card-button {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.customer-product-thumbnail {
+    height: 300px;
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.customer-product-body {
+    height: 100px;
+    width: 100%;
+    padding: 10px 20px;
+}
+
+.customer-product-title {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    height: 50px;
+    overflow: hidden;
+    font-weight: lighter;
+    font-family: var(--family);
+    margin-bottom: 5px;
+}
+
+.customer-product-price {
+    font-family: var(--family);
+}
+
+.customer-admin-section{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 25px 25px;
+}
+
+.left, .right{
+    width: 50%;
+    height: 100%;
+    display: flex;
+    font-family: var(--family);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.customer-admin-meet-btn{
+    color: #fff;
+    background-color: var(--brand-green);
+    padding: 10px 45px;
+}
+
+.customer-admin-headline{
+    font-family: var(--family);
+    color: #acacac;
+    font-size: large;
+}
+
+.customer-admin-summary{
+    font-family: var(--family);
+}
+
+
+.left{
+    padding: 45px;
+}
+.right{
+    padding: 45px;
+}
+
+.customer-testimonials-section{
+    height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #fff;
+    padding: 25px 25px;
+}
+
+.customer-testimonials-headline{
+    font-size: 5vh;
+    font-family: var(--family);
+    text-transform: uppercase;
+    font-weight: lighter;
+}

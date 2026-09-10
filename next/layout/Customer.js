@@ -1,5 +1,8 @@
 "use client"
 
+import { Header } from "@/src/components/customer/Header"
+import { Main } from "@/src/components/customer/Main"
+
 // import { Aside } from "../../src/components/admin/Aside"
 // import { Main } from "../../src/components/admin/Main"
 // import { Header } from "../../src/components/admin/Header"
@@ -8,10 +11,9 @@
 /**
  * @Styles import
  */
-// import "./styles/xxl.css";
-// import "./styles/paidItem.css";
 
-
+import "./styles/customer/xxl.css";
+import "./styles/customer/mega-header.css"
 
 
 
@@ -24,8 +26,8 @@ export default function Customer({children}) {
 
                 {/* <Aside /> */}
                 <div className="customer-content">
-                    {/* <Header />
-                    <Main children={children} /> */}
+                    <Header />
+                    <Main children={children} />
                 </div>
             </div>
         </>

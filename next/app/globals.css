@@ -4,6 +4,23 @@
   --background: #ffffff;
   --foreground: #171717;
 }
+:root {
+  /* Brand */
+  --brand-green: #278A3D;
+  --brand-dark: #0B3B1A;
+  --brand-light: #63D94F;
+
+  /* Neutrals */
+  --white: #FFFFFF;
+  --off-white: #F8FAF7;
+  --text-dark: #172019;
+  --text-muted: #66736A;
+  --border: #E1E8E2;
+
+  /* Supporting */
+  --soft-green: #EEF7EF;
+  --sage: #8BA98F;
+}
 
 @theme inline {
   --color-background: var(--background);

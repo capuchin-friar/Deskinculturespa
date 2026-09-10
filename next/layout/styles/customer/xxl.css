@@ -2,14 +2,36 @@
 * - Variables 
 */
 
+:root {
+    /* Brand */
+    --brand-green: #278A3D;
+    --brand-dark: #0B3B1A;
+    --brand-light: #63D94F;
+  
+    /* Neutrals */
+    --white: #FFFFFF;
+    --off-white: #F8FAF7;
+    --text-dark: #172019;
+    --text-muted: #66736A;
+    --border: #E1E8E2;
+  
+    /* Supporting */
+    --soft-green: #EEF7EF;
+    --sage: #8BA98F;
+
+    /* Border Radius */
+    --radius: 5px;
+    --family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  }
 
 
 
 /**
-* - Admin container 
+* - Customer container 
 */
-.admin-cnt {
+.customer-cnt {
     height: 100vh;
+    font-family: var(--family);
     width: 100vw;
     display: flex;
     flex-direction: row;
@@ -17,63 +39,81 @@
     align-items: center;
 }
 
-.admin-content {
+.customer-content {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
     height: 100vh;
-    width: calc(100% - 180px);
+    width: 100%;
 }
 
 /**
 * - Header 
 */
-header {
+.customer-header {
     height: 60px;
     width: 100%;
     background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0px 25px;
+    padding: 0px 45px;
 }
 
-header div:nth-child(1) {
-    height: 60px;
-    width: 60%;
-    display: flex;
-    color: #000;
-    align-items: flex-start;
-    flex-direction: column;
-    justify-content: center;
-}
-
-header button {
+.customer-header .customer-resource {
     margin: 0px 0px 0px 0px;
     padding: 0px;
+    width: fit-content;
     display: flex;
+    align-items: center;
     color: #000;
     cursor: pointer;
 }
 
-header button span:nth-child(1){
+.customer-header .customer-resource button{
+    cursor: pointer;
+}
+
+.customer-header .customer-resource button p{
+    font-size: 15px;
+}
+
+.customer-header .customer-welcome-box {
+    height: 60px;
+    width: fit-content;
+    display: flex;
+    color: #000;
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.customer-header .customer-features {
+    margin: 0px 0px 0px 0px;
+    padding: 0px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    color: #000;
+    cursor: pointer;
+}
+
+.customer-header .customer-features button {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #d8d8d8;
+    background-color: #fff;
     border-radius: 50%;
+    margin: 0px 5px 0px 10px;
     height: 35px;
     width: 33px;
 }
-header button span:nth-child(2) {
-    display: flex;
-    flex-direction: column;
+
+.customer-header .customer-features button:hover {
+    background-color: #d8d8d8;
 }
-header button span:nth-child(2) p{
-    margin-bottom: -2.5px;
-    
-}
+
 
 /**
 * - Aside 
@@ -85,7 +125,7 @@ aside {
     padding: 25px 20px;
 }
 
-aside a{
+aside a {
     text-decoration: none;
     color: #737373;
     font-size: small;
@@ -95,22 +135,21 @@ aside a{
     padding: 5px 10px;
 }
 
-aside a:hover{
+aside a:hover {
     background-color: green;
     color: #fff;
     border-radius: 8px;
 }
 
-aside section:nth-child(1){
+aside section:nth-child(1) {
     margin: 0px 0px 10px 0px;
     display: flex;
     color: #000;
 }
 
-aside section:nth-child(1) span:nth-child(1){
+aside section:nth-child(1) span:nth-child(1) {}
 
-}
-aside section:nth-child(1) span:nth-child(2) p{
+aside section:nth-child(1) span:nth-child(2) p {
     margin-bottom: -2.5px;
 }
 
@@ -118,23 +157,23 @@ aside section:nth-child(1) span:nth-child(2) p{
 /**
 * - Main 
 */
-main {
+.customer-main {
     height: calc(100vh - 60px);
     width: 100%;
     background-color: #f9f9f9;
     overflow: auto;
     color: #000;
-    padding: 25px 25px;
+    padding: 0px 0px;
 }
 
-.overview-cnt{
+.overview-cnt {
     width: 100%;
     display: flex;
     overflow-x: auto;
     margin: 10px 0px;
 }
 
-.admin-metric-card{
+.customer-metric-card {
     height: 100px;
     width: 250px;
     margin: 0px 10px;
@@ -148,27 +187,27 @@ main {
     gap: 35;
 }
 
-.admin-metric-card span:nth-child(1){
-    background-color: rgba(0,0,0,.5);
+.customer-metric-card span:nth-child(1) {
+    background-color: rgba(0, 0, 0, .5);
     padding: 10px 10px;
     border-radius: 12px;
 }
 
 
-.admin-metric-card span:nth-child(2){
+.customer-metric-card span:nth-child(2) {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: space-between;
 }
 
-.summary-cnt{
+.summary-cnt {
     display: flex;
     width: 100%;
     justify-content: space-between;
 }
 
-.chart-cnt{
+.chart-cnt {
     display: flex;
     flex-direction: column;
     margin: 10px 0px;
@@ -177,18 +216,18 @@ main {
     gap: 10;
 }
 
-.chart-cnt div:nth-child(1){
+.chart-cnt div:nth-child(1) {
     display: flex;
     flex-direction: column;
 }
 
-.chart-cnt div:nth-child(2){
+.chart-cnt .customer-features {
     display: flex;
     flex-direction: column;
 }
 
 
-.activity-cnt{
+.activity-cnt {
     display: flex;
     flex-direction: column;
     margin: 10px 0px;
@@ -199,7 +238,7 @@ main {
     gap: 10;
 }
 
-.activity-headline{
+.activity-headline {
     height: 50px;
     width: 100%;
     padding: 0px 18px;
@@ -209,16 +248,15 @@ main {
     border-bottom: 1px solid #d8d8d8;
 }
 
-.view-all{
+.view-all {
     display: flex;
     align-items: center;
     font-weight: bold;
     cursor: pointer;
 }
 
-.activity-card-cnt{
+.activity-card-cnt {
     height: 350px;
     overflow: auto;
     padding: 10px;
 }
-

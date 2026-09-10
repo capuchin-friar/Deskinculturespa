@@ -8,8 +8,8 @@ import { Header } from "@/src/components/admin/Header"
 /**
  * @Styles import
  */
-import "./styles/xxl.css";
-import "./styles/paidItem.css";
+import "./styles/admin/xxl.css";
+import "./styles/admin/paidItem.css";
 import { usePathname } from "next/navigation";
 
 
