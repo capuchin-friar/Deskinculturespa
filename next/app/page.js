@@ -26,6 +26,39 @@ export default function Home() {
       price: 15000
     }
   ];
+
+  const services = [
+    {
+      title: "Relaxing Full Body Massage",
+      thumbnail: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&auto=format&fit=crop",
+      description: "A calming full-body massage designed to release tension, improve circulation, and leave you feeling deeply relaxed."
+    },
+    {
+      title: "Luxury Facial Treatment",
+      thumbnail: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop",
+      description: "A personalized facial treatment that cleanses, hydrates, and rejuvenates your skin for a fresh and radiant appearance."
+    },
+    {
+      title: "Hot Stone Massage",
+      thumbnail: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&auto=format&fit=crop",
+      description: "Experience deep relaxation with heated stones combined with therapeutic massage techniques to ease muscle tension."
+    },
+    {
+      title: "Aromatherapy Massage",
+      thumbnail: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop",
+      description: "A soothing massage enhanced with aromatic essential oils to promote relaxation and create a tranquil wellness experience."
+    },
+    {
+      title: "Deep Cleansing Facial",
+      thumbnail: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop",
+      description: "A thorough facial treatment focused on deep cleansing, exfoliation, and hydration to refresh and revitalize your skin."
+    },
+    {
+      title: "Body Scrub & Exfoliation",
+      thumbnail: "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&auto=format&fit=crop",
+      description: "A luxurious exfoliating treatment that removes dead skin cells, smooths the body, and leaves your skin soft and renewed."
+    }
+  ];
   return (
     <>
       <div className="customer-hero-section">
@@ -89,6 +122,47 @@ export default function Home() {
         </div>
       </div>
 
+      <div className="customer-services-section">
+        <p className="customer-service-tag">
+          Our Featured Treatments
+        </p>
+        <div className="customer-service-cnt">
+          {
+            services.map((s, i) =>
+              <div className="customer-service-card shadow-sm">
+                <div className="customer-service-thumbnail" style={{
+                  backgroundImage: `url(${s.thumbnail})`
+                }}>
+                  {/* <button className="card-button">
+                    Add To Cart
+                  </button> */}
+
+                  <div className="customer-service-body">
+                    <div className="customer-service-body-wrapper">
+                      <p className="customer-service-title">
+                        {s.title ?? "Service title"}
+                      </p>
+                      <div className="customer-service-description">
+                        {s.description ?? "Service Description"}
+                      </div>
+
+                      <button>
+                        <u>Read More</u>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        </div>
+
+        <button className="customer-service-view-btn">
+          View All
+        </button>
+
+      </div>
+
       <div className="customer-products-section">
         <p className="customer-product-tag">
           Shop Essentials
@@ -131,14 +205,14 @@ export default function Home() {
         <div className="left">
           <small className="customer-admin-headline">Meet The Founder</small>
 
-          <h1 className="customer-admin-name"><i>Dr. Ifeanyi</i></h1>
+          <h1 className="customer-admin-name"><i>Dr. Chinelo Stella</i></h1>
 
           <p className="customer-admin-summary">
             Internationally distinguished board-certified dermatologist and clinical skincare expert. Dr. Zenovia is committed to researching and developing innovative methods to treat acne, aging, and other leading skin concerns — using clinical-grade formulations backed by over 20 years of dermatology practice.
           </p>
 
           <button className="customer-admin-meet-btn">
-            Meet Dr. Ifeanyi
+            Meet Dr. Chinelo Stella
           </button>
         </div>
         <div className="right">
@@ -148,8 +222,8 @@ export default function Home() {
 
       <div className="customer-testimonials-section">
         <h1 className="customer-testimonials-headline">Testimonials</h1>
-          <Testimonials />
-        
+        <Testimonials />
+
       </div>
     </>
   );

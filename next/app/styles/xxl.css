@@ -3,6 +3,7 @@
     --brand-green: #278A3D;
     --brand-dark: #0B3B1A;
     --brand-light: #63D94F;
+    --brand-green-light: #278A3D80;
 
     /* Neutrals */
     --white: #FFFFFF;
@@ -228,7 +229,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
     background-color: #fff;
     padding: 25px 25px;
 }
@@ -237,5 +238,115 @@
     font-size: 5vh;
     font-family: var(--family);
     text-transform: uppercase;
+    margin-bottom: 145px;
     font-weight: lighter;
+}
+
+.customer-services-section {
+    height: 155vh;
+    width: 100%;
+    padding: 25px;
+    display: flex;
+    font-family: var(--family);
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--brand-green);
+    align-items: center;
+    /* background-color: var(--sage); */
+}
+
+.customer-service-tag {
+    font-size: 7vh;
+    font-weight: lighter;
+    color: #fff;
+    font-family: var(--family);
+
+}
+
+.customer-service-view-btn {
+    background-color: #fff;
+    color: var(--brand-green);
+    padding: 10px 145px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: var(--radius);
+}
+
+.customer-service-cnt {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    overflow: auto;
+}
+
+.customer-service-card {
+    height: 400px;
+    width: calc((100% / 3) - 20px);
+    flex-shrink: 0;
+    margin: 20px 0px;
+    background-color: #fff;
+    position: relative;
+}
+
+.customer-service-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.customer-product-thumbnail {
+    position: relative;
+    overflow: hidden;
+}
+
+.customer-service-body {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+
+    transform: translate(-50%, 100%);
+
+    opacity: 0;
+
+    width: 100%;
+    padding: 10px 10px;
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--family);
+    text-transform: uppercase;
+    font-size: 15px;
+
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.customer-service-body-wrapper{
+    background-color: var(--brand-green-light);
+    padding: 15px 15px;
+}
+
+.customer-service-card:hover .customer-service-body {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.customer-service-thumbnail {
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.customer-service-title{
+    font-size: 15px;
+}
+
+.customer-service-description{
+    font-size: 12px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
 }

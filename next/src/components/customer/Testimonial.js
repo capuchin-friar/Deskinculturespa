@@ -6,31 +6,31 @@ const testimonials = [
     {
         id: 1,
         name: "Sarah M.",
-        image: "/images/testimonials/sarah.jpg",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&auto=format&fit=crop",
         text: "I absolutely loved my experience at De Skin Culture. The treatment was relaxing, professional, and my skin felt amazing afterward."
     },
     {
         id: 2,
         name: "Amaka O.",
-        image: "/images/testimonials/amaka.jpg",
+        image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=500&auto=format&fit=crop",
         text: "The staff were incredibly welcoming and attentive. I could immediately tell that they genuinely cared about my skin and overall experience."
     },
     {
         id: 3,
         name: "Stephen C.",
-        image: "/images/testimonials/stephen.jpg",
+        image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500&auto=format&fit=crop",
         text: "So far I love this product. It's lightweight and absorbs almost instantly. It has a really silky smooth consistency and glides right onto your skin. I've seen a slight improvement of my skin and look forward to seeing more."
     },
     {
         id: 4,
         name: "Jessica A.",
-        image: "/images/testimonials/jessica.jpg",
+        image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=500&auto=format&fit=crop",
         text: "The entire experience was beautiful from start to finish. The atmosphere was peaceful, the service was excellent, and I left feeling completely refreshed."
     },
     {
         id: 5,
         name: "Grace E.",
-        image: "/images/testimonials/grace.jpg",
+        image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=500&auto=format&fit=crop",
         text: "De Skin Culture has completely changed how I take care of my skin. Their recommendations have been simple, effective, and perfect for my skin."
     }
 ];

@@ -26,8 +26,9 @@
 
 .testimonial-avatars {
     position: relative;
-    height: 280px;
-    max-width: 1400px;
+    height: 220px;
+    /* max-width: 1400px; */
+    width: 70%;
     margin: 0 auto;
 }
 
@@ -100,9 +101,10 @@
 }
 
 .testimonial-content {
-    max-width: 1100px;
+    /* max-width: 1100px; */
+    width: 70%;
 
-    margin: 80px auto 0;
+    margin: 40px auto 0;
 
     text-align: center;
 }
@@ -110,7 +112,7 @@
 .testimonial-content p {
     margin: 0;
 
-    font-size: 30px;
+    font-size: 16px;
     line-height: 1.5;
     font-weight: 400;
 
@@ -120,9 +122,9 @@
 .testimonial-content span {
     display: block;
 
-    margin-top: 35px;
+    margin-top: 15px;
 
-    font-size: 22px;
+    font-size: 18px;
     font-style: italic;
 
     color: #66736a;
