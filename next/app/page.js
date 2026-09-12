@@ -2,6 +2,8 @@ import { IoArrowForward } from "react-icons/io5";
 import Testimonials from "@/src/components/customer/Testimonial"
 import "./styles/xxl.css"
 import "./styles/testimonial.css"
+import Link from "next/link";
+import WhyChooseUs from "@/src/components/customer/Why"
 export default function Home() {
 
   const products = [
@@ -59,66 +61,58 @@ export default function Home() {
       description: "A luxurious exfoliating treatment that removes dead skin cells, smooths the body, and leaves your skin soft and renewed."
     }
   ];
+
+  const packages = [
+    {
+      title: "Relaxing Full Body Massage",
+      thumbnail: "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&auto=format&fit=crop",
+      description: "A calming full-body massage designed to release tension, improve circulation, and leave you feeling deeply relaxed."
+    },
+    {
+      title: "Luxury Facial Treatment",
+      thumbnail: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop",
+      description: "A personalized facial treatment that cleanses, hydrates, and rejuvenates your skin for a fresh and radiant appearance."
+    },
+    {
+      title: "Hot Stone Massage",
+      thumbnail: "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&auto=format&fit=crop",
+      description: "Experience deep relaxation with heated stones combined with therapeutic massage techniques to ease muscle tension."
+    },
+    {
+      title: "Aromatherapy Massage",
+      thumbnail: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop",
+      description: "A soothing massage enhanced with aromatic essential oils to promote relaxation and create a tranquil wellness experience."
+    }
+  ];
+
   return (
     <>
       <div className="customer-hero-section">
-        <div className="left">
-          <div className="hero-tagline">
-            <span>Healthy Skin</span>•
-            <span>Confidence</span>•
-            <span>You</span>
-          </div>
-          <div className="hero-slogan">
-            <h1>
-              Expert Care,
-              <br />
-              Visible Results
-            </h1>
-          </div>
-          <div className="hero-writeup">
-            <p>Transform your skin, body, and confidence with personalized spa care.</p>
-            <p>Explore premium services and treatments designed around your needs.</p>
-            <p>Customize your experience and book your perfect appointment.</p>
-          </div>
 
-          <div className="hero-btns">
-            <button>
-              <span>
-                Book Appointment
-              </span>
-              <span>
-                <IoArrowForward size={20} />
-              </span>
+        <div className="customer-hero">
+          <div className="customer-hero-content">
+            <div className="customer-hero-logo">
+              <img src="/logo.jpeg" style={{
+                height: "70px",
+                width: "70px"
+              }} alt="Logo" />
+            </div>
+            <br />
+            <br />
+            <h2 className="customer-hero-title">
+              Where Skin Gets the Care It Deserves.
+            </h2>
+            <p className="customer-hero-summary">
+              We highly recommend booking your treatment in advance to secure your preferred time and service. Walk-ins are welcome; however, they are subject to availability.
+            </p>
+            <br />
+            <button className="customer-hero-btn">
+              Book An Appointment Now
             </button>
-
-            <button>
-              <span>
-                Explore Services
-              </span>
-            </button>
-          </div>
-
-          <div className="hero-value-prop-bar">
-            {
-              [
-                {},
-                {},
-                {}
-              ].map((v, i) =>
-                <div>
-                  <span>
-                    {/* Icon section */}
-                  </span>
-                  <span>
-                    {v.text ?? "Value proposition"}
-                  </span>
-                </div>
-              )
-            }
           </div>
         </div>
-
-        <div className="right">
+        <div className="customer-value-proposition">
+          <WhyChooseUs />
         </div>
       </div>
 
@@ -163,6 +157,29 @@ export default function Home() {
 
       </div>
 
+      <div className="customer-appointment-section">
+        <div className="customer-appointment-content">
+          <div className="customer-appointment-logo">
+            <img src="/logo.jpeg" style={{
+              height: "70px",
+              width: "70px"
+            }} alt="Logo" />
+          </div>
+          <br />
+          <br />
+          <h2 className="customer-appointment-title">
+            Appointment
+          </h2>
+          <p className="customer-appointment-summary">
+            We highly recommend booking your treatment in advance to secure your preferred time and service. Walk-ins are welcome; however, they are subject to availability.
+          </p>
+          <br />
+          <button className="customer-appointment-btn">
+            Book An Appointment Now
+          </button>
+        </div>
+      </div>
+
       <div className="customer-products-section">
         <p className="customer-product-tag">
           Shop Essentials
@@ -197,8 +214,45 @@ export default function Home() {
         </div>
 
         <button className="customer-product-view-btn">
+          <Link href={`/store`} style={{ height: "100%", width: "100%", textDecoration: "none", color: "#fff" }}>View All</Link>
+        </button>
+      </div>
+
+      <div className="customer-packages-section">
+        <p className="customer-package-tag">
+          Our Packages
+        </p>
+        <div className="customer-package-cnt">
+          {
+            packages.map((s, i) =>
+              <div className="customer-package-card shadow-sm">
+                <div className="customer-package-thumbnail" style={{
+                  backgroundImage: `url(${s.thumbnail})`
+                }}>
+                  <div className="customer-package-body">
+                    <div className="customer-package-body-wrapper">
+                      <p className="customer-package-title">
+                        {s.title ?? "Service title"}
+                      </p>
+                      <div className="customer-package-description">
+                        {s.description ?? "Service Description"}
+                      </div>
+
+                      <button>
+                        <u>Read More</u>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          }
+        </div>
+
+        <button className="customer-package-view-btn">
           View All
         </button>
+
       </div>
 
       <div className="customer-admin-section">
@@ -215,8 +269,10 @@ export default function Home() {
             Meet Dr. Chinelo Stella
           </button>
         </div>
-        <div className="right">
-          <img src="" style={{ height: "100%", width: "100%" }} alt="" />
+        <div className="right" style={{
+          backgroundImage: `url(/profile.jpeg)`
+        }}>
+          {/* <img src={"/profile.jpeg"} style={{ height: "100%", width: "100%" }} alt="" /> */}
         </div>
       </div>
 

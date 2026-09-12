@@ -22,54 +22,70 @@
 }
 
 .customer-hero-section {
-    height: 100vh;
+    height: 120vh;
     width: 100%;
     display: flex;
+    flex-direction: column;
     font-family: var(--family);
 
     justify-content: space-between;
+    background-image: url('/spa.png');
+    background-size: cover;
+    background-repeat: no-repeat;
 }
 
-.customer-hero-section .right {
-    height: calc(100vh - 60px);
-    width: 50%;
-
-    background-image: url('/bg.jpeg');
-
+.customer-value-proposition {
+    height: fit-content;
+    width: 100%;
     background-color: #fff;
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
-.customer-hero-section .left {
-    height: calc(100vh - 60px);
-    width: 50%;
-    padding: 25px 25px;
-    background-color: #fff;
-    background-repeat: no-repeat;
-    background-size: cover;
-    font-family: var(--family);
+.customer-hero {
+    height: calc(100% - 200px);
+    width: 100%;
+    background-color: transparent;
     display: flex;
     align-items: center;
     flex-direction: column;
     justify-content: center;
 }
 
-.hero-tagline {
+
+.customer-hero-content{
+    height: 100%;
     width: 100%;
     display: flex;
+    align-items: center;
+    flex-direction: column;
+    justify-content: center;
     font-family: var(--family);
-    justify-content: space-between;
-    width: 60%;
+    color: #fff;
+    padding: 45px 65px;
+    background-color: rgba(0, 0, 0, 0.2);
 }
 
-.hero-slogan h1 {
-    font-size: 7.5vh;
-    font-family: var(--family);
-    font-weight: bold;
+.customer-hero-title{
+    font-size: 6vh;
 }
 
-.hero-writeup {}
+.customer-hero-summary{
+    width: 40%;
+    height: fit-content;
+    font-weight: lighter;
+    font-size: 20px;
+}
+
+.customer-hero-btn{
+    border: 1px solid var(--brand-green);
+    padding: 10px 15px;
+    background-color: var(--brand-green-light);
+}
+
+.customer-hero-btn:hover{
+    background-color: var(--brand-green);
+    border-radius: var(--radius);
+}
+
 
 .customer-products-section {
     height: 100vh;
@@ -180,13 +196,14 @@
 }
 
 .customer-admin-section{
-    height: 100vh;
+    height: 125vh;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: space-between;
     background-color: #fff;
-    padding: 25px 25px;
+    padding: 85px 25px;
+    /* margin: 35px 0px; */
 }
 
 .left, .right{
@@ -199,10 +216,20 @@
     justify-content: center;
 }
 
+.right{
+    /* height: 90%; */
+    width:40%;
+    background-repeat: no-repeat;
+    background-size: contain;
+    border-radius: var(--radius);
+    background-position: 40% 80%;
+}
+
 .customer-admin-meet-btn{
     color: #fff;
     background-color: var(--brand-green);
     padding: 10px 45px;
+    border-radius: var(--radius);
 }
 
 .customer-admin-headline{
@@ -289,11 +316,14 @@
     margin: 20px 0px;
     background-color: #fff;
     position: relative;
+    border-radius: var(--radius);
 }
 
 .customer-service-thumbnail {
     position: relative;
     overflow: hidden;
+    border-radius: var(--radius);
+
 }
 
 .customer-product-thumbnail {
@@ -317,6 +347,7 @@
     font-family: var(--family);
     text-transform: uppercase;
     font-size: 15px;
+    border-radius: var(--radius);
 
     transition:
         transform 0.3s ease,
@@ -324,8 +355,9 @@
 }
 
 .customer-service-body-wrapper{
-    background-color: var(--brand-green-light);
+    border-radius: var(--radius);
     padding: 15px 15px;
+    background-color: var(--brand-green-light);
 }
 
 .customer-service-card:hover .customer-service-body {
@@ -346,6 +378,158 @@
 }
 
 .customer-service-description{
+    font-size: 12px;
+    text-transform: capitalize;
+    margin-bottom: 10px;
+}
+
+.customer-appointment-section{
+    height: 95vh;
+    width: 100%;
+    background-image: url('/appointment.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.customer-appointment-content{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    font-family: var(--family);
+    color: #fff;
+    padding: 45px 65px;
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.customer-appointment-title{
+    font-size: 6vh;
+}
+
+.customer-appointment-summary{
+    width: 40%;
+    height: fit-content;
+    font-weight: lighter;
+    font-size: 20px;
+}
+
+.customer-appointment-btn{
+    border: 1px solid var(--brand-green);
+    padding: 10px 15px;
+    background-color: var(--brand-green-light);
+}
+
+.customer-appointment-btn:hover{
+    background-color: var(--brand-green);
+    border-radius: var(--radius);
+}
+
+.customer-packages-section {
+    height: 100vh;
+    width: 100%;
+    padding: 25px;
+    display: flex;
+    font-family: var(--family);
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: var(--brand-green);
+    align-items: center;
+    /* background-color: var(--sage); */
+}
+
+.customer-package-tag {
+    font-size: 7vh;
+    font-weight: lighter;
+    color: #fff;
+    font-family: var(--family);
+
+}
+
+.customer-package-view-btn {
+    background-color: #fff;
+    color: var(--brand-green);
+    padding: 10px 145px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-weight: 500;
+    border-radius: var(--radius);
+}
+
+.customer-package-cnt {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    overflow: auto;
+}
+
+.customer-package-card {
+    height: 400px;
+    width: calc((100% / 4) - 20px);
+    flex-shrink: 0;
+    margin: 20px 0px;
+    background-color: #fff;
+    position: relative;
+    border-radius: var(--radius);
+}
+
+.customer-package-thumbnail {
+    position: relative;
+    overflow: hidden;
+    border-radius: var(--radius);
+
+}
+
+.customer-package-body {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+
+    transform: translate(-50%, 100%);
+
+    opacity: 0;
+
+    width: 100%;
+    padding: 10px 10px;
+    cursor: pointer;
+    color: #fff;
+    font-family: var(--family);
+    text-transform: uppercase;
+    font-size: 15px;
+    border-radius: var(--radius);
+
+    transition:
+        transform 0.3s ease,
+        opacity 0.3s ease;
+}
+
+.customer-package-body-wrapper{
+    border-radius: var(--radius);
+    padding: 15px 15px;
+    background-color: var(--brand-green-light);
+}
+
+.customer-package-card:hover .customer-package-body {
+    transform: translate(-50%, 0);
+    opacity: 1;
+}
+
+.customer-package-thumbnail {
+    height: 100%;
+    width: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.customer-package-title{
+    font-size: 15px;
+}
+
+.customer-package-description{
     font-size: 12px;
     text-transform: capitalize;
     margin-bottom: 10px;

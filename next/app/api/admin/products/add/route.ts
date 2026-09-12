@@ -21,6 +21,7 @@ export const POST = async (req: NextRequest) => {
             subcategory,
             brand,
             images,
+            stock,
             thumbnail_url,
             specifications
         } = body;
@@ -104,6 +105,7 @@ export const POST = async (req: NextRequest) => {
                 price: productPrice,
                 brand: productBrand,
                 images: (productImages),
+                stock: Number(stock),
                 thumbnail_url: thumbnailUrl,
                 specifications: productSpecifications,
                 admin_id

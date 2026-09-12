@@ -6,6 +6,7 @@ CREATE TABLE products (
     name VARCHAR(255) NOT NULL,
     
     price BIGINT NOT NULL,
+    stock BIGINT DEFAULT 1,
 
     description TEXT,
 

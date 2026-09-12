@@ -18,13 +18,10 @@ export class ProductModel {
     static createProductDoc = withErrorHandling(
         async (payload: NewProductDoc) => {
             const {
-                admin_id, name, price, description,
-                category, subcategory, brand, images, thumbnail_url, specifications
+                admin_id, name, price, stock, description, category, subcategory, brand, images, thumbnail_url, specifications
             } = payload;
-            console.log("price: ", price)
-            const columns = ["admin_id", "name",  "price", "description", "category", "subcategory", "brand", "images", "thumbnail_url", "specifications", "status", "created_at"];
-            const values = [admin_id, name, price, description, 
-                category, subcategory, brand, (images), thumbnail_url, specifications, "active", new Date()];
+            const columns = ["admin_id", "name", "price", "stock", "description", "category", "subcategory", "brand", "images", "thumbnail_url", "specifications", "status", "created_at"];
+            const values =  [admin_id, name, price, stock, description, category, subcategory, brand, (images), thumbnail_url, specifications, "active", new Date()];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
             const sql = `INSERT INTO products (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;

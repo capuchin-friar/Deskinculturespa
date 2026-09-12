@@ -80,3 +80,10 @@ export interface User {
     socialLinks?: SocialLinks;
     profileCompletion?: number;
 }
+
+
+export interface NewCartDoc {
+    product_id?: string;
+    qty?: number;
+    user_id?: string;
+}

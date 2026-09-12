@@ -30,7 +30,7 @@
 * - Customer container 
 */
 .customer-cnt {
-    height: 100vh;
+    /* height: 100vh; */
     font-family: var(--family);
     width: 100vw;
     display: flex;
@@ -45,7 +45,7 @@
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    height: 100vh;
+    height: 100%;
     width: 100%;
 }
 
@@ -115,18 +115,27 @@
     background-color: #d8d8d8;
 }
 
+.customer-body{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    /* padding: 25px 25px; */
+}
+
 
 /**
 * - Aside 
 */
-aside {
+.customer-aside {
     height: 100vh;
-    width: 180px;
+    width: 300px;
     background-color: #fff;
     padding: 25px 20px;
 }
 
-aside a {
+.customer-aside a {
     text-decoration: none;
     color: #737373;
     font-size: small;
@@ -136,21 +145,21 @@ aside a {
     padding: 5px 10px;
 }
 
-aside a:hover {
+.customer-aside a:hover {
     background-color: green;
     color: #fff;
     border-radius: 8px;
 }
 
-aside section:nth-child(1) {
+.customer-aside section:nth-child(1) {
     margin: 0px 0px 10px 0px;
     display: flex;
     color: #000;
 }
 
-aside section:nth-child(1) span:nth-child(1) {}
+.customer-aside section:nth-child(1) span:nth-child(1) {}
 
-aside section:nth-child(1) span:nth-child(2) p {
+.customer-aside section:nth-child(1) span:nth-child(2) p {
     margin-bottom: -2.5px;
 }
 
@@ -159,7 +168,8 @@ aside section:nth-child(1) span:nth-child(2) p {
 * - Main 
 */
 .customer-main {
-    height: calc(100vh - 60px);
+    height: auto;
+    /* height: calc(100vh - 60px); */
     width: 100%;
     background-color: #f9f9f9;
     overflow: auto;

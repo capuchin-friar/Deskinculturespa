@@ -14,24 +14,34 @@ import { Footer } from "@/src/components/customer/Footer"
  */
 
 import "./styles/customer/xxl.css";
+import "./styles/customer/why.css";
 import "./styles/customer/footer.css"
 import "./styles/customer/mega-header.css"
+import { Aside } from "@/src/components/customer/Aside";
+import { usePathname } from "next/navigation";
 
 
 
 
-export default function Customer({children}) {
+export default function Customer({ children }) {
 
-    return(
+    let pathname = usePathname().split("/");
+    let path = pathname.length == 1 && pathname[1] === "store";
+    return (
         <>
             <div className="customer-cnt">
 
-                {/* <Aside /> */}
+
                 <div className="customer-content">
                     <Header />
-                    <Main children={children} />
+                    <div className="customer-body">
+                        {
+                            path && <Aside />
+                        }
+                        <Main children={children} />
+                    </div>
+                    <Footer />
                 </div>
-                <Footer />
             </div>
         </>
     )

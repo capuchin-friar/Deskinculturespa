@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 // import { set_admin_shop_details } from "../../../redux/admin/admin_shop"
 import "./styles/xxl.css"
 import "./styles/s.css"
-import api from "../../api/config"
+import { api } from "../../api/config"
 import {
   IoVideocamOutline,
   IoLocationOutline

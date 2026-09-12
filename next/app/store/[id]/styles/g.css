@@ -1,0 +1,56 @@
+.quantity-counter {
+    display: inline-flex;
+    align-items: center;
+
+    height: 42px;
+
+    border: 1px solid #dfe7e1;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    overflow: hidden;
+}
+
+.quantity-btn {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+    background: #ffffff;
+
+    color: #278a3d;
+
+    font-size: 20px;
+    font-weight: 400;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.quantity-btn:hover:not(:disabled) {
+    background: #e8f5eb;
+}
+
+.quantity-btn:disabled {
+    color: #b8c2bb;
+    cursor: not-allowed;
+}
+
+.quantity-number {
+    min-width: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #172019;
+
+    font-size: 15px;
+    font-weight: 500;
+}

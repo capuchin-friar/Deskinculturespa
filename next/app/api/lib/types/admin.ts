@@ -10,6 +10,7 @@ export interface NewProductDoc {
     name: string,
     description: string,
     price: number,
+    stock: number,
     category: string,
     subcategory: string,
     brand: string,

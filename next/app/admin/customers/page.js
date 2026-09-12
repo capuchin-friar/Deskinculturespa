@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import "./styles/xxl.css"
 import "./styles/s.css"
-import api from "../../api/config"
+import { api } from "../../api/config"
 
 
 function jsAgo(value) {

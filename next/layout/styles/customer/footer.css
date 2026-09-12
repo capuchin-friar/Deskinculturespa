@@ -24,7 +24,7 @@
 
 footer{
     position: relative;
-    height: fit-content;
+    height: 80vh;
     width: 100%;
     padding: 80px 40px 10px 40px;
     display: flex;
@@ -46,7 +46,7 @@ footer .footer-newsletter-cnt{
 
 .right, .left{
     width: 50%;
-
+    padding: 45px;
 }
 
 .footer-input-cnt{
@@ -60,7 +60,7 @@ footer .footer-newsletter-cnt{
 
 .footer-input-cnt .input-btn input{
     height: 45px;
-    width: 400px;
+    width: 300px;
     border: .5px solid #8BA98F;
     padding: 10px 20px;
     outline: .5px solid #777777;
