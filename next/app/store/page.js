@@ -38,6 +38,7 @@ export default function Store() {
        router.push(`/store/${p.id}`);
     }
 
+
     return (
         <>
             <div className="customer-store">

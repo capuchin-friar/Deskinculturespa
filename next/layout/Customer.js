@@ -19,7 +19,10 @@ import "./styles/customer/footer.css"
 import "./styles/customer/mega-header.css"
 import { Aside } from "@/src/components/customer/Aside";
 import { usePathname } from "next/navigation";
-
+import { useEffect } from "react";
+import { baseApi } from "@/app/api/config";
+import { useDispatch } from "react-redux";
+import { set_cart } from "@/redux/customer/cart";
 
 
 
@@ -27,6 +30,26 @@ export default function Customer({ children }) {
 
     let pathname = usePathname().split("/");
     let path = pathname.length == 1 && pathname[1] === "store";
+
+    let dispatch = useDispatch();
+    useEffect(() => {
+        (async () => {
+            try {
+                const {
+                    data,
+                    status
+                } = await baseApi.get("/cart");
+        
+                if(!data.success){
+                    throw new Error("Error: ", data.message);
+                }
+                dispatch(set_cart(data.data));
+            } catch (error) {
+                console.log(error);
+            }
+        })();
+
+    }, [])
     return (
         <>
             <div className="customer-cnt">

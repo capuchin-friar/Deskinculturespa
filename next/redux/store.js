@@ -13,7 +13,7 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import AdminCookieReducer from "./admin/cookie";
-
+import cartReducer from "./customer/cart";
 // ============================================================================
 // STORE CONFIGURATION
 // ============================================================================
@@ -23,7 +23,10 @@ import AdminCookieReducer from "./admin/cookie";
  */
 const store = configureStore({
   reducer: {
-    admin_cookie: AdminCookieReducer
+    admin_cookie: AdminCookieReducer,
+    
+
+    cart: cartReducer
   }
 });
 
