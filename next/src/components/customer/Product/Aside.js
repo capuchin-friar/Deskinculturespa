@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { IoLocationSharp, IoReturnDownForward } from 'react-icons/io5';
 import { useDispatch, useSelector } from 'react-redux';
 // import { setPickupChannelTo } from '@/redux/buyer_store/pickup_channel';
 // import returnSvg from '@/files/assets/return-svgrepo-com.svg';
@@ -121,8 +122,12 @@ export default function Aside({item,order_list,seller}) {
                 <div className="input-cnt" style={{marginBottom: '10px', width: screenWidth >= 659 && screenWidth <= 999 ? '50%' : '100%', padding: '10px', height: 'auto', float: 'right'}}>
                   <small className="" style={{padding:'0px', margin: '0', height: '50px', width: '100%', background: '#fff', fontWeight: '500', display: 'flex', alignItems: 'center'}}>Delivery Data</small>
                   <section style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '8px', border: '1px solid #efefef'}}>
-                    <div>
-                      {/* <img loading='lazy' src={deliverySvg.src} style={{height: '30px', width: '30px'}} alt="" /> */}
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}>
+                      <IoLocationSharp size={25} />
                     </div>
 
                     <div style={{padding: '0px 8px', width: 'calc(100% - 40px)', display: 'flex', justifyContent: 'space-between', flexDirection: 'column'}}>
@@ -140,8 +145,12 @@ export default function Aside({item,order_list,seller}) {
                   </section>
 
                   <section style={{display: 'flex', justifyContent: 'space-between', width: '100%', padding: '8px', border: '1px solid #efefef'}}>
-                    <div>
-                      {/* <img loading='lazy' src={returnSvg.src} style={{height: '30px', width: '30px'}} alt="" /> */}
+                    <div style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center"
+                    }}>
+                      <IoReturnDownForward size={25} />
                     </div>
                     <div style={{padding: '0px 8px', width: 'calc(100% - 40px)', display: 'flex', justifyContent: 'space-between', flexDirection: 'column'}}>
                       <div style={{display: 'flex', width: '100%', justifyContent: 'space-between', marginBottom: '5px'}}>
@@ -157,43 +166,6 @@ export default function Aside({item,order_list,seller}) {
 
               
             </div>
-          </div>
-
-          <div style={{padding: '0px',  width: '100%', background: '#f9f9f9', margin: '5px 0px'}}>
-            <h6 className="" style={{padding:'10px', margin: '0', borderBottom: '1px solid #efefef', height: '50px', width: '100%', background: '#fff', fontWeight: '600', display: 'flex', alignItems: 'center'}}>Seller Information</h6>
-            <div style={{margin: '0px'}}>
-              <section>
-                <div style={{display: 'flex', justifyContent: 'flex-start', marginBottom: '1px', flexDirection: 'column', background: '#fff', border: '1px solid #f9f9f9', padding: '10px'}}>
-                    <div style={{fontSize: '12px', lineHeight: '15px', fontWeight: '500', marginBottom: '12px', display: 'flex', justifyContent: 'space-between'}}>
-                      <span>{seller?.fname} {seller?.lname}</span>
-                      <span>
-                        {/* <img loading='lazy' src={nextSvg.src} style={{height: '16px', width: '16px', rotate: '180deg', cursor: 'pointer'}} alt="" /> */}
-                      </span>
-                    </div>
-                    {/* <div style={{fontSize: '12px', lineHeight: '15px', marginBottom: '3px'}}>54% Seller score</div>
-                    <div style={{fontSize: '12px', lineHeight: '15px', marginBottom: '3px', display: 'flex', justifyContent: 'space-between'}}>
-                      <span>30 Followers</span>
-                      <span>
-                        <button className='shadow' style={{height: '30px', width: '60', borderRadius: '2.5px'}}>
-                          Follow
-                        </button>
-                      </span>
-                    </div> */}
-                </div>
-              </section>
-            </div>
-            
-            {/* <h6 className="" style={{padding:'10px', margin: '0', borderBottom: '1px solid #fff', height: '50px', width: '100%', background: '#fff', fontWeight: '600', display: 'flex', alignItems: 'center'}}>Seller Performance</h6>
-            <div style={{margin: '0px'}}>
-              <section>
-                <div style={{display: 'flex', justifyContent: 'flex-start', marginBottom: '0px', flexDirection: 'column', background: '#fff', border: '1px solid #fff', padding: '10px'}}>
-                    <div style={{fontSize: '12px', lineHeight: '15px', marginBottom: '12px'}}>Order Fulfillment Rate: Poor</div>
-                    <div style={{fontSize: '12px', lineHeight: '15px', marginBottom: '12px'}}>Quality Score: Excellent</div>
-                    <div style={{fontSize: '12px', lineHeight: '15px', marginBottom: '12px'}}>Customer Rating: Average</div>
-                </div>
-              </section>
-            </div> */}
-            
           </div>
         </div>
     </>
