@@ -1,0 +1,443 @@
+@media screen  and (min-width: 759px) and (max-width: 999px) {
+    *{
+        box-sizing: border-box;
+    }
+
+    html,body{
+        height: 100%;
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        background-color: #f9f9f9;
+    }
+
+    .buyer-header{
+        height: 70px;
+        width: 100%; 
+        background-color: #fff;
+        display: flex;
+        position: sticky;
+        top: 0;
+        align-items: center;
+        padding: 20px 85px 20px 85px;
+        
+    }
+    .buyer-header .input-cnt{
+        height: 100%;
+        width: 50%;
+        position: relative;
+        display: flex;
+        margin: auto;
+        align-items: center;
+        flex-direction: row;
+
+    }
+    .buyer-header ul{
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+        width: 20%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .buyer-header ul li{
+        cursor: pointer;
+        display: flex;
+        white-space: nowrap;
+        align-items: center;
+        color: orangered;
+        font-weight: 500;
+        font-size: small;
+        height: 35px;
+        border-radius: 5px;
+        padding: 0 10px 0 10px;
+        justify-content: space-between;
+    }
+    .buyer-header ul li:hover{
+        background-color: rgb(255, 68, 0);
+        background-color: rgb(255, 68, 0, .1);
+    }
+    .buyer-header .input-cnt input{
+        height: 45px;
+        float: left;
+        border-top-left-radius: 5px;
+        border-bottom-left-radius: 5px;
+        font-size: large;
+        padding: 20px;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        font-weight: bolder;
+        width: 100%;
+
+    }
+    .buyer-header .input-cnt button{
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        height: 45px;
+        font-weight: bold;
+        float: right;
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
+        position: relative;
+        width: 100px;
+        background-color: orangered;
+        color: #fff;
+        outline: none;
+        margin-left: 5px;
+        font-weight: 500;
+        border: none;
+
+    }
+
+    .buyer-dashboard-cnt{
+        height: 100vh;
+        width: 100vw;
+        overflow: auto;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 10px 10px;
+        background-color: #FF4500;
+    }
+
+    .buyer-showcase{
+        height: fit-content;
+        width: 100%;
+        padding: 0px;
+        position: relative;
+        margin: 20px 0 0 0;
+        /* background-color: #FF4500; */
+    }
+    .buyer-showcase-cnt {
+        height: fit-content;
+        width: calc(100% - 0px);
+        padding: 0px;
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        border-radius: 5px;
+        text-align: center; 
+        /* margin: 10px 0 10px 0; */
+        background-color: #fff;
+
+    }
+    .buyer-showcase-cnt .card{
+        position: relative;
+        display: flex;
+        height: auto;
+        width: calc(16.67% - 12px);
+        flex-shrink: 0;
+        float: left;
+        margin: 0 5px 0 5px;
+        padding: 10px;
+        text-align: left;
+        cursor: pointer;
+        background-color: #fff;
+    }
+
+
+
+    .buyer-ads-cnt{
+        height: 450px;
+        width: 100%;
+        position: relative;
+        padding: 0;
+        margin: 20px 0 0 0;
+        background-color: red;
+    }
+    .buyer-ads-cnt section:nth-child(odd){
+        width: 250px;
+        margin: 0 0 0 0;
+        height: 100%;
+        float: left;
+        border-radius: 1px;
+        background-color: orangered;
+    }
+    .buyer-ads-cnt section:nth-child(even){
+        width: calc(100% - 250px);
+        margin: 0 0 0 0;
+        height: 100%;
+        float: right;
+        position: relative;
+        border-radius: 1px;
+        background-color: orangered;
+    }
+    .buyer-ads-cnt .img-cnt img{
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        position: relative;
+        padding: 0;
+        border-radius: 1px;
+    }
+
+
+   
+
+
+    .buyer-product{
+        height: calc(100vh - 70px);
+        width: 100vw;
+        overflow: auto;
+        margin: auto;
+        /* display: flex; */
+        /* justify-content: space-between; */
+        padding: 10px 10px;
+        /* flex-direction: column; */
+        /* align-items: flex-start; */
+        background-color: #f9f9f9;
+    }
+    .buyer-product-cnt{
+        height: auto;
+        width: calc(100% - 0px);
+        overflow: auto;
+        margin: auto;
+        display: flex;
+        position: relative;
+        justify-content: space-between;
+        flex-direction: column;
+        /* padding: 40px; */
+        background-color: #f9f9f9;
+    }
+    .buyer-product-data {
+        height: fit-content;
+        width: 100%;
+        z-index: 1000;
+        position: relative;
+        background-color: #fff;
+    }
+    .buyer-product-data #left{
+        float: left;
+        width: 300px;
+        height: auto;
+        display: flex;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 10px;
+    }
+    .buyer-product-data #left .img-cnt{
+        height: 350px;
+        width: 100%;
+
+    }
+    .buyer-product-data #left .img-list-cnt{
+        height: auto;
+        width: 100%;
+        padding: 10px 0 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        overflow: auto;
+
+
+    }
+    .buyer-product-data #left .img-list-cnt div{
+        height: 70px;
+        margin: 0 5px 0 5px;
+        width: 100px;
+        flex-shrink: 0;
+    }
+    .buyer-product-data #right{
+        float: right;
+        width: calc(100% - 300px);
+        height: 100%;
+        padding: 10px 10px;
+        text-align: left;
+        font-size: small;
+
+    }
+    .buyer-product-data #right h6, p, h3{
+        font-size: 3vh;
+        /* font-weight: 500; */
+        padding: 10px;
+        margin: 0;
+        color: #696969;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+    .buyer-product-data #right section div{
+        margin-bottom: 5px;
+    }
+    .buyer-product-data #right section div span{
+        font-size: small;
+
+    }
+    .buyer-product-data #right section ul{
+        list-style-type: none;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        padding: 5px;
+        
+        margin: 0;
+    }
+    .buyer-product-data #right section ul li{
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid orangered;
+        border-radius: 50%;
+        position: relative;
+        margin: 0 5px 0 5px;
+        padding: 5px;
+        text-align: center;
+    }
+    .buyer-product-aside{
+        width: 100%;
+        height: 700px;
+        position: relative;
+        background-color: #f9f9f9;
+    }
+    .buyer-product-description{
+        height: auto;
+        margin: 10px 0 10px 0;
+        width: 100%;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        padding: 10px;
+        text-align: left;
+        background-color: #efefef;
+    }
+    .buyer-product-description section{
+        font-size: large;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        padding: 10px;
+        font-weight: 500;
+    }
+    .buyer-product-related-items{
+        background-color: #fff;
+        height: fit-content;
+        width: 100%;
+        text-align: left;
+        padding: 10px;
+    }
+    .buyer-product-related-items ul{
+        list-style-type: none;
+        display: flex;
+        align-items: center;
+        overflow: auto;
+        justify-content: left;
+        padding: 10px;
+        margin: 0;
+    }
+    .buyer-product-related-items ul li{
+        height: 400px;
+        flex-shrink: 0;
+        width: 300px;
+        margin: 0 10px 0 10px;
+        background-color: beige;
+
+    }
+    .buyer-product-seller-details{
+        height: fit-content;
+        display: flex;
+        flex-direction: column;
+        margin: 5px 0 5px 0;
+        width: 100%;
+        background-color: #fff;
+    }
+    .buyer-product-seller-details .buyer-seller-history{
+        min-height: 100px;
+        width: 100%;
+        padding: 10px 20px 10px 20px;
+        text-align: left;
+    }
+
+    .buyer-product-seller-details .buyer-seller-history h4{
+        color: #000;
+        padding: 0 0 0 5px;
+    }
+
+    .buyer-product-seller-details .buyer-seller-history ul{
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .buyer-product-seller-details .buyer-seller-history ul li{
+        height: 200px;
+        margin: 5px 0 5px 0;
+        width: 100%;
+    }
+
+    .buyer-product-seller-details .buyer-seller-products{
+        min-height: 100px;
+        width: 100%;
+        padding: 10px 20px 10px 20px;
+        text-align: left;
+    }
+
+    .buyer-product-seller-details .buyer-seller-products h4{
+        color: orangered;
+        padding: 0 0 0 5px;
+    }
+
+    .buyer-product-seller-details .buyer-seller-products ul{
+        list-style-type: none;
+        padding: 0;
+        overflow: auto;
+        display: flex;
+        align-items: center;
+        justify-content: left;
+        padding: 5px;
+
+        margin: 0;
+    }
+
+    .buyer-product-seller-details .buyer-seller-products ul li{
+        height: 400px;
+        margin: 5px 5px 5px 5px;
+        width: 350px;
+        flex-shrink: 0;
+    }
+
+
+    button{
+        height: 50px;
+        width: 100%;
+        background-color: #FF4500;
+        color: #fff;
+        outline: none;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+
+    .buyer-product-reviews{
+        height: auto;
+        margin: 10px 0 10px 0;
+        width: 100%;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        padding: 10px;
+        text-align: left;
+        background-color: #efefef;
+        
+    }
+    .buyer-product-reviews section{
+        width: 100%;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        text-align: left;
+        background-color: #fff;
+        display: flex;
+        padding: 10px;
+
+        align-items: flex-start;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    .buyer-product-reviews .ratings{
+        font-size: large;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        font-weight: 500;
+        width: 200px;
+        height: auto;
+    }
+    .buyer-product-reviews .comments{
+        font-size: large;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue';
+        font-weight: 500;
+        width: calc(100% - 210px);
+        height: auto;
+    }
+}

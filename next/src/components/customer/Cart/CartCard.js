@@ -14,8 +14,6 @@ import { set_cart } from "../../../../redux/customer/cart";
 import Thumbnail from "../../Thumbnail";
 import axios from "axios";
 import { baseApi } from "../../../../app/api/config";
-// import { buyer_overlay_setup } from "@/files/reusable.js/overlay-setup";
-// import { open_notice } from "@/files/reusable.js/notice";
 
 const Card = ({ item, index, getTotalPrice }) => {
 

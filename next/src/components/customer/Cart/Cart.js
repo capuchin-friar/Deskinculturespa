@@ -56,7 +56,7 @@ const CartComp = () => {
         }
     }, [Cart])
 
-  
+
     let [screenWidth, setScreenWidth] = useState(0)
 
     useEffect(() => {
@@ -64,7 +64,7 @@ const CartComp = () => {
         setScreenWidth(width)
     }, [])
 
-  
+
 
     return (
         <>
@@ -84,21 +84,47 @@ const CartComp = () => {
                     ?
 
                     <div className="buyer-cart-checkout">
-                        <div style={{ borderBottom: '1px solid #eeeeee' }}>
-                            <span>Cart Summary</span>
+                        <h4 className="cart-title">
+                           Cart Summary
+                        </h4>
+                        <div className="cart-summary">
+
+                            <div className="summary-row">
+                                <span>Subtotal</span>
+                                <span>
+                                    ₦{
+                                        new Intl.NumberFormat("en-NG", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(subTotal))
+                                    }
+                                </span>
+                            </div>
+
+                            <div className="summary-row">
+                                <span>Delivery fee</span>
+                                <span>Free</span>
+                            </div>
+
+                            <div className="summary-row total-row">
+                                <span>Total (Incl. VAT)</span>
+                                <span>
+                                    ₦{
+                                        new Intl.NumberFormat("en-NG", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2
+                                        }).format(Number(subTotal))
+                                    }
+                                </span>
+                            </div>
+
                         </div>
 
-                        <div>
-                            <small style={{ float: 'left' }}>Sub total</small>
-                            <small style={{ float: 'right' }}><small>&#8358;</small>{new Intl.NumberFormat('en-us').format(subTotal)}</small>
-                        </div>
-
-                        <div style={{ fontSize: 'small' }}>
-                            <small>Delivery is free</small>
-                        </div>
-                        <div style={{ height: '80px' }}>
-                            <Btn url={url} subTotal={subTotal} />
-                        </div>
+                        <button className="checkout-btn" onClick={e => {
+                            window.location.href = "/store/checkout"
+                        }}>
+                            Checkout Now
+                        </button>
                     </div>
                     :
                     <>

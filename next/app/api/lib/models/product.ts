@@ -62,6 +62,20 @@ export class ProductModel {
         }
     );
 
+    static getProductDoc = withErrorHandling(
+        async (payload: { id: string }) => {
+            const {
+                id
+            } = payload;
+            const { rows } = await query(
+                `SELECT * FROM products WHERE id = $1`,
+                [id]
+            );
+
+            return rows;
+        }
+    )
+
     static getAllProducttDoc = withErrorHandling(
         async (payload: { id: string }) => {
             const {
