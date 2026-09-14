@@ -9,7 +9,7 @@ import "./styles/xxl.css";
 import {
     api,
     baseApi
-} from "../../api/config";
+} from "../../../api/config";
 import Select from "react-select";
 import uuidV4 from "uuid-v4";
 
