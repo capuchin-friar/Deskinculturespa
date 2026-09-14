@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 // import { set_admin_shop_details } from "../../../redux/admin/admin_shop"
 import "./styles/xxl.css"
 import "./styles/s.css"
-import { api } from "../../api/config"
+import { api, baseApi } from "../../api/config"
 import {
   IoVideocamOutline,
   IoLocationOutline
@@ -67,6 +67,7 @@ function formatRevenue(n, currency) {
 }
 
 function ProductTableRow({
+  s_n,
   item,
   menuOpenId,
   onToggleMenu,
@@ -87,9 +88,11 @@ function ProductTableRow({
     productId != null
       ? `/admin/create?product=${encodeURIComponent(String(productId))}&type=${encodeURIComponent(type)}&edit=${encodeURIComponent(true)}`
       : "#"
+  const folderPath = item.specifications?.hash ?? null;
 
   return (
     <tr>
+      <td>{s_n}</td>
       <td>
         <div className="product-list-cell-product">
           {thumb ? (
@@ -161,7 +164,7 @@ function ProductTableRow({
                 className="product-list-actions-item product-list-actions-item-danger"
                 role="menuitem"
                 onClick={() => {
-                  if (productId != null) onDeleteProduct(productId)
+                  if (folderPath != null) onDeleteProduct(folderPath, productId)
                 }}
               >
                 Delete
@@ -259,29 +262,48 @@ export default function ProductListPage() {
     return type === "products" ? prods : type === "services" ? services : appointments
   }
 
-  //   const onDeleteProduct = useCallback(
-  //     async (productId) => {
-  //       setDeleteError("")
-  //       const shopIdNum = Number.parseInt(String(selectedShopId), 10)
-  //       if (admin_id == null || Number.isNaN(shopIdNum)) {
-  //         setDeleteError("Missing shop or account.")
-  //         return
-  //       }
-  //       if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
-  //         return
-  //       }
-  //       try {
-  //         await deleteProduct(shopIdNum, productId, admin_id)
-  //         setProds((prev) =>
-  //           prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
-  //         )
-  //         setMenuOpenId(null)
-  //       } catch (err) {
-  //         setDeleteError(err?.message || "Could not delete product.")
-  //       }
-  //     },
-  //     [admin_id, selectedShopId]
-  //   )
+    const onDeleteProduct = useCallback(
+      async (hash, productId) => {
+        setDeleteError("")
+        if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
+          return
+        }
+        try {
+          baseApi.delete("delete/folder-delete", {
+            data: {
+              product_id: hash
+            }
+          }).then(async(response) => {
+            if(response.data.success){
+              const {
+                data
+              } = await api.delete("products/delete", {
+                data: {
+                  product_id: productId
+                }
+              });
+              if(!data.success){
+                throw new Error("Error: ", data.message);
+                return;
+              }
+              setProds((prev) =>
+                prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
+              )
+            }else{
+              throw new Error(response.data.message);
+            }
+          }).catch(err => {
+            console.log(err);
+            alert("Error: ", err);
+          })
+
+          setMenuOpenId(null)
+        } catch (err) {
+          setDeleteError(err?.message || "Could not delete product.")
+        }
+      },
+      [admin_id]
+    )
 
   return (
     <div style={{
@@ -334,6 +356,7 @@ export default function ProductListPage() {
         <table className="product-list-table">
           <thead>
             <tr>
+              <th scope="col">S/N</th>
               <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
               <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
               <th scope="col">Price</th>
@@ -357,11 +380,12 @@ export default function ProductListPage() {
                         prod?.product_id ??
                         `prod-${index}`
                       }
+                      s_n={index+1}
                       item={prod}
                       menuOpenId={menuOpenId}
                       onToggleMenu={toggleActionMenu}
                       type={type}
-                      onDeleteProduct={""}
+                      onDeleteProduct={onDeleteProduct}
                     />
                   ))
                   : null;
