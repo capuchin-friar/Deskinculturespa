@@ -26,19 +26,6 @@
     width: calc(100% - 180px);
 }
 
-/**
-* - Header 
-*/
-header {
-    height: 60px;
-    width: 100%;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0px 25px;
-}
-
 
 /**
 * - Aside 

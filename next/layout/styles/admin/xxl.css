@@ -49,11 +49,17 @@
     justify-content: center;
 }
 
+.admin-header .admin-welcome-box h3{
+    font-size: 2.5vh;
+    margin: 0;
+}
+
 .admin-header button {
     margin: 0px 0px 0px 0px;
     padding: 0px;
     display: flex;
     color: #000;
+    width: fit-content;
     cursor: pointer;
 }
 
