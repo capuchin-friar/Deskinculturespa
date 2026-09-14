@@ -52,7 +52,7 @@ export default function Customer({ children }) {
             }
         })();
 
-    }, [])
+    }, [pathname])
     return (
         <>
             <div className="customer-cnt">

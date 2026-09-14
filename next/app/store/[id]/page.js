@@ -1,132 +1,140 @@
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-import ProductPageClient from "./product"; // Client component
-import Head from "next/head";
-import { baseApi } from "../../api/config";
+import ProductPageClient from "./product";
 
-export async function generateMetadata({  }) {
-  // const slug = params?.slug;
-  let slug = 2;
+export async function generateMetadata({ params }) {
+  const { id } = await params;
 
-  const params = {
-    id: slug
-  };
-  if (!slug) {
-    return { title: "Default Product" };
+  console.log("Product ID:", id);
+
+  if (!id) {
+    return {
+      title: "Product Not Found",
+    };
   }
 
-
   try {
-    const res = await fetch(`http:localhost:3000/api/product?${new URLSearchParams(params)}`, {
-      method: "GET"
-    });
+    const res = await fetch(
+      `http://localhost:3000/api/product?id=${encodeURIComponent(id)}`,
+      {
+        method: "GET",
+        cache: "no-store",
+      }
+    );
 
-    if (!res.ok) throw new Error("Failed to fetch product data");
-
-    let {
-      data
-    } = await res.json();
-  
-    let product = data;
-
-    console.log('product: ', product)
-    if (!product || Object.keys(product).length === 0) {
-      return { title: "Product Not Found" };
+    if (!res.ok) {
+      throw new Error("Failed to fetch product data");
     }
 
-    const isImg = ["jpg", "jpeg", "png", "gif", "webp"].includes(
-      product?.thumbnail_url?.split(".").pop()?.toLowerCase()
-    );
-    const thumbnail = product?.thumbnail_url || slug;
-    const videoUrl = product?.thumbnail_url; // If video is applicgitable
+    const { data: product } = await res.json();
 
-    const formattedTitle = `${product?.name || slug} - ₦${new Intl.NumberFormat(
-      "en-US"
-    ).format(product?.price)}`;
+    console.log("Product:", product);
+
+    if (!product || Object.keys(product).length === 0) {
+      return {
+        title: "Product Not Found",
+      };
+    }
+
+    const thumbnail = product?.thumbnail_url;
+
+    const isImg =
+      thumbnail &&
+      ["jpg", "jpeg", "png", "gif", "webp"].includes(
+        thumbnail.split("?")[0].split(".").pop()?.toLowerCase()
+      );
+
+    const formattedTitle = `${
+      product?.name || "Product"
+    } - ₦${new Intl.NumberFormat("en-NG").format(
+      Number(product?.price || 0)
+    )}`;
+
+    const productUrl = `https://www.deskinculture.com/store/${product.id}`;
 
     return {
       title: formattedTitle,
+
+      description: product?.description || "",
+
       alternates: {
-        canonical: `https://www.deskinculture.com/store/${product?.id}`,
+        canonical: productUrl,
       },
-      url: `https://www.deskinculture.com/store/${product?.id}`,
+
       robots: {
         index: true,
         follow: true,
       },
+
       openGraph: {
         title: formattedTitle,
         description: product?.description || "",
-        url: `https://www.deskinculture.com/store/${product?.id}`,
+        url: productUrl,
         type: isImg ? "website" : "video.other",
-        ...(isImg
+
+        ...(isImg && thumbnail
           ? {
-            images: [{ url: thumbnail, width: 1200, height: 630 }],
-          }
-          : {
-            videos: [
-              {
-                url: videoUrl,
-                secure_url: videoUrl,  // 👈 Add this for HTTPS
-                width: 1280,
-                height: 720,
-                type: "video/mp4",
-              },
-            ],
-          }),
+              images: [
+                {
+                  url: thumbnail,
+                  width: 1200,
+                  height: 630,
+                },
+              ],
+            }
+          : {}),
       },
+
       twitter: {
-        card: isImg ? "summary_large_image" : "player",
+        card: isImg ? "summary_large_image" : "summary",
         title: formattedTitle,
         description: product?.description || "",
-        ...(isImg
-          ? { images: [thumbnail] }
-          : {
-            player: videoUrl,
-            playerStream: videoUrl, // Direct MP4 link
-            playerStreamContentType: "video/mp4",
-            playerWidth: 1280,
-            playerHeight: 720
-          }
-        ),
+
+        ...(isImg && thumbnail
+          ? {
+              images: [thumbnail],
+            }
+          : {}),
       },
     };
   } catch (error) {
     console.error("Metadata fetch error:", error);
-    return { title: "Product Details - DeskinCulture" };
+
+    return {
+      title: "Product Details - De Skin Culture",
+    };
   }
 }
 
-export default async function ProductPage({  }) {
-  let slug;
-  // const { slug } = params;
-  const params = {
-    id: 2
-  };
-  let product = null;
+export default async function ProductPage({ params }) {
+  const { id } = await params;
 
-  const res = await fetch(`http:localhost:3000/api/product?${new URLSearchParams(params)}`, {
-    method: "GET"
-  });
+  console.log("Product ID:", id);
 
-  if (!res.ok) throw new Error("Failed to fetch product data");
+  if (!id) {
+    return <div>Error: No product ID provided.</div>;
+  }
 
-  let {
-    data
-  } = await res.json();
+  const res = await fetch(
+    `http://localhost:3000/api/product?id=${encodeURIComponent(id)}`,
+    {
+      method: "GET",
+      cache: "no-store",
+    }
+  );
 
-  product = data;
-  console.log('product: ', product)
+  if (!res.ok) {
+    throw new Error("Failed to fetch product data");
+  }
 
-  // if (!slug) {
-  //   return <div>Error: No product slug provided.</div>;
-  // }
+  const { data: product } = await res.json();
 
+  console.log("Product:", product);
 
+  if (!product || Object.keys(product).length === 0) {
+    return <div>Product not found.</div>;
+  }
 
-  return <ProductPageClient
-    // slug={slug} 
-    product={product}
-  />;
+  return <ProductPageClient product={product} />;
 }

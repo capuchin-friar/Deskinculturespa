@@ -18,7 +18,7 @@ import Share from './Share'
 import Contact from './Contact'
 import Link from 'next/link'
 import axios from 'axios'
-import { IoCart, IoCartOutline, IoCubeOutline } from 'react-icons/io5'
+import { IoCart, IoCartOutline, IoCubeOutline, IoImageOutline } from 'react-icons/io5'
 import StarRating from '../../../utils/star'
 import { baseApi } from '../../../../app/api/config'
 import { set_cart } from '../../../../redux/customer/cart'
@@ -43,7 +43,7 @@ let BtnStyles = {
     margin: '0'
 }
 
-const Product = ({ item, order_list }) => {
+const Product = ({ item }) => {
     let dispatch = useDispatch()
 
     let { cart } = useSelector(s => s.cart);
@@ -69,7 +69,6 @@ const Product = ({ item, order_list }) => {
     // let {ActiveImg} = useSelector(s => s.ActiveImg)
 
     let [metaImg, setMetaImg] = useState('')
-    let [activeImg, setActiveImg] = useState("")
     let [screenWidth, setScreenWidth] = useState(0)
     let [isCarted, setIsCarted] = useState(false);
     let [loading, setLoading] = useState(false);
@@ -77,7 +76,7 @@ const Product = ({ item, order_list }) => {
 
 
 
-    useEffect(() => { setMetaImg(ItemImages[0]) }, [])
+    // useEffect(() => { setMetaImg(ItemImages[0]) }, [])
     // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)}, [ItemImages])
     // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)},[])
     // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)},[ActiveImg])
@@ -98,7 +97,7 @@ const Product = ({ item, order_list }) => {
 
     useEffect(() => {
         let cartedProd = cart.find(c => c.product_id === item.id);
-        if(cartedProd){
+        if (cartedProd) {
             setQty(cartedProd.quantity);
         }
     }, [cart]);
@@ -131,7 +130,7 @@ const Product = ({ item, order_list }) => {
         }
     }
 
-    async function addToCart(){
+    async function addToCart() {
         const {
             data,
             status
@@ -140,16 +139,16 @@ const Product = ({ item, order_list }) => {
             qty: qty
         });
 
-        if(!data.success){
+        if (!data.success) {
             console.log("Error: ", data.message)
         }
-        if(data.success){
+        if (data.success) {
             const {
                 data,
                 status
             } = await baseApi.get("cart");
 
-            if(!data.success){
+            if (!data.success) {
                 console.log("Error: ", data.message)
             }
             console.log(data.data)
@@ -161,7 +160,7 @@ const Product = ({ item, order_list }) => {
         }
     }
 
-    async function rmFromCart(){
+    async function rmFromCart() {
         let cartId = cart.filter(c => c.product_id === item.id)[0].id;
         const {
             data,
@@ -172,29 +171,35 @@ const Product = ({ item, order_list }) => {
             }
         });
 
-        if(!data.success){
+        if (!data.success) {
             console.log("Error: ", data.message)
         }
-        if(data.success){
+        if (data.success) {
             dispatch(
                 set_cart(
                     cart.filter(c => c.id !== cartId)
                 )
             )
             setQty(1);
-            
+
         }
     }
 
 
-    function toggleCart(){
+    function toggleCart() {
         let isProductCarted = cart.some(c => c.product_id === item.id);
-        if(isProductCarted){
+        if (isProductCarted) {
             rmFromCart();
-        }else{
+        } else {
             addToCart();
         }
 
+    }
+
+    let [activeImg, setActiveImg] = useState(0);
+
+    function handleActiveImage(data) {
+        setActiveImg(data)
     }
 
     return (
@@ -209,25 +214,18 @@ const Product = ({ item, order_list }) => {
                 <div id="left">
                     {
 
-                        activeImg !== '' && !activeImg.src
-                            ?
-                            <div className="img-cnt" style={{ backgroundImage: `url(${activeImg})`, borderRadius: '5px', backgroundRepeat: 'no-repeat', backgroundSize: '350px 350px', backgroundPosition: 'center' }}>
-                                {
-                                    (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(activeImg?.split('.').pop().toLowerCase())) ?
-                                        <img src={activeImg} style={{ height: '100%', width: '100%', borderRadius: '5px' }} alt="" loading="lazy" />
-
-                                        :
-                                        <video src={activeImg} controls style={{ width: '100%', borderRadius: '2px', height: '100%' }}></video>
-
-                                }
-                            </div>
-                            :
-                            <img src={activeImg?.src} style={{ height: '100%', width: '100%', borderRadius: '5px' }} alt="" />
+                        <div className="img-cnt" style={{ backgroundImage: `url(${item.images[activeImg]})`, borderRadius: '5px', backgroundRepeat: 'no-repeat', backgroundSize: '350px 350px', backgroundPosition: 'center' }}>
+                            <img src={item.images[activeImg]} style={{ height: '100%', width: '100%', borderRadius: '5px' }} alt="" loading="lazy" />
+                        </div>
                     }
                     {
                         item
                             ?
-                            <ItemImgs category={item?.category} product_id={item?.product_id} title={item?.title} />
+                            <ItemImgs
+                                imgList={item?.images}
+                                activeImg={activeImg}
+                                handleActiveImage={handleActiveImage}
+                            />
                             :
                             ''
                     }
@@ -258,7 +256,7 @@ const Product = ({ item, order_list }) => {
 
                             <div className="buyer-items-stock" data-price={item.price} style={{
                                 opacity: cart.some(c => c.product_id === item.id) ? 1 : .5,
-                                pointerEvents: cart.some(c => c.product_id === item.id) 
+                                pointerEvents: cart.some(c => c.product_id === item.id)
                             }}>
                                 <button onClick={(e) => updateHandler('reduce', Number(qty), cart.find(c => c.product_id === item.id).id)} data-id={item.product_id} disabled={loading || qty < 2 || !cart.some(c => c.product_id === item.id)}>-</button>
 
@@ -289,7 +287,7 @@ const Product = ({ item, order_list }) => {
                                     display: "flex",
                                     justifyContent: "space-between",
                                     padding: "0px 10px",
-                                    
+
                                 }}>
                                     {/* <button style={{ borderRadius: '2.5px', border: 'none', outline: 'none', width: '46%' }} className='shadow' onClick={e => handleOrder(item.product_id)}>
                                         Buy Now

@@ -63,129 +63,18 @@ const ProductPageClient = ({product}) => {
     useEffect(() => {setActiveImg('')}, [searchParams]);
 
     useEffect(() => {
-        // buyer_overlay_setup(true, 'Getting Product Info...')
         try {
             if (product) {
                 setItem(product)
-                // buyer_overlay_setup(false, '')
             }else{
-                // open_notice(true, error.message)
-                // buyer_overlay_setup(false, '')
-
                 console.log(error)
             }
         } catch (error) {
-            // buyer_overlay_setup(false, '')
-
             console.log(error)
         }
     }, [pathname])
 
-
-    useEffect(() => {
-        try {
-            let overlay = document.querySelector('.overlay');
-            overlay.setAttribute('id', 'overlay');
-            if (product.user_id) {
-                fetch(`https://cs-node.vercel.app/vendor?user_id=${product?.user_id}`, { cache: 'no-store',}).then(async (res) => {
-                    let response = await res.json()
-                    set_seller(response.data)
-                    console.log('seller: ', response)
-
-                    overlay.removeAttribute('id')
-
-               }).catch(err => console.log(err))
-            }
-        } catch (error) {
-            console.log(error)
-            // window.location.reload()
-
-        }
-    },[product])
-
-    async function AddNewViewer(product_id,user_id) {
-        fetch(`/api/store/new-view`, {
-            method: 'post',
-            headers: {
-                'Gender': window.localStorage.getItem('cs-gender') 
-            },
-            body: JSON.stringify({
-                product_id,
-                user_id
-            })
-        })
-        .then(async(res) => {
-            let response = await res.json();
-
-            if (response.success) {
-                
-                
-            } else {
-                
-            }
-        })
-        .catch(err =>{
-            console.log(err)
-        });
-    }
- 
     const hasRun = useRef(false);
-
-    useEffect(() => {
-        if (!item?.product_id || hasRun.current) return;
-        hasRun.current = true;
-
-        const user_id =
-        window.localStorage.getItem("CE_user_id") ||
-        window.localStorage.getItem("id_for_unknown_buyer");
-
-        const finalBuyerId = user_id && user_id !== 'null' ? user_id : window.localStorage.getItem("id_for_unknown_buyer");
-
-        try {
-            setTimeout(() => {
-                AddNewViewer(item?.product_id, finalBuyerId);
-            }, 3000);
-        } catch (error) {
-            console.log(error);
-        }
-    }, [product?.product_id]);
-    
-    async function handleOrder() {
-        let result = order_list.filter((data) => data.product.product_id === product.product_id && data.order.user_id === user_id).length
-        if(result<1){
-            if(user_id === null || user_id === '' || user_id === 'null'){
-                window.location.href=(`/login`)
-            }else{
-                window.location.href=(`/store/orders/${product.product_id}/create`)
-            }
-        }else{
-            window.location.href=(`/store/orders/${product.product_id}/checkout`)
-        }
-    }
-
-    function SaveHistory() {
-        const history = JSON.parse(localStorage.getItem('campus_express_history') || '[]');
-        const isDuplicate = history.some(data => data?.product_id === product?.product_id);
-        if (!isDuplicate) {
-            const updatedHistory = [...history, { category: product?.category, product_id: product?.product_id }];
-            localStorage.setItem('campus_express_history', JSON.stringify(updatedHistory));
-        }
-    }
-
-    useEffect(() => {
-        
-        if (user_id) {
-            fetch(`/api/store/orders?user_id=${user_id}`, { cache: 'no-store', }).then(async (res) => {
-                let response = await res.json();
-               
-               if (response?.success) {
-                    set_order_list(response?.data)
-               }
-           }).catch(err => console.log(err))
-        }
-      
-    }, [user_id]) 
-    
 
     const jsonLd = {
         '@context': 'https://schema.org',
@@ -315,7 +204,10 @@ const ProductPageClient = ({product}) => {
                                     
                                 } */}
                             </button>
-                            <button style={{borderRadius: '2.5px',border: 'none', outline: 'none', width: '100%'}} className='shadow' onClick={e=>handleOrder(item.product_id)}> 
+                            <button style={{borderRadius: '2.5px',border: 'none', outline: 'none', width: '100%'}} className='shadow' onClick={e=>
+                                // handleOrder(item.product_id)
+                                ""
+                                }> 
                                 {
                                     order_list?.filter((data) => data?.product?.product_id === item?.product_id && data?.order?.user_id === user_id).length > 0
                                     ?
