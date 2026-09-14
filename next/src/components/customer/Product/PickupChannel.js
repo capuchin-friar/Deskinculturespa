@@ -121,7 +121,7 @@ export default function PickupChannel({updateLocation,title,edit,order_data}) {
         <>
            
             <div style={{background: '#fff', width: 'fit-content', padding: '10px', position: 'relative', height: '80%', borderRadius: '10px'}}>
-              <h2 style={{padding: '10px', color: '#FF4500', fontWeight: '500'}}><u>Input Your {title} Location </u></h2>
+              <h2 style={{padding: '10px', color: '#278A3D', fontWeight: '500'}}><u>Input Your {title} Location </u></h2>
                 <section style={{padding: '10px', overflow: 'auto', height: 'calc(100% - 100px)'}}>
                     <div className="input-cnt">
                         <label htmlFor="">State</label>

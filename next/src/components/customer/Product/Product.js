@@ -39,7 +39,7 @@ let BtnStyles = {
     color: '#fff',
     fontSize: 'small',
     fontWeight: '500',
-    backgroundColor: 'orangered',
+    backgroundColor: '#278A3D',
     margin: '0'
 }
 
@@ -242,14 +242,14 @@ const Product = ({ item }) => {
 
                     {
 
-                        <div style={{ background: '#fff', padding: '10px', color: 'orangered', fontWeight: '500', position: 'relative', borderRadius: '5px', height: 'fit-content' }}>
+                        <div style={{ background: '#fff', padding: '10px', color: '#278A3D', fontWeight: '500', position: 'relative', borderRadius: '5px', height: 'fit-content' }}>
 
                             <p style={{ fontWeight: '700', margin: '0', padding: '10px 0', fontSize: '3.5vh', color: '#000' }}>
                                 <small>&#8358;</small>{new Intl.NumberFormat('en-us').format(item?.price)}
                             </p>
 
 
-                            <h3 style={{ fontSize: 'small', fontWeight: 'bold', textDecoration: 'underline', padding: '0px', textTransform: 'capitalize', color: '#FF4500', marginBottom: '10px', display: "flex", alignItems: 'center', justifyContent: 'flex-start' }}>
+                            <h3 style={{ fontSize: 'small', fontWeight: 'bold', textDecoration: 'underline', padding: '0px', textTransform: 'capitalize', color: '#278A3D', marginBottom: '10px', display: "flex", alignItems: 'center', justifyContent: 'flex-start' }}>
                                 <IoCubeOutline size={25} /> &nbsp; {item?.stock} units availble
                             </h3>
                             <br />

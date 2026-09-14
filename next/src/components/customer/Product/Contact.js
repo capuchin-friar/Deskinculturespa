@@ -23,7 +23,7 @@ export default function Contact({phone,item}) {
             marginTop: '20px'
         }}>
         {/* onClick={e => true !== 0 ? DeleteProduct(e,item.product_id) : AddToCart(e,item.product_id)} */}
-            <button className='shadow-sm' style={{height: '50px', width: '45%', borderRadius: '5px', display: 'flex', alignItems: 'center', cursor: 'pointer',fontSize: 'x-small', justifyContent: 'center', background: '#FF4500', color: '#fff'}}  onClick={async e => {
+            <button className='shadow-sm' style={{height: '50px', width: '45%', borderRadius: '5px', display: 'flex', alignItems: 'center', cursor: 'pointer',fontSize: 'x-small', justifyContent: 'center', background: '#278A3D', color: '#fff'}}  onClick={async e => {
                 const whatsappUrl = `whatsapp://send?text=Hey, I would love to make more enquiries about "${item.title}" ${encodeURIComponent(window.location.href)}`;
                 window.open(whatsappUrl, '_blank');
 
@@ -37,7 +37,7 @@ export default function Contact({phone,item}) {
                 <span>WhatsApp</span>
             </button>
 
-            <div onClick={e => window.location.href = `tel:+234${phone}`} style={{height: '50px', width: '45%', borderRadius: '5px', display: 'flex', alignItems: 'center', cursor: 'pointer', justifyContent: 'center', fontSize: 'x-small', background: 'orangered', color: '#fff'}}>
+            <div onClick={e => window.location.href = `tel:+234${phone}`} style={{height: '50px', width: '45%', borderRadius: '5px', display: 'flex', alignItems: 'center', cursor: 'pointer', justifyContent: 'center', fontSize: 'x-small', background: '#278A3D', color: '#fff'}}>
                 {
                     
                     <>

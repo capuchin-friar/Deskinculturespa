@@ -44,13 +44,13 @@ const CardCnt = ({items}) => {
                     items.map((item, index) => 
                     <div className="cols" >
                             <div className="card" key={index} style={{height: 'fit-content', marginBottom: '10x', flexShrink: '0', width: '200px', borderRadius: '10px'}}>
-                                {/* <span  style={{background: 'orangered',display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute',color: '#000', borderRadius: '5px', top: screenWidth > 400 ? '15px' : '8px', left: screenWidth > 400 ? '15px' : '8px', padding: '2.5px'}}>
-                                    <span  style={{background: 'orangered',color: 'orangered', padding: '0'}}>
+                                {/* <span  style={{background: '#278A3D',display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'absolute',color: '#000', borderRadius: '5px', top: screenWidth > 400 ? '15px' : '8px', left: screenWidth > 400 ? '15px' : '8px', padding: '2.5px'}}>
+                                    <span  style={{background: '#278A3D',color: '#278A3D', padding: '0'}}>
                                         <img src={locationSvg} style={{height: screenWidth  > 480 ? '15px' : '8px', width: screenWidth  > 480 ? '20px' : '10px', marginBottom: '5px'}} alt="" />
 
                                     </span>
 
-                                    <span  style={{background: 'orangered',color: '#fff', padding: '0',  fontSize: screenWidth > 480 ? 'x-small' : 'xx-small', fontWeight: '500'}}>
+                                    <span  style={{background: '#278A3D',color: '#fff', padding: '0',  fontSize: screenWidth > 480 ? 'x-small' : 'xx-small', fontWeight: '500'}}>
                                         UNIZIK, Awka
                                     </span>
                                 </span> */}
@@ -80,9 +80,9 @@ const CardCnt = ({items}) => {
                                         <h6 onClick={e => navigate(`/product?product_id=${item.product_id}`)} style={{marginBottom: '10px', fontWeight: '700', color: '#000'}}>&#8358;{new Intl.NumberFormat('en-us').format(item.price)}</h6>
                                     }
 
-                                    {/* <div onClick={e => navigate(`/product?product_id=${item.product_id}`)} style={{display: 'flex',background: '#fff', color: 'orangered',  alignItems: 'center', justifyContent: 'left', padding: '0'}}>
+                                    {/* <div onClick={e => navigate(`/product?product_id=${item.product_id}`)} style={{display: 'flex',background: '#fff', color: '#278A3D',  alignItems: 'center', justifyContent: 'left', padding: '0'}}>
                                         <span  style={{background: '#fff', color: '#000', borderRadius: '5px', top: '20px', display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', left: '20px', padding: '5px 0 5px 0'}}>
-                                            <span  style={{background: '#fff',color: 'orangered', padding: '0'}}>
+                                            <span  style={{background: '#fff',color: '#278A3D', padding: '0'}}>
 
                                                 <img src={conditionSvg} style={{height: '20px', width: '20px', marginBottom: '5px'}} alt="" />
 

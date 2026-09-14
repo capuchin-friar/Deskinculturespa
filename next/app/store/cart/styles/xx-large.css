@@ -50,7 +50,7 @@
         display: flex;
         white-space: nowrap;
         align-items: center;
-        color: orangered;
+        color: #278A3D;
         font-weight: 500;
         font-size: small;
         height: 35px;
@@ -86,7 +86,7 @@
         border-bottom-right-radius: 5px;
         position: relative;
         width: 100px;
-        background-color: orangered;
+        background-color: #278A3D;
         color: #fff;
         outline: none;
         margin-left: 5px;
@@ -394,7 +394,7 @@
 
         font-weight: 500;
 
-        color: orangered;
+        color: #278A3D;
     }
 
 
@@ -494,7 +494,7 @@
     /* PLUS / MINUS BUTTONS */
 
     .buyer-items-stock div:nth-child(odd) {
-        background-color: orangered;
+        background-color: #278A3D;
 
         color: #fff;
 

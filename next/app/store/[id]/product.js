@@ -186,8 +186,8 @@ const ProductPageClient = ({product}) => {
                                 width: 'fit-content',
                                 height: 'fit-content',
                                 borderRadius: '6px',
-                                background: is_carted ? '#FF4500' : 'transparent',
-                                border: '1px solid #FF4500'
+                                background: is_carted ? '#278A3D' : 'transparent',
+                                border: '1px solid #278A3D'
                             }} onClick={e => {
                                 cartHandler()
                             }}

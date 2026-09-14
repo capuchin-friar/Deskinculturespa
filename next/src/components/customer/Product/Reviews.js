@@ -12,7 +12,7 @@ export default function Reviews() {
 
                     <section style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center'}}>
                         <div style={{background: '#efefef', width: '100%', height: 'auto', borderRadius: '5px', padding: '10px'}}>
-                            <h3 style={{textAlign: 'center', color: '#FF4500', marginBottom: '5px'}}>4.5/5.0</h3>
+                            <h3 style={{textAlign: 'center', color: '#278A3D', marginBottom: '5px'}}>4.5/5.0</h3>
                             <div style={{ padding: '20px 0px', textAlign: 'center' }}>
                                 <StarRating
                                     rating={4.5}

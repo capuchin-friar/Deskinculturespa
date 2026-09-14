@@ -39,7 +39,7 @@
         cursor: pointer;
         display: flex;
         align-items: center;
-        color: orangered;
+        color: #278A3D;
         font-weight: 500;
         font-size: small;
         height: 35px;
@@ -59,7 +59,7 @@
     .buyer-main-cnt{
         padding: 1px 10px 10px 10px; 
 
-        background-color: orangered;
+        background-color: #278A3D;
     }
 
     .buyer-flash-ads{
@@ -127,7 +127,7 @@
         align-items: center;
         justify-content: space-between;
 
-        background-color: orangered;
+        background-color: #278A3D;
     }
 
     .buyer-ads-cnt section:nth-child(odd){
@@ -145,7 +145,7 @@
         /* padding: 10px; */
         height: 100%;
         border-radius: 1px;
-        background-color: orangered;
+        background-color: #278A3D;
     }
     .buyer-ads-cnt section:nth-child(even) img{
         height: 150px;
@@ -241,7 +241,7 @@
         cursor: pointer;
         margin: 0 5px 0 5px;
         font-size: large;
-        background-color: orangered;
+        background-color: #278A3D;
         color: #fff;
         font-weight: 500;
     }
@@ -271,7 +271,7 @@
         border-bottom-right-radius: 35px;
         position: relative;
         width: 100px;
-        background-color: orangered;
+        background-color: #278A3D;
         color: #fff;
         outline: none;
         font-weight: 500;
@@ -297,7 +297,7 @@
         width: 100%;
         font-size: large;
         font-weight: 1000;
-        color: orangered;
+        color: #278A3D;
     }
 
     .buyer-aside-cnt{
@@ -409,7 +409,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid orangered;
+        border: 1px solid #278A3D;
         border-radius: 50%;
         position: relative;
         margin: 0 5px 0 5px;
@@ -501,7 +501,7 @@
     }
 
     .buyer-product-seller-details .buyer-seller-products h4{
-        color: orangered;
+        color: #278A3D;
         padding: 0 0 0 5px;
     }
 

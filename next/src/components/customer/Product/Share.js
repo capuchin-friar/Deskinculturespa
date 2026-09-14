@@ -11,7 +11,7 @@ export default function Share({role,item,url,activeImg}) {
                     // const url = window.location.href;
                     window.open(`https://www.facebook.com/sharer/sharer.php?u=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
-                    <IoLogoFacebook size={25} />
+                    <IoLogoFacebook color='#1877F2' size={25} />
                 </li>
 
                 <li onClick={e => {
@@ -19,7 +19,7 @@ export default function Share({role,item,url,activeImg}) {
                     const twitterUrl = `https://twitter.com/intent/tweet?&text=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`;
                     window.open(twitterUrl, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
-                    <IoLogoTwitter size={25} />
+                    <IoLogoTwitter color='#1DA1F2' size={25} />
                 </li>
 
                 <li onClick={async e => {
@@ -27,7 +27,7 @@ export default function Share({role,item,url,activeImg}) {
                     window.open(whatsappUrl, '_blank');
 
                 }} style={{border: 'none', padding: '0', cursor: 'pointer'}}>
-                    <IoLogoWhatsapp size={25} />
+                    <IoLogoWhatsapp color='#25D366' size={25} />
                 </li>
 
             </ul>

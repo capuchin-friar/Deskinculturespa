@@ -36,7 +36,7 @@
 
   font-weight: 500;
 
-  color: orangered;
+  color: #278A3D;
 }
 
 
@@ -99,7 +99,7 @@
 /* PLUS / MINUS BUTTONS */
 
 .buyer-items-stock button {
-  background-color: orangered;
+  background-color: #278A3D;
 
   color: #fff;
   display: flex;
