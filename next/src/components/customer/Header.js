@@ -197,17 +197,17 @@ export function Header() {
 
                 <div className="customer-features">
                     <button onClick={e => {
-                        window.location.href = ("/cart");
+                        window.location.href = ("/store/cart");
                     }}>
                         <IoCartOutline height={23} width={23} />
                     </button>
                     <button onClick={e => {
-                        window.location.href = ("/wishlist");
+                        window.location.href = ("/store/wishlist");
                     }}>
                         <IoHeartOutline height={23} width={23} />
                     </button>
                     <button onClick={e => {
-                        window.location.href = ("/search");
+                        window.location.href = ("/store/search");
                     }}>
                         <IoSearchOutline height={23} width={23} />
                     </button>

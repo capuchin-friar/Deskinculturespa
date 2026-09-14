@@ -512,7 +512,7 @@
     }
 
     .buyer-items-stock div:nth-child(odd):hover {
-        background-color: #e63e00;
+        background-color: #278A3D;
 
         transform: scale(1.04);
     }
