@@ -90,4 +90,15 @@ export class ProductModel {
         }
     )
 
+    static _getAllProducttDoc = withErrorHandling(
+        async () => {
+            
+            const { rows } = await query(
+                `SELECT * FROM products`
+            );
+
+            return rows;
+        }
+    )
+
 }

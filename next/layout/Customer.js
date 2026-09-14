@@ -19,7 +19,7 @@ import "./styles/customer/footer.css"
 import "./styles/customer/mega-header.css"
 import { Aside } from "@/src/components/customer/Aside";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { baseApi } from "@/app/api/config";
 import { useDispatch } from "react-redux";
 import { set_cart } from "@/redux/customer/cart";
@@ -29,7 +29,7 @@ import { set_cart } from "@/redux/customer/cart";
 export default function Customer({ children }) {
 
     let pathname = usePathname().split("/");
-    let path = pathname.length == 1 && pathname[1] === "store";
+    let [path, setPath] = useState(false);
 
     let dispatch = useDispatch();
     useEffect(() => {
@@ -39,11 +39,14 @@ export default function Customer({ children }) {
                     data,
                     status
                 } = await baseApi.get("/cart");
-        
-                if(!data.success){
+
+                if (!data.success) {
                     throw new Error("Error: ", data.message);
                 }
                 dispatch(set_cart(data.data));
+                console.log(pathname)
+                let path = pathname.length == 2 && pathname[1] === "store";
+                setPath(path);
             } catch (error) {
                 console.log(error);
             }

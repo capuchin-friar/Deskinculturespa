@@ -1,33 +1,31 @@
+"use client"
 import { IoArrowForward } from "react-icons/io5";
 import Testimonials from "@/src/components/customer/Testimonial"
 import "./styles/xxl.css"
 import "./styles/testimonial.css"
 import Link from "next/link";
 import WhyChooseUs from "@/src/components/customer/Why"
+import { useEffect, useState } from "react";
+import { baseApi } from "./api/config";
+import Formatter from "../src/utils/formatter";
 export default function Home() {
 
-  const products = [
-    {
-      thumbnail: "https://images.unsplash.com/photo-1556229010-6c3f2c9ca5f8?w=500",
-      title: "Premium Lavender Aromatherapy Body Oil for Deep Relaxation and Nourishing Skin Care",
-      price: 12000
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=500",
-      title: "Intensive Hydrating Face Cream with Natural Botanical Ingredients for Radiant Healthy Skin",
-      price: 8500
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1608248543803-ba4f8c70ae0b?w=500",
-      title: "Luxury Aromatherapy Bath Salt for Ultimate Relaxation, Stress Relief and Rejuvenation",
-      price: 6500
-    },
-    {
-      thumbnail: "https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=500",
-      title: "Advanced Vitamin C Facial Serum for Brighter, Smoother and More Youthful Looking Skin",
-      price: 15000
-    }
-  ];
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    (async () => {
+      let {
+        data
+      } = await baseApi.get("products");
+
+      if (data.success) {
+        setProducts(data.data.splice(0, 4))
+      }
+      if (!data.success) {
+        setProducts([])
+      }
+    })();
+  }, []);
 
   const services = [
     {
@@ -190,7 +188,7 @@ export default function Home() {
             products.map((p, i) =>
               <div className="customer-product-card shadow-sm">
                 <div className="customer-product-thumbnail" style={{
-                  backgroundImage: `url(${p.thumbnail})`
+                  backgroundImage: `url(${p.thumbnail_url})`
                 }}>
                   <button className="card-button">
                     Add To Cart
@@ -200,10 +198,10 @@ export default function Home() {
 
                 <div className="customer-product-body">
                   <p className="customer-product-title">
-                    {p.title ?? "Product title"}
+                    {p.name ?? "Product title"}
                   </p>
                   <div className="customer-product-price">
-                    {p.price ?? "0.00"}
+                    ₦ {Formatter.formatRevenue(p.price ?? 0)}
                   </div>
                 </div>
 
