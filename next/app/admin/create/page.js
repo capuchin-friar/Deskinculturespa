@@ -10,27 +10,25 @@ import Select from "react-select";
 
 export default function CreateProductPage() {
 
-    const [productName, setProductName] = useState("Macbook Air");
+    const [productName, setProductName] = useState("");
 
-    const [description, setDescription] = useState(
-        "The Apple MacBook Pro 13.3-inch laptop is powered by the new M2 chip. It comes with the same compact design but now it supports up to 20 hours."
-    );
+    const [description, setDescription] = useState("");
 
-    const [price, setPrice] = useState("120.00");
-    const [discount, setDiscount] = useState("25");
+    const [discountType, setDiscountType] = useState("");
 
-    const [category, setCategory] = useState("Electronics");
-    const [subCategory, setSubCategory] = useState("Electronics");
-    const [tag, setTag] = useState("Internet Of Things");
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [price, setPrice] = useState("");
+    const [discount, setDiscount] = useState("");
+
+    const [category, setCategory] = useState("");
+    const [subCategory, setSubCategory] = useState("");
 
     const [brand, setBrand] = useState("");
-    const [quantity, setQuantity] = useState("1");
+    const [quantity, setQuantity] = useState("");
 
-    const [images, setImages] = useState([
-        "https://images.unsplash.com/photo-1517336714739-489689fd1ca8?w=800",
-        "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800",
-        "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800"
-    ]);
+    const [images, setImages] = useState([]);
 
     const [selectedImage, setSelectedImage] = useState(0);
 
@@ -39,21 +37,37 @@ export default function CreateProductPage() {
 
     useEffect(() => {
         let data = formatSubCategory(category);
-        console.log(data)
         setSubCategoryOptions(data);
     }, [category])
 
     const handleImageUpload = (e) => {
-
         const files = Array.from(e.target.files);
 
         if (!files.length) return;
 
-        const newImages = files.map((file) =>
+        const validFiles = files.filter((file) => {
+            return file.type.startsWith("image/");
+        });
+
+        if (validFiles.length !== files.length) {
+            setErrors((prev) => ({
+                ...prev,
+                images: "Only image files are allowed."
+            }));
+        }
+
+        const newImages = validFiles.map((file) =>
             URL.createObjectURL(file)
         );
 
         setImages((prev) => [...prev, ...newImages]);
+
+        if (newImages.length > 0) {
+            setErrors((prev) => ({
+                ...prev,
+                images: ""
+            }));
+        }
     };
 
     const removeImage = (index) => {
@@ -67,23 +81,117 @@ export default function CreateProductPage() {
         }
     };
 
-    const handleSubmit = (e) => {
-
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const productData = {
-            productName,
-            description,
-            price,
-            discount,
-            category,
-            tag,
-            brand,
-            quantity,
-            images
-        };
+        const newErrors = {};
 
-        console.log(productData);
+        // Product name
+        if (!productName.trim()) {
+            newErrors.productName = "Product name is required.";
+        } else if (productName.trim().length < 3) {
+            newErrors.productName =
+                "Product name must be at least 3 characters.";
+        }
+
+        // Description
+        if (!description.trim()) {
+            newErrors.description = "Product description is required.";
+        } else if (description.trim().length < 10) {
+            newErrors.description =
+                "Description must be at least 10 characters.";
+        }
+
+        // Images
+        if (!images || images.length === 0) {
+            newErrors.images = "At least one product image is required.";
+        }
+
+        // Price
+        const numericPrice = Number(price);
+
+        if (!price || Number.isNaN(numericPrice)) {
+            newErrors.price = "Product price is required.";
+        } else if (numericPrice <= 0) {
+            newErrors.price = "Product price must be greater than ₦0.";
+        }
+
+        // Discount
+        const numericDiscount = Number(discount);
+
+        if (discount !== "" && Number.isNaN(numericDiscount)) {
+            newErrors.discount = "Enter a valid discount.";
+        } else if (
+            discount !== "" &&
+            (numericDiscount < 0 || numericDiscount > 100)
+        ) {
+            newErrors.discount =
+                "Discount must be between 0% and 100%.";
+        }
+
+        // Quantity
+        const numericQuantity = Number(quantity);
+
+        if (quantity === "" || Number.isNaN(numericQuantity)) {
+            newErrors.quantity = "Quantity is required.";
+        } else if (!Number.isInteger(numericQuantity)) {
+            newErrors.quantity = "Quantity must be a whole number.";
+        } else if (numericQuantity < 0) {
+            newErrors.quantity = "Quantity cannot be negative.";
+        }
+
+        // Category
+        if (!category) {
+            newErrors.category = "Please select a category.";
+        }
+
+        // Subcategory
+        if (!subCategory) {
+            newErrors.subCategory = "Please select a sub-category.";
+        }
+
+        // Brand
+        if (!brand) {
+            newErrors.brand = "Please select a brand.";
+        }
+
+        // Stop submission if there are errors
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            return;
+        }
+
+        setErrors({});
+        setIsSubmitting(true);
+
+        try {
+            const productData = {
+                productName: productName.trim(),
+                description: description.trim(),
+                price: numericPrice,
+                category,
+                subCategory,
+                brand,
+                quantity: numericQuantity,
+                images,
+                specialization: {
+                    discount: {
+                        discountType,
+                        discount: numericDiscount
+                    }
+                }
+            };
+
+            console.log(productData);
+
+            // API request here
+            // await baseApi.post("/product", productData);
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const brandOptions = brands.map((brand) => ({
@@ -116,7 +224,6 @@ export default function CreateProductPage() {
 
 
                     <div className="form-group">
-
                         <label>
                             Product Name
                         </label>
@@ -124,29 +231,54 @@ export default function CreateProductPage() {
                         <input
                             type="text"
                             value={productName}
-                            onChange={(e) =>
-                                setProductName(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setProductName(e.target.value);
+
+                                if (errors.productName) {
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        productName: ""
+                                    }));
+                                }
+                            }}
                             placeholder="Enter product name"
+                            className={errors.productName ? "input-error" : ""}
                         />
 
+                        {errors.productName && (
+                            <span className="error-message">
+                                {errors.productName}
+                            </span>
+                        )}
                     </div>
 
 
                     <div className="form-group">
-
                         <label>
                             Description
                         </label>
 
                         <textarea
                             value={description}
-                            onChange={(e) =>
-                                setDescription(e.target.value)
-                            }
+                            onChange={(e) => {
+                                setDescription(e.target.value);
+
+                                if (errors.description) {
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        description: ""
+                                    }));
+                                }
+                            }}
                             placeholder="Describe your product"
+                            className={errors.description ? "input-error" : ""}
                         />
 
+                        {errors.description && (
+                            <span className="error-message">
+                                {errors.description}
+                            </span>
+                        )}
                     </div>
 
                 </section>
@@ -254,7 +386,11 @@ export default function CreateProductPage() {
                             </button>
 
                         </div> */}
-
+                    {errors.images && (
+                        <span className="error-message">
+                            {errors.images}
+                        </span>
+                    )}
                 </section>
 
 
@@ -305,7 +441,6 @@ export default function CreateProductPage() {
 
 
                         <div className="form-group">
-
                             <label>
                                 Quantity
                             </label>
@@ -313,12 +448,26 @@ export default function CreateProductPage() {
                             <input
                                 type="number"
                                 min="0"
+                                step="1"
                                 value={quantity}
-                                onChange={(e) =>
-                                    setQuantity(e.target.value)
-                                }
+                                onChange={(e) => {
+                                    setQuantity(e.target.value);
+
+                                    if (errors.quantity) {
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            quantity: ""
+                                        }));
+                                    }
+                                }}
+                                className={errors.quantity ? "input-error" : ""}
                             />
 
+                            {errors.quantity && (
+                                <span className="error-message">
+                                    {errors.quantity}
+                                </span>
+                            )}
                         </div>
 
                     </div>
@@ -346,27 +495,39 @@ export default function CreateProductPage() {
 
 
                     <div className="form-group">
-
                         <label>
                             Base Pricing
                         </label>
 
-                        <div className="input-prefix">
-
-                            <span>
-                                ₦
-                            </span>
+                        <div
+                            className={`input-prefix ${errors.price ? "input-error-wrapper" : ""
+                                }`}
+                        >
+                            <span>₦</span>
 
                             <input
                                 type="number"
+                                min="0"
+                                step="0.01"
                                 value={price}
-                                onChange={(e) =>
-                                    setPrice(e.target.value)
-                                }
-                            />
+                                onChange={(e) => {
+                                    setPrice(e.target.value);
 
+                                    if (errors.price) {
+                                        setErrors((prev) => ({
+                                            ...prev,
+                                            price: ""
+                                        }));
+                                    }
+                                }}
+                            />
                         </div>
 
+                        {errors.price && (
+                            <span className="error-message">
+                                {errors.price}
+                            </span>
+                        )}
                     </div>
 
 
@@ -398,13 +559,10 @@ export default function CreateProductPage() {
                             </label>
 
                             <select
-                                defaultValue=""
+                                value={discountType}
+                                onChange={(e) => setDiscountType(e.target.value)}
                             >
-
-                                <option
-                                    value=""
-                                    disabled
-                                >
+                                <option value="" disabled>
                                     Select a discount type
                                 </option>
 
@@ -415,7 +573,6 @@ export default function CreateProductPage() {
                                 <option value="fixed">
                                     Fixed Amount
                                 </option>
-
                             </select>
 
                         </div>
@@ -444,47 +601,34 @@ export default function CreateProductPage() {
                         <Select
                             options={formatCategory()}
                             isSearchable
-                            onChange={(selected) => setCategory(selected?.value || "")}
-
-                            placeholder="Select a brand..."
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    minHeight: "56px",
-                                    borderRadius: "8px",
-                                    borderColor: state.isFocused
-                                        ? "#bfc1c8"
-                                        : "#e8e9ed",
-                                    backgroundColor: "#f8f9fa",
-                                    boxShadow: state.isFocused
-                                        ? "0 0 0 3px rgba(0, 0, 0, 0.025)"
-                                        : "none",
-                                    "&:hover": {
-                                        borderColor: "#bfc1c8"
+                            value={
+                                category
+                                    ? {
+                                        value: category,
+                                        label: category
                                     }
-                                }),
+                                    : null
+                            }
+                            onChange={(selected) => {
+                                setCategory(selected?.value || "");
+                                setSubCategory("");
 
-                                menu: (base) => ({
-                                    ...base,
-                                    borderRadius: "8px",
-                                    overflow: "hidden",
-                                    zIndex: 100
-                                }),
-
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#278A3D"
-                                        : state.isFocused
-                                            ? "#E8F5EB"
-                                            : "#fff",
-                                    color: state.isSelected
-                                        ? "#fff"
-                                        : "#222",
-                                    cursor: "pointer"
-                                })
+                                if (errors.category) {
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        category: ""
+                                    }));
+                                }
                             }}
+                            placeholder="Select a category..."
+                            className={errors.category ? "select-error" : ""}
                         />
+
+                        {errors.category && (
+                            <span className="error-message">
+                                {errors.category}
+                            </span>
+                        )}
 
                     </div>
 
@@ -498,47 +642,33 @@ export default function CreateProductPage() {
                         <Select
                             options={subCategoryOptions}
                             isSearchable
-                            onChange={(selected) => setSubCategory(selected?.value || "")}
-
-                            placeholder="Select a brand..."
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    minHeight: "56px",
-                                    borderRadius: "8px",
-                                    borderColor: state.isFocused
-                                        ? "#bfc1c8"
-                                        : "#e8e9ed",
-                                    backgroundColor: "#f8f9fa",
-                                    boxShadow: state.isFocused
-                                        ? "0 0 0 3px rgba(0, 0, 0, 0.025)"
-                                        : "none",
-                                    "&:hover": {
-                                        borderColor: "#bfc1c8"
+                            value={
+                                subCategory
+                                    ? {
+                                        value: subCategory,
+                                        label: subCategory
                                     }
-                                }),
+                                    : null
+                            }
+                            onChange={(selected) => {
+                                setSubCategory(selected?.value || "");
 
-                                menu: (base) => ({
-                                    ...base,
-                                    borderRadius: "8px",
-                                    overflow: "hidden",
-                                    zIndex: 100
-                                }),
-
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#278A3D"
-                                        : state.isFocused
-                                            ? "#E8F5EB"
-                                            : "#fff",
-                                    color: state.isSelected
-                                        ? "#fff"
-                                        : "#222",
-                                    cursor: "pointer"
-                                })
+                                if (errors.subCategory) {
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        subCategory: ""
+                                    }));
+                                }
                             }}
+                            placeholder="Select a sub-category..."
+                            className={errors.subCategory ? "select-error" : ""}
                         />
+
+                        {errors.subCategory && (
+                            <span className="error-message">
+                                {errors.subCategory}
+                            </span>
+                        )}
 
                     </div>
 
@@ -551,46 +681,33 @@ export default function CreateProductPage() {
                         <Select
                             options={brandOptions}
                             isSearchable
-                            onChange={(selected) => setBrand(selected?.value || "")}
-                            placeholder="Select a brand..."
-                            styles={{
-                                control: (base, state) => ({
-                                    ...base,
-                                    minHeight: "56px",
-                                    borderRadius: "8px",
-                                    borderColor: state.isFocused
-                                        ? "#bfc1c8"
-                                        : "#e8e9ed",
-                                    backgroundColor: "#f8f9fa",
-                                    boxShadow: state.isFocused
-                                        ? "0 0 0 3px rgba(0, 0, 0, 0.025)"
-                                        : "none",
-                                    "&:hover": {
-                                        borderColor: "#bfc1c8"
+                            value={
+                                brand
+                                    ? {
+                                        value: brand,
+                                        label: brand
                                     }
-                                }),
+                                    : null
+                            }
+                            onChange={(selected) => {
+                                setBrand(selected?.value || "");
 
-                                menu: (base) => ({
-                                    ...base,
-                                    borderRadius: "8px",
-                                    overflow: "hidden",
-                                    zIndex: 100
-                                }),
-
-                                option: (base, state) => ({
-                                    ...base,
-                                    backgroundColor: state.isSelected
-                                        ? "#278A3D"
-                                        : state.isFocused
-                                            ? "#E8F5EB"
-                                            : "#fff",
-                                    color: state.isSelected
-                                        ? "#fff"
-                                        : "#222",
-                                    cursor: "pointer"
-                                })
+                                if (errors.brand) {
+                                    setErrors((prev) => ({
+                                        ...prev,
+                                        brand: ""
+                                    }));
+                                }
                             }}
+                            placeholder="Select a brand..."
+                            className={errors.brand ? "select-error" : ""}
                         />
+
+                        {errors.brand && (
+                            <span className="error-message">
+                                {errors.brand}
+                            </span>
+                        )}
 
                     </div>
 
