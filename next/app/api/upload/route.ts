@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
-import { getJwtSecret } from "../../lib/jwt";
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const ALLOWED = new Set([
@@ -13,18 +12,33 @@ const ALLOWED = new Set([
 
 export async function POST(request: NextRequest) {
   try {
-    const token = request.cookies.get("entrepreneur_secret")?.value;
-    if (!token) {
-      return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
-    }
-    const secret = getJwtSecret();
-    if (!secret) {
+
+    // Extract the admin id from the JWT
+    const getCookie = request.cookies.get("admin_token");
+    if (!getCookie || !getCookie.value) {
       return NextResponse.json(
-        { error: "Server auth misconfiguration." },
+        { success: false, data: "Server error, cookie is missing!" },
         { status: 500 }
       );
     }
-    jwt.verify(token, secret);
+    const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
+
+    const decoded = jwt.decode(token);
+
+    const admin_id = decoded.id;
+
+    // const token = request.cookies.get("entrepreneur_secret")?.value;
+    // if (!token) {
+    //   return NextResponse.json({ error: "You must be signed in." }, { status: 401 });
+    // }
+    // const secret = getJwtSecret();
+    // if (!secret) {
+    //   return NextResponse.json(
+    //     { error: "Server auth misconfiguration." },
+    //     { status: 500 }
+    //   );
+    // }
+    // jwt.verify(token, secret);
 
     const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
     const apiKey = process.env.CLOUDINARY_API_KEY;
@@ -47,8 +61,16 @@ export async function POST(request: NextRequest) {
 
     const form = await request.formData();
     const file = form.get("file");
+    const productId = form.get("product_id");
     if (!file || typeof file === "string") {
       return NextResponse.json({ error: "Missing file." }, { status: 400 });
+    }
+
+    if (!productId || typeof productId !== "string") {
+      return NextResponse.json(
+        { error: "Missing product ID." },
+        { status: 400 }
+      );
     }
 
     const mime = file.type || "application/octet-stream";
@@ -71,11 +93,12 @@ export async function POST(request: NextRequest) {
     const dataUri = `data:${mime};base64,${b64}`;
 
     const uploaded = await cloudinary.uploader.upload(dataUri, {
-      folder: "Deskinculture/verification",
+      folder: `Deskinculture/products/${productId}`,
       resource_type: "auto",
     });
 
     return NextResponse.json({
+      success: true,
       url: uploaded.secure_url,
       publicId: uploaded.public_id,
     });
