@@ -201,11 +201,11 @@ export function Header() {
                     }}>
                         <IoCartOutline height={23} width={23} />
                     </button>
-                    <button onClick={e => {
+                    {/* <button onClick={e => {
                         window.location.href = ("/store/wishlist");
                     }}>
                         <IoHeartOutline height={23} width={23} />
-                    </button>
+                    </button> */}
                     <button onClick={e => {
                         window.location.href = ("/store/search");
                     }}>

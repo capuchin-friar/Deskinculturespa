@@ -24,7 +24,7 @@ import { baseApi } from '../../../../app/api/config'
 import { set_cart } from '../../../../redux/customer/cart'
 import QuantityCounter from '../QuantityCounter'
 import { data } from 'react-router-dom'
-
+import useToggler from "../../../hooks/toggler"
 let BtnStyles = {
     height: '35px',
     width: '100%',
@@ -53,6 +53,12 @@ const Product = ({ item }) => {
     let ItemImages = [];
     let ActiveImg = {};
 
+    const {
+        addToCart,
+        rmFromCart,
+        isCarted
+    } = useToggler();
+
     // let {
     //     user_id
     // } = useSelector(s => s.user_id);
@@ -70,7 +76,6 @@ const Product = ({ item }) => {
 
     let [metaImg, setMetaImg] = useState('')
     let [screenWidth, setScreenWidth] = useState(0)
-    let [isCarted, setIsCarted] = useState(false);
     let [loading, setLoading] = useState(false);
     let [qty, setQty] = useState(1);
 
@@ -92,8 +97,6 @@ const Product = ({ item }) => {
 
     const handleRatingChange = (newRating) => setRating(newRating);
     const buyNow = () => "";
-
-    useEffect(() => setIsCarted(cart.filter(c => c.id === item.id).length > 0), [cart])
 
     useEffect(() => {
         let cartedProd = cart.find(c => c.product_id === item.id);
@@ -130,68 +133,15 @@ const Product = ({ item }) => {
         }
     }
 
-    async function addToCart() {
-        const {
-            data,
-            status
-        } = await baseApi.post("cart/add", {
-            product_id: item.id,
-            qty: qty
-        });
 
-        if (!data.success) {
-            console.log("Error: ", data.message)
-        }
-        if (data.success) {
-            const {
-                data,
-                status
-            } = await baseApi.get("cart");
+    async function toggleCart() {
+        let isProductCarted = isCarted(item.id);
 
-            if (!data.success) {
-                console.log("Error: ", data.message)
-            }
-            console.log(data.data)
-            dispatch(
-                set_cart(
-                    data.data
-                )
-            )
-        }
-    }
-
-    async function rmFromCart() {
-        let cartId = cart.filter(c => c.product_id === item.id)[0].id;
-        const {
-            data,
-            status
-        } = await baseApi.delete("cart/delete", {
-            data: {
-                id: cartId
-            }
-        });
-
-        if (!data.success) {
-            console.log("Error: ", data.message)
-        }
-        if (data.success) {
-            dispatch(
-                set_cart(
-                    cart.filter(c => c.id !== cartId)
-                )
-            )
-            setQty(1);
-
-        }
-    }
-
-
-    function toggleCart() {
-        let isProductCarted = cart.some(c => c.product_id === item.id);
         if (isProductCarted) {
-            rmFromCart();
+            await rmFromCart(item.id);
+            setQty(1);
         } else {
-            addToCart();
+            await addToCart({item, qty})
         }
 
     }
@@ -294,7 +244,7 @@ const Product = ({ item }) => {
                                     </button> */}
                                     <button style={{ borderRadius: '2.5px', border: 'none', outline: 'none', width: '100%' }} className='shadow' onClick={e => toggleCart()}>
                                         {
-                                            cart.some(c => c.product_id === item.id) ? "Remove From Cart" : "Add To Cart"
+                                            isCarted(item.id) ? "Remove From Cart" : "Add To Cart"
                                         }
                                     </button>
                                 </div>

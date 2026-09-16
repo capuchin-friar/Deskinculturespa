@@ -4,11 +4,19 @@ import "./styles/xxl.css";
 import { useEffect, useState } from "react";
 import { baseApi } from "../api/config";
 import Formatter from "../../src/utils/formatter";
+import useToggler from "../../src/hooks/toggler";
 
 export default function Store() {
 
     let router = useRouter();
     const [products, setProducts] = useState([]);
+
+    const {
+        addToCart,
+        rmFromCart,
+        isCarted
+    } = useToggler();
+
 
     useEffect(() => {
         (async () => {
@@ -41,13 +49,23 @@ export default function Store() {
                                 <div className="customer-store-product-thumbnail" style={{
                                     backgroundImage: `url(${p.thumbnail_url})`
                                 }}>
-                                    <div className="card-button">
-                                        <button className="btn">
-                                            Add To Cart
+                                    <div className="card-button" style={{ justifyContent: 'center' }}>
+                                        <button className="btn" style={{ background: "transparent", color: "#fff", fontWeight: "500" }} onClick={async () => {
+                                            let isProductCarted = isCarted(p.id);
+
+                                            if (isProductCarted) {
+                                                await rmFromCart(p.id);
+                                            } else {
+                                                await addToCart({ item: p, qty: 1 })
+                                            }
+                                        }}>
+                                            {
+                                                isCarted(p.id) ? "Remove From Cart" : "Add To Cart"
+                                            }
                                         </button>
-                                        <button className="btn">
+                                        {/* <button className="btn">
                                             Buy Now
-                                        </button>
+                                        </button> */}
                                     </div>
                                     {/* <img src={p.thumbnail ?? ""} style={{height: "100%", width: "100%"}} alt="product-image" /> */}
                                 </div>

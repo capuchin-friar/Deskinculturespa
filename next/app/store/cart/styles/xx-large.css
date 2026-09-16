@@ -165,7 +165,7 @@
         border: none;
         border-radius: 4px;
 
-        background: #7761e8;
+        background: #278a3d;
 
         color: #ffffff;
 
@@ -180,7 +180,7 @@
     }
 
     .checkout-btn:hover {
-        background: #6851d9;
+        background: #63D94F;
     }
 
     .checkout-btn:active {

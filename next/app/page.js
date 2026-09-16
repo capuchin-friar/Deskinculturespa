@@ -8,9 +8,19 @@ import WhyChooseUs from "@/src/components/customer/Why"
 import { useEffect, useState } from "react";
 import { baseApi } from "./api/config";
 import Formatter from "../src/utils/formatter";
+import useToggler from "../src/hooks/toggler";
+import { useRouter } from "next/navigation";
 export default function Home() {
 
+  const router = useRouter();
   const [products, setProducts] = useState([]);
+
+  const {
+    addToCart,
+    rmFromCart,
+    isCarted
+  } = useToggler();
+
 
   useEffect(() => {
     (async () => {
@@ -190,13 +200,22 @@ export default function Home() {
                 <div className="customer-product-thumbnail" style={{
                   backgroundImage: `url(${p.thumbnail_url})`
                 }}>
-                  <button className="card-button">
-                    Add To Cart
+                  <button className="card-button" onClick={async () => {
+                    let isProductCarted = isCarted(p.id);
+
+                    if (isProductCarted) {
+                      await rmFromCart(p.id);
+                    } else {
+                      await addToCart({ item: p, qty: 1 })
+                    }
+                  }}>
+                    {
+                      isCarted(p.id) ? "Remove From Cart" : "Add To Cart"
+                    }
                   </button>
-                  {/* <img src={p.thumbnail ?? ""} style={{height: "100%", width: "100%"}} alt="product-image" /> */}
                 </div>
 
-                <div className="customer-product-body">
+                <div className="customer-product-body" onClick={() => router.push(`/store/${p.id}`)}>
                   <p className="customer-product-title">
                     {p.name ?? "Product title"}
                   </p>

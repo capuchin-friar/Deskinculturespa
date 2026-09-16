@@ -16,12 +16,7 @@ const CardCnt = ({items}) => {
         let width = window.innerWidth;
         setScreenWidth(width)
     }, [])
-
-    
-    
  
-    let dispatch = useDispatch()
-
     return ( 
         <>
             <div className="overlay" >

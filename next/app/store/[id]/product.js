@@ -25,6 +25,9 @@ import axios from 'axios';
 // import { buyer_overlay_setup } from '@/src/reusable.js/overlay-setup';
 // import Share from '@/src/components/customer/Product/Share';
 import { useParams } from 'next/navigation';
+import Carousel from '../../../src/components/customer/Product/SimilarProds';
+import SimilarProducts from '../../../src/components/customer/Product/SimilarProds';
+import useToggler from '../../../src/hooks/toggler';
 // import Contact from '@/src/components/customer/Product/Contact'; 
 
 const ProductPageClient = ({product}) => {
@@ -75,6 +78,12 @@ const ProductPageClient = ({product}) => {
     }, [pathname])
 
     const hasRun = useRef(false);
+    const {
+        addToCart,
+        rmFromCart,
+        isCarted
+      } = useToggler();
+    
 
     const jsonLd = {
         '@context': 'https://schema.org',
@@ -104,16 +113,10 @@ const ProductPageClient = ({product}) => {
   };
 
     let { cart: Cart } = useSelector(s => s.cart);
-    const [is_carted, set_is_carted] = useState(false);
-    useEffect(() => {
-        let filter = Cart.filter(cart_item => cart_item.product_id === item.product_id)
-        set_is_carted(filter.length > 0)
-    }, [Cart])
-
 
     function cartHandler () {
         buyer_overlay_setup(true, 'Processing')
-        if (!is_carted) {
+        if (!isCarted(item?.id ?? item?.product_id)) {
             axios.post('/api/store/cart/create', {
                 product_id: item.product_id,
                 user_id: buyer_info.user_id
@@ -186,7 +189,7 @@ const ProductPageClient = ({product}) => {
                                 width: 'fit-content',
                                 height: 'fit-content',
                                 borderRadius: '6px',
-                                background: is_carted ? '#278A3D' : 'transparent',
+                                background: isCarted(item?.id ?? item?.product_id) ? '#278A3D' : 'transparent',
                                 border: '1px solid #278A3D'
                             }} onClick={e => {
                                 cartHandler()
@@ -195,14 +198,6 @@ const ProductPageClient = ({product}) => {
                                     order_list?.filter((data) => data?.product?.product_id === item?.product_id && data?.order?.user_id === user_id).length > 0
                                 }
                             >
-                                {/* {
-                                    is_carted
-                                    ?
-                                    <img src={ytCartSvg.src} style={{height: '22px', width: '22px'}} alt="" />
-                                    :
-                                    <img src={cartSvg.src} style={{height: '22px', width: '22px'}} alt="" />
-                                    
-                                } */}
                             </button>
                             <button style={{borderRadius: '2.5px',border: 'none', outline: 'none', width: '100%'}} className='shadow' onClick={e=>
                                 // handleOrder(item.product_id)
@@ -243,17 +238,11 @@ const ProductPageClient = ({product}) => {
 
                     {/* <Reviews /> */}
                     <section style={{marginBottom: '0', marginTop: "10px"}}> 
-                        <div className="header" style={{height: '50px', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'left', position: 'relative', width: '100%', background: '#fff'}}>
+                        {/* <div className="header" style={{height: '50px', padding: '10px', display: 'flex', alignItems: 'center', justifyContent: 'left', position: 'relative', width: '100%', background: '#fff'}}>
                             <div style={{float: 'left', color: '#000', fontFamily: 'sans-serif',}}><b>Similar Items You May like</b></div>
-                        </div>
+                        </div> */}
+                            <SimilarProducts /> 
                         <div style={{display: 'flex'}}>
-                            {/* {
-                                product
-                                ?
-                                <Carousel category={btoa(product?.category)} product_id={product?.product_id} />
-                                :
-                                ''
-                            } */}
                         </div>
                     </section>
 
