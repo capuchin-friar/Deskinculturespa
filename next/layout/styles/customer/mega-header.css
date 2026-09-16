@@ -1,79 +1,418 @@
+/* =========================================================
+   CUSTOMER HEADER NAVIGATION
+========================================================= */
 
-
-.nav {
+.customer-header .customer-resource {
     height: 100%;
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 34px;
 }
 
-.nav-item {
+
+/* =========================================================
+   NAV ITEM
+========================================================= */
+
+.customer-header .customer-resource .nav-item {
     position: static;
+
     height: 100%;
+
     display: flex;
     align-items: center;
+
     cursor: pointer;
 }
 
-.mega-menu {
+
+/* =========================================================
+   NAV ITEM LABEL
+========================================================= */
+
+.customer-header .customer-resource .nav-item-label {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+
+    height: 100%;
+
+    color: #172019;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    letter-spacing: 0.1px;
+
+    transition:
+        color 0.2s ease;
+}
+
+
+.customer-header .customer-resource .nav-item-label::after {
+    content: "";
+
     position: absolute;
+
+    left: 0;
+    bottom: 14px;
+
+    width: 0;
+    height: 1.5px;
+
+    background-color: #278A3D;
+
+    transition:
+        width 0.25s ease;
+}
+
+
+.customer-header .customer-resource .nav-item:hover
+.nav-item-label {
+    color: #278A3D;
+}
+
+
+.customer-header .customer-resource .nav-item:hover
+.nav-item-label::after {
+    width: 100%;
+}
+
+
+/* =========================================================
+   MEGA MENU
+========================================================= */
+
+.customer-header .customer-resource .mega-menu {
+    position: absolute;
+
     top: 60px;
     left: 0;
 
     width: 100%;
-    min-height: 50px;
 
-    background: rgb(255, 255, 255);
-    border-top: 1px solid #eee;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    background-color: #FFFFFF;
 
-    /* Hidden state */
+    border-top: 1px solid #E8EEE9;
+
+    box-shadow:
+        0 18px 45px rgba(11, 59, 26, 0.10);
+
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-15px);
+
+    transform:
+        translateY(-8px);
 
     transition:
-        opacity 0.25s ease,
-        transform 0.25s ease,
-        visibility 0.25s ease;
+        opacity 0.22s ease,
+        visibility 0.22s ease,
+        transform 0.22s ease;
 
     z-index: 1000;
 }
 
-.nav-item:hover .mega-menu {
+
+/* =========================================================
+   MEGA MENU HOVER
+========================================================= */
+
+.customer-header .customer-resource .nav-item:hover
+.mega-menu {
     opacity: 1;
+
     visibility: visible;
-    transform: translateY(0);
+
+    transform:
+        translateY(0);
 }
 
-.mega-menu-content {
+
+/* =========================================================
+   MEGA MENU INNER
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-inner {
     width: 100%;
-    /* max-width: 1200px; */
-    margin: 0 auto;
-    padding: 40px;
+
+    min-height: 280px;
+
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: stretch;
+
+    padding: 0 55px;
 }
 
-.mega-menu-offers{
-    width: fit-content;
-    margin: 0px 25px;
+
+/* =========================================================
+   MEGA MENU INTRO
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-intro {
+    width: 260px;
+
+    padding: 42px 40px 42px 0;
+
+    border-right: 1px solid #E8EEE9;
+
+    flex-shrink: 0;
 }
 
-.mega-menu-offers h4{
-    margin-bottom: 10px;
-    font-weight: 600;
-    font-size: 15px;
+
+.customer-header .customer-resource .mega-menu-eyebrow {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #278A3D;
+
+    font-size: 10px;
+
+    font-weight: 700;
+
+    letter-spacing: 1.7px;
 }
 
-.mega-menu-opt-cnt{
+
+.customer-header .customer-resource .mega-menu-intro h3 {
     margin: 0;
+
+    color: #0B3B1A;
+
+    font-size: 24px;
+
+    font-weight: 700;
+
+    letter-spacing: -0.4px;
+}
+
+
+.customer-header .customer-resource .mega-menu-intro p {
+    max-width: 210px;
+
+    margin: 12px 0 0;
+
+    color: #66736A;
+
+    font-size: 12px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   MEGA MENU CONTENT
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-content {
+    flex: 1;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 70px;
+
+    padding: 42px 0 42px 55px;
+}
+
+
+/* =========================================================
+   MEGA MENU SECTION
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-section {
+    min-width: 190px;
+}
+
+
+.customer-header .customer-resource .mega-menu-section h4 {
+    margin: 0 0 17px;
+
+    color: #0B3B1A;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.3px;
+}
+
+
+/* =========================================================
+   MEGA MENU LIST
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-list {
+    margin: 0;
+
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 11px;
+
+    list-style: none;
+}
+
+
+/* =========================================================
+   MEGA MENU LIST ITEM
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-list-item {
+    margin: 0;
+
     padding: 0;
 }
 
-.mega-menu-opt{
-    margin: 0;
-    padding: 2.5px 0px;
-    font-size: 14px;
+
+.customer-header .customer-resource .mega-menu-list-item a {
+    position: relative;
+
+    display: inline-flex;
+
+    align-items: center;
+
+    color: #66736A;
+
+    font-size: 12px;
+
+    font-weight: 400;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.customer-header .customer-resource .mega-menu-list-item a::before {
+    content: "";
+
+    width: 0;
+
+    height: 1px;
+
+    margin-right: 0;
+
+    background-color: #278A3D;
+
+    transition:
+        width 0.2s ease,
+        margin-right 0.2s ease;
+}
+
+
+.customer-header .customer-resource .mega-menu-list-item a:hover {
+    color: #278A3D;
+
+    transform:
+        translateX(2px);
+}
+
+
+.customer-header .customer-resource .mega-menu-list-item a:hover::before {
+    width: 10px;
+
+    margin-right: 7px;
+}
+
+
+/* =========================================================
+   VIEW ALL
+========================================================= */
+
+.customer-header .customer-resource .mega-menu-view-all {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-top: 18px;
+
+    color: #278A3D;
+
+    font-size: 11px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+}
+
+
+.customer-header .customer-resource .mega-menu-view-all span {
+    transition:
+        transform 0.2s ease;
+}
+
+
+.customer-header .customer-resource .mega-menu-view-all:hover span {
+    transform:
+        translateX(4px);
+}
+
+
+/* =========================================================
+   RESOURCE MENU
+========================================================= */
+
+.customer-header .customer-resource
+.mega-menu-resource-section {
+    min-width: 300px;
+}
+
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
+
+.customer-header .customer-features {
+    display: flex;
+
+    align-items: center;
+
+    gap: 5px;
+}
+
+
+.customer-header .customer-features button {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    padding: 0;
+
+    border: 1px solid transparent;
+
+    background-color: #FFFFFF;
+
+    color: #172019;
+
+    border-radius: 50%;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.customer-header .customer-features button:hover {
+    background-color: #EEF7EF;
+
+    border-color: #DDE9DF;
+
+    color: #278A3D;
 }

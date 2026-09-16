@@ -1,9 +1,15 @@
+import {
+    IoCartOutline,
+    IoPersonOutline,
+    IoSearchOutline
+} from "react-icons/io5";
 
-import { IoCart, IoCartOutline, IoHeart, IoHeartOutline, IoPersonOutline, IoSearchOutline, IoStorefrontOutline } from "react-icons/io5";
 import Link from "next/link";
+
+
 export function Header() {
 
-    let offers = [
+    const offers = [
         {
             products: [
                 {
@@ -32,7 +38,6 @@ export function Header() {
                 }
             ]
         },
-    
         {
             services: [
                 {
@@ -65,7 +70,6 @@ export function Header() {
                 }
             ]
         },
-    
         {
             appointments: [
                 {
@@ -100,125 +104,380 @@ export function Header() {
         }
     ];
 
-    let resources = [
+
+    const resources = [
         {
-            "resource": [
-                "About",
-                // "Career",
+            resource: [
+                "About Us",
+                "Our Story",
                 "Blogs",
                 "FAQ",
-                "Contact us",
-                "News Letter",
-                "Referral"
+                "Contact Us",
+                "Newsletter",
+                "Referral Program",
+                "Shipping & Returns"
             ]
         }
-    ]
+    ];
+
+
+    const gallery = [
+        {
+            gallery: [
+                "Treatment Gallery",
+                "Before & After",
+                "Spa Experience",
+                "Facial Treatments",
+                "Body Treatments",
+                "Massage Sessions"
+            ]
+        }
+    ];
+
 
     return (
-        <>
-            <header className="customer-header">
-                <nav className="nav customer-resource">
-                    <div className="nav-item">
+        <header className="customer-header">
+
+            {/* =========================
+                LEFT NAVIGATION
+            ========================== */}
+
+            <nav className="nav customer-resource">
+
+
+                {/* =========================
+                    SHOP
+                ========================== */}
+
+                <div className="nav-item">
+
+                    <span className="nav-item-label">
                         Shop
-                        <div className="mega-menu">
-                            <div className="mega-menu-content">
-                                {
-                                    offers.map((o, i) => {
-                                        const [type, items] = Object.entries(o)[0];
-
-                                        return (
-                                            <div className="mega-menu-offers" key={i}>
-                                                <h4>{type.charAt(0).toUpperCase()}{type.slice(1)}</h4>
-
-                                                <ul className="mega-menu-opt-cnt">
-                                                    {items.map((item, index) => (
-                                                        <li className="mega-menu-opt" key={index}>
-                                                            <Link href="#">
-                                                                {item.name}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        );
-                                    })
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="nav-item">
-                        Resources
-                        <div className="mega-menu">
-                            <div className="mega-menu-content">
-                                {
-                                    resources.map((o, i) => {
-                                        const [type, items] = Object.entries(o)[0];
-
-                                        return (
-                                            <div className="mega-menu-offers" key={i}>
-                                                {/* <h4>{type}</h4> */}
-
-                                                <ul className="mega-menu-opt-cnt">
-                                                    {items.map((item, index) => (
-                                                        <li className="mega-menu-opt" key={index}>
-                                                            <Link href="#">
-                                                                {item}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        );
-                                    })
-                                }
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="nav-item">
-                        Gallery
-                        <div className="mega-menu">
-                            <div className="mega-menu-content">
-                                <h3>Services</h3>
-                                <p>Explore our services</p>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
-                <div className="customer-welcome-box">
-                    <span>
-                        <img src="" alt="logo" />
                     </span>
-                    &nbsp;
-                    <span><b>DeSkinCulture</b></span>
+
+                    <div className="mega-menu">
+
+                        <div className="mega-menu-inner">
+
+                            <div className="mega-menu-intro">
+
+                                <span className="mega-menu-eyebrow">
+                                    EXPLORE
+                                </span>
+
+                                <h3>
+                                    Shop
+                                </h3>
+
+                                <p>
+                                    Discover our products, treatments
+                                    and personalized experiences.
+                                </p>
+
+                            </div>
+
+
+                            <div className="mega-menu-content">
+
+                                {offers.map((offer, index) => {
+
+                                    const [type, items] =
+                                        Object.entries(offer)[0];
+
+                                    return (
+
+                                        <div
+                                            className="mega-menu-section"
+                                            key={index}
+                                        >
+
+                                            <h4>
+                                                {type.charAt(0).toUpperCase()}
+                                                {type.slice(1)}
+                                            </h4>
+
+                                            <ul className="mega-menu-list">
+
+                                                {items.map((item) => (
+
+                                                    <li
+                                                        className="mega-menu-list-item"
+                                                        key={item.id}
+                                                    >
+
+                                                        <Link href="#">
+                                                            {item.name}
+                                                        </Link>
+
+                                                    </li>
+
+                                                ))}
+
+                                            </ul>
+
+                                            <Link
+                                                href="#"
+                                                className="mega-menu-view-all"
+                                            >
+                                                View all
+                                                <span>→</span>
+                                            </Link>
+
+                                        </div>
+
+                                    );
+
+                                })}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
                 </div>
 
-                <div className="customer-features">
-                    <button onClick={e => {
-                        window.location.href = ("/store/cart");
-                    }}>
-                        <IoCartOutline color="#000" height={23} width={23} />
-                    </button>
-                    {/* <button onClick={e => {
-                        window.location.href = ("/store/wishlist");
-                    }}>
-                        <IoHeartOutline color="#000" height={23} width={23} />
-                    </button> */}
-                    <button onClick={e => {
-                        window.location.href = ("/store/search");
-                    }}>
-                        <IoSearchOutline color="#000" height={23} width={23} />
-                    </button>
-                    <button onClick={e => {
+
+                {/* =========================
+                    RESOURCES
+                ========================== */}
+
+                <div className="nav-item">
+
+                    <span className="nav-item-label">
+                        Resources
+                    </span>
+
+                    <div className="mega-menu">
+
+                        <div className="mega-menu-inner">
+
+                            <div className="mega-menu-intro">
+
+                                <span className="mega-menu-eyebrow">
+                                    DISCOVER
+                                </span>
+
+                                <h3>
+                                    Resources
+                                </h3>
+
+                                <p>
+                                    Learn more about De Skin Culture,
+                                    our services and how we can help you.
+                                </p>
+
+                            </div>
+
+
+                            <div className="mega-menu-content">
+
+                                {resources.map((resource, index) => {
+
+                                    const [type, items] =
+                                        Object.entries(resource)[0];
+
+                                    return (
+
+                                        <div
+                                            className="mega-menu-section mega-menu-resource-section"
+                                            key={index}
+                                        >
+
+                                            <h4>
+                                                Helpful Links
+                                            </h4>
+
+                                            <ul className="mega-menu-list">
+
+                                                {items.map((item, itemIndex) => (
+
+                                                    <li
+                                                        className="mega-menu-list-item"
+                                                        key={itemIndex}
+                                                    >
+
+                                                        <Link href="#">
+                                                            {item}
+                                                        </Link>
+
+                                                    </li>
+
+                                                ))}
+
+                                            </ul>
+
+                                        </div>
+
+                                    );
+
+                                })}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                {/* =========================
+                    GALLERY
+                ========================== */}
+
+                <div className="nav-item">
+
+                    <span className="nav-item-label">
+                        Gallery
+                    </span>
+
+                    <div className="mega-menu">
+
+                        <div className="mega-menu-inner">
+
+                            <div className="mega-menu-intro">
+
+                                <span className="mega-menu-eyebrow">
+                                    OUR WORK
+                                </span>
+
+                                <h3>
+                                    Gallery
+                                </h3>
+
+                                <p>
+                                    Take a look at our treatments,
+                                    spa experience and results.
+                                </p>
+
+                            </div>
+
+
+                            <div className="mega-menu-content">
+
+                                {gallery.map((galleryItem, index) => {
+
+                                    const [type, items] =
+                                        Object.entries(galleryItem)[0];
+
+                                    return (
+
+                                        <div
+                                            className="mega-menu-section"
+                                            key={index}
+                                        >
+
+                                            <h4>
+                                                Explore Gallery
+                                            </h4>
+
+                                            <ul className="mega-menu-list">
+
+                                                {items.map((item, itemIndex) => (
+
+                                                    <li
+                                                        className="mega-menu-list-item"
+                                                        key={itemIndex}
+                                                    >
+
+                                                        <Link href="#">
+                                                            {item}
+                                                        </Link>
+
+                                                    </li>
+
+                                                ))}
+
+                                            </ul>
+
+                                        </div>
+
+                                    );
+
+                                })}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </nav>
+
+
+            {/* =========================
+                BRAND
+            ========================== */}
+
+            <div className="customer-welcome-box">
+
+                <span className="customer-logo">
+
+                    <img
+                        src=""
+                        alt="De Skin Culture"
+                    />
+
+                </span>
+
+                <span className="customer-brand-name">
+                    <b>
+                        DeSkinCulture
+                    </b>
+                </span>
+
+            </div>
+
+
+            {/* =========================
+                HEADER ACTIONS
+            ========================== */}
+
+            <div className="customer-features">
+
+                <button
+                    type="button"
+                    aria-label="Shopping cart"
+                    onClick={() => {
+                        window.location.href = "/store/cart";
+                    }}
+                >
+                    <IoCartOutline
+                        size={23}
+                    />
+                </button>
+
+
+                <button
+                    type="button"
+                    aria-label="Search"
+                    onClick={() => {
+                        window.location.href = "/store/search";
+                    }}
+                >
+                    <IoSearchOutline
+                        size={23}
+                    />
+                </button>
+
+
+                <button
+                    type="button"
+                    aria-label="Profile"
+                    onClick={() => {
                         window.open("/profile", "_blank");
-                    }}>
-                        <IoPersonOutline color="#000" height={20} width={20} />
-                    </button>
-                </div>
+                    }}
+                >
+                    <IoPersonOutline
+                        size={20}
+                    />
+                </button>
 
-            </header>
-        </>
-    )
+            </div>
+
+        </header>
+    );
 }

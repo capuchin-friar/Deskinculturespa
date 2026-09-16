@@ -1,114 +1,481 @@
+/* =========================================================
+   DSC FOOTER — ROOT VARIABLES
+========================================================= */
+
 :root {
-    /* Brand */
-    --brand-green: #278A3D;
-    --brand-dark: #0B3B1A;
-    --brand-light: #63D94F;
-    --brand-green-light: #278A3D80;
+    --dsc-footer-green: #278A3D;
+    --dsc-footer-dark: #0B3B1A;
+    --dsc-footer-light: #63D94F;
 
-    /* Neutrals */
-    --white: #FFFFFF;
-    --off-white: #F8FAF7;
-    --text-dark: #172019;
-    --text-muted: #66736A;
-    --border: #E1E8E2;
+    --dsc-footer-white: #FFFFFF;
+    --dsc-footer-off-white: #F8FAF7;
 
-    /* Supporting */
-    --soft-green: #EEF7EF;
-    --sage: #8BA98F;
+    --dsc-footer-text-dark: #172019;
+    --dsc-footer-text-muted: #66736A;
 
-    /* Border Radius */
-    --radius: 5px;
-    --family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    --dsc-footer-border: #E1E8E2;
+    --dsc-footer-soft-green: #EEF7EF;
+
+    --dsc-footer-radius: 10px;
+
+    --dsc-footer-font:
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        Oxygen,
+        Ubuntu,
+        Cantarell,
+        "Open Sans",
+        "Helvetica Neue",
+        sans-serif;
 }
 
 
-footer{
+/* =========================================================
+   DSC FOOTER
+========================================================= */
+
+.dsc-footer {
     position: relative;
-    height: 80vh;
+
     width: 100%;
-    padding: 80px 40px 10px 40px;
+    min-height: 760px;
+
+    padding: 55px 45px 0;
+
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    background-color: var(--brand-green);
+
+    background-color: var(--dsc-footer-green);
+
+    color: var(--dsc-footer-white);
+
+    font-family: var(--dsc-footer-font);
+
+    overflow: hidden;
 }
 
-footer .footer-newsletter-cnt{
-    height: 400px;
+
+/* =========================================================
+   DSC FOOTER — NEWSLETTER
+========================================================= */
+
+.dsc-footer-newsletter {
     width: 100%;
+    min-height: 300px;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-radius: var(--radius);
-    background-color: #FFFFFF;
+
+    padding: 0;
+
+    background-color: var(--dsc-footer-white);
+
+    border-radius: 14px;
+
+    box-shadow:
+        0 15px 40px rgba(11, 59, 26, 0.10);
+
+    overflow: hidden;
 }
 
-.right, .left{
-    width: 50%;
-    padding: 45px;
+
+/* =========================================================
+   DSC FOOTER — NEWSLETTER LEFT
+========================================================= */
+
+.dsc-footer-newsletter-left {
+    width: 52%;
+
+    padding: 50px 60px;
 }
 
-.footer-input-cnt{
-    height: 120px;
-    width: fit-content;
+
+.dsc-footer-eyebrow {
+    display: block;
+
+    margin-bottom: 12px;
+
+    color: var(--dsc-footer-green);
+
+    font-size: 11px;
+    font-weight: 700;
+
+    letter-spacing: 1.8px;
+}
+
+
+.dsc-footer-newsletter-left h1 {
+    margin: 0;
+
+    color: var(--dsc-footer-dark);
+
+    font-size: 36px;
+    line-height: 1.15;
+
+    font-weight: 700;
+
+    letter-spacing: -0.8px;
+}
+
+
+.dsc-footer-newsletter-left p {
+    max-width: 520px;
+
+    margin: 16px 0 0;
+
+    color: var(--dsc-footer-text-muted);
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   DSC FOOTER — NEWSLETTER RIGHT
+========================================================= */
+
+.dsc-footer-newsletter-right {
+    width: 48%;
+    min-height: 300px;
+
     display: flex;
+    align-items: center;
+
+    padding: 50px 60px;
+
+    background-color: var(--dsc-footer-soft-green);
+
+    border-left: 1px solid var(--dsc-footer-border);
+}
+
+
+/* =========================================================
+   DSC FOOTER — NEWSLETTER FORM
+========================================================= */
+
+.dsc-footer-newsletter-form {
+    width: 100%;
+    max-width: 500px;
+
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    flex-direction: column;
-    justify-content: space-between;
+
+    gap: 10px;
 }
 
-.footer-input-cnt .input-btn input{
-    height: 45px;
-    width: 300px;
-    border: .5px solid #8BA98F;
-    padding: 10px 20px;
-    outline: .5px solid #777777;
-    border-radius: var(--radius);
-    border-radius: 10px 0px 0px 10px;
 
+.dsc-footer-newsletter-form label {
+    color: var(--dsc-footer-dark);
+
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.footer-input-cnt .input-btn button{
-    background-color: #000;
-    padding: 10px 25px;
-    color: #fff;
-    font-weight: 500;
-    font-family: var(--family);
-    height: 45px;
-    border-radius: 0px 10px 10px 0px;
-}
 
-.footer-input-cnt label{
-    font-weight: 500;
-}
+/* =========================================================
+   DSC FOOTER — NEWSLETTER INPUT GROUP
+========================================================= */
 
-.footer-input-cnt p{
-    color: #999999;
-}
-
-footer .footer-col-cnt{
-    position: relative;
-    height: 100%;
+.dsc-footer-newsletter-input-group {
     width: 100%;
-    padding: 0px 25px;
+
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: var(--brand-green);
+    align-items: stretch;
 }
 
 
-footer .footer-col-cnt .footer-cols h1{
-    font-size: 18px;
+.dsc-footer-newsletter-input-group input {
+    height: 50px;
+
+    flex: 1;
+
+    min-width: 0;
+
+    padding: 0 18px;
+
+    border: 1px solid #D5DED6;
+
+    border-right: none;
+
+    outline: none;
+
+    background-color: var(--dsc-footer-white);
+
+    color: var(--dsc-footer-text-dark);
+
+    font-family: var(--dsc-footer-font);
+
+    font-size: 14px;
+
+    border-radius: 8px 0 0 8px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-.footer-copywright{
-    background-color: var(--brand-dark);
-    color: #fff;
+
+.dsc-footer-newsletter-input-group input::placeholder {
+    color: #9AA59D;
+}
+
+
+.dsc-footer-newsletter-input-group input:focus {
+    border-color: var(--dsc-footer-green);
+
+    box-shadow:
+        0 0 0 3px rgba(39, 138, 61, 0.08);
+}
+
+
+.dsc-footer-newsletter-input-group button {
+    height: 50px;
+
+    padding: 0 28px;
+
+    border: none;
+
+    background-color: var(--dsc-footer-dark);
+
+    color: var(--dsc-footer-white);
+
+    font-family: var(--dsc-footer-font);
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    border-radius: 0 8px 8px 0;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.dsc-footer-newsletter-input-group button:hover {
+    background-color: #062A12;
+}
+
+
+.dsc-footer-newsletter-input-group button:active {
+    transform: scale(0.98);
+}
+
+
+/* Newsletter privacy text */
+
+.dsc-footer-newsletter-form p {
+    margin: 0;
+
+    color: #849087;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   DSC FOOTER — NAVIGATION
+========================================================= */
+
+.dsc-footer-navigation {
     width: 100%;
-    padding: 10px 0px;
-    text-align: center;
+
+    display: grid;
+
+    grid-template-columns:
+        1.5fr
+        1fr
+        1fr
+        1fr;
+
+    gap: 70px;
+
+    padding: 65px 15px 80px;
+}
+
+
+/* =========================================================
+   DSC FOOTER — COLUMNS
+========================================================= */
+
+.dsc-footer-column {
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: flex-start;
+}
+
+
+.dsc-footer-column h1 {
+    margin: 0 0 22px;
+
+    color: var(--dsc-footer-white);
+
+    font-size: 15px;
+
+    line-height: 1.3;
+
+    font-weight: 700;
+
+    letter-spacing: 0.2px;
+}
+
+
+/* =========================================================
+   DSC FOOTER — BRAND
+========================================================= */
+
+.dsc-footer-brand h1 {
+    font-size: 22px;
+
+    letter-spacing: -0.3px;
+}
+
+
+.dsc-footer-brand h1::after {
+    content: "";
+
+    display: block;
+
+    width: 28px;
+    height: 2px;
+
+    margin-top: 10px;
+
+    background-color: var(--dsc-footer-light);
+
+    border-radius: 5px;
+}
+
+
+/* =========================================================
+   DSC FOOTER — ADDRESS
+========================================================= */
+
+.dsc-footer-address {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 9px;
+}
+
+
+.dsc-footer-address a {
+    color: var(--dsc-footer-white);
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+.dsc-footer-address a:hover {
+    color: var(--dsc-footer-light);
+}
+
+
+.dsc-footer-address p {
+    margin: 0;
+
+    white-space: pre-line;
+
+    color: rgba(255, 255, 255, 0.68);
+
+    font-size: 13px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   DSC FOOTER — COLUMN LISTS
+========================================================= */
+
+.dsc-footer-column ul {
+    margin: 0;
+
+    padding: 0;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 13px;
+
+    list-style: none;
+}
+
+
+.dsc-footer-column ul li {
+    margin: 0;
+
+    padding: 0;
+}
+
+
+.dsc-footer-column ul li a {
+    position: relative;
+
+    color: rgba(255, 255, 255, 0.72);
+
+    font-size: 13px;
+
+    font-weight: 400;
+
+    text-decoration: none;
+
+    transition:
+        color 0.2s ease,
+        padding-left 0.2s ease;
+}
+
+
+.dsc-footer-column ul li a:hover {
+    color: var(--dsc-footer-white);
+
+    padding-left: 4px;
+}
+
+
+/* =========================================================
+   DSC FOOTER — COPYRIGHT
+========================================================= */
+
+.dsc-footer-copyright {
     position: absolute;
+
     bottom: 0;
+    left: 0;
+
+    width: 100%;
+
+    padding: 18px 20px;
+
+    border-top:
+        1px solid rgba(255, 255, 255, 0.12);
+
+    background-color: var(--dsc-footer-dark);
+
+    color: rgba(255, 255, 255, 0.65);
+
+    text-align: center;
+
+    font-size: 11px;
+
+    letter-spacing: 0.2px;
 }
