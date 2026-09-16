@@ -131,8 +131,17 @@
 .customer-aside {
     height: 100vh;
     width: 300px;
+    /* display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-direction: column; */
     background-color: #fff;
     padding: 25px 20px;
+}
+
+.customer-aside section{
+    width: 100%;
+    height: fit-content;
 }
 
 .customer-aside a {

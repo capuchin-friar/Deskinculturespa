@@ -5,18 +5,23 @@ import { useEffect, useState } from "react";
 import { baseApi } from "../api/config";
 import Formatter from "../../src/utils/formatter";
 import useToggler from "../../src/hooks/toggler";
+import { useSelector } from "react-redux";
 
-export default function Store() {
+export default function Store({}) {
+
+    let {
+        filters
+    } = useSelector(s => s.filters);
 
     let router = useRouter();
     const [products, setProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
 
     const {
         addToCart,
         rmFromCart,
         isCarted
     } = useToggler();
-
 
     useEffect(() => {
         (async () => {
@@ -32,6 +37,48 @@ export default function Store() {
             }
         })();
     }, []);
+    useEffect(() => {implementFilter(filters)}, [filters, products]);
+
+
+
+    function implementFilter(filter) {
+        let filtered = products;
+    
+        if (filter.price) {
+            filtered = filtered.filter(
+                (p) =>
+                    Number(p.price) >= Number(filter.price.min) &&
+                    Number(p.price) <= Number(filter.price.max)
+            );
+        }
+    
+        if (filter.category && filter.category !== "") {
+            filtered = filtered.filter(
+                (p) =>
+                    p.category?.toLowerCase() ===
+                    filter.category.toLowerCase()
+            );
+        }
+    
+        if (filter.subCategory && filter.subCategory !== "") {
+            filtered = filtered.filter(
+                (p) =>
+                    p.subcategory?.toLowerCase() ===
+                    filter.subCategory.toLowerCase()
+            );
+        }
+    
+        if (filter.brand && filter.brand !== "") {
+            filtered = filtered.filter(
+                (p) =>
+                    p.brand?.toLowerCase() ===
+                    filter.brand.toLowerCase()
+            );
+        }
+    
+        console.log("filtered: ", filtered)
+        setFilteredProducts(filtered);
+    }
 
 
     function handleClick(p) {
@@ -44,7 +91,7 @@ export default function Store() {
             <div className="customer-store">
                 <div className="customer-store-product-card-cnt">
                     {
-                        products.map((p, i) =>
+                        filteredProducts.map((p, i) =>
                             <div className="customer-store-product-card shadow-sm">
                                 <div className="customer-store-product-thumbnail" style={{
                                     backgroundImage: `url(${p.thumbnail_url})`

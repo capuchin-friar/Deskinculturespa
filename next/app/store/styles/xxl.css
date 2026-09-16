@@ -155,3 +155,19 @@
     padding: 10px 15px;
     border-radius: var(--radius);
 }
+
+.filter-input-cnt{
+    margin: 20px 0px;
+    height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.apply-filter-btn{
+    height: 40px;
+    width: 100%;
+    background-color: var(--brand-green);
+    color: #fff;
+    border-radius: var(--radius);
+}
