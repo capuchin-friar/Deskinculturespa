@@ -199,22 +199,22 @@ export function Header() {
                     <button onClick={e => {
                         window.location.href = ("/store/cart");
                     }}>
-                        <IoCartOutline height={23} width={23} />
+                        <IoCartOutline color="#000" height={23} width={23} />
                     </button>
                     {/* <button onClick={e => {
                         window.location.href = ("/store/wishlist");
                     }}>
-                        <IoHeartOutline height={23} width={23} />
+                        <IoHeartOutline color="#000" height={23} width={23} />
                     </button> */}
                     <button onClick={e => {
                         window.location.href = ("/store/search");
                     }}>
-                        <IoSearchOutline height={23} width={23} />
+                        <IoSearchOutline color="#000" height={23} width={23} />
                     </button>
                     <button onClick={e => {
                         window.open("/profile", "_blank");
                     }}>
-                        <IoPersonOutline height={20} width={20} />
+                        <IoPersonOutline color="#000" height={20} width={20} />
                     </button>
                 </div>
 

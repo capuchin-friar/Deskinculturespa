@@ -62,7 +62,7 @@ export default function Customer({ children }) {
 
                 <div className="customer-content">
                     <Header />
-                    <div className="customer-body">
+                    <div className="customer-body" style={{marginTop: "60px"}}>
                         {
                             path && <Aside />
                         }

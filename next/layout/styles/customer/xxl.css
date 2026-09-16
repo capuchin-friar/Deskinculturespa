@@ -58,6 +58,10 @@
     background-color: #ffffff;
     display: flex;
     align-items: center;
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    left: 0;
     justify-content: space-between;
     padding: 0px 45px;
 }
@@ -112,7 +116,7 @@
 }
 
 .customer-header .customer-features button:hover {
-    background-color: #d8d8d8;
+    border-bottom: 1px solid var(--sage);
 }
 
 .customer-body{

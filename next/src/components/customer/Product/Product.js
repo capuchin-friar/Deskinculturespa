@@ -184,7 +184,7 @@ const Product = ({ item }) => {
                 <div id="right" style={{ position: 'relative' }}>
 
                     <div style={{ borderBottom: '1px solid #696969' }}>
-                        <div style={{ fontSize: '3vh', marginBottom: '10px' }}>{item?.title}</div>
+                        <div style={{ fontSize: '3vh', marginBottom: '10px' }}>{item?.name ?? item?.title}</div>
                         <div style={{ fontSize: '13px', marginBottom: '10px' }}>
                             Category: <span style={{ color: 'blue' }}>{item?.category}</span> | <span style={{ color: 'blue' }}>Similar products from {item?.category}</span>
                         </div>
