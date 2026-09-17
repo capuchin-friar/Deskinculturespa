@@ -286,11 +286,15 @@ export function Header() {
 
                 <div className="nav-item">
 
-                    <span className="nav-item-label">
-                        Gallery
+                    <span className="nav-item-label" >
+                        <Link href={"gallery"} style={{
+                            textDecoration: "none"
+                        }}>
+                            Gallery
+                        </Link>
                     </span>
 
-                    <div className="mega-menu">
+                    {/* <div className="mega-menu">
 
                         <div className="mega-menu-inner">
 
@@ -359,7 +363,7 @@ export function Header() {
 
                         </div>
 
-                    </div>
+                    </div> */}
 
                 </div>
 
