@@ -8,12 +8,17 @@ import Link from "next/link";
 import useProductHandler from "@/src/hooks/product";
 import useServiceHandler from "@/src/hooks/service";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 
 export function Header() {
     const [products, setProducts] = useState([]);
     const [services, setServices] = useState([]);
     const [appointments, setAppointments] = useState([]);
+
+    let {
+        cart
+    } = useSelector(s => s.cart);
 
     const {
         products: prods
@@ -406,10 +411,24 @@ export function Header() {
                     onClick={() => {
                         window.location.href = "/store/cart";
                     }}
+                    style={{
+                        position: "relative"
+                    }}
                 >
                     <IoCartOutline
                         size={23}
                     />
+
+                    <small style={{
+                        color: "#fff",
+                        fontSize: "x-small",
+                        position: "absolute",
+                        top: "1px",
+                        right: "1px",
+                        background: "#278a3d",
+                        borderRadius: "50%",
+                        padding: "0px 4px"
+                    }}>{(cart.length ?? 0)}</small>
                 </button>
 
 
