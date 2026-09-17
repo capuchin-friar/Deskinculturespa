@@ -2,7 +2,6 @@ CREATE TABLE services (
     id SERIAL PRIMARY KEY,
     admin_id BIGINT NOT NULL,
 
-    name VARCHAR(150) NOT NULL,
     description TEXT,
 
     category VARCHAR(100),

@@ -75,14 +75,14 @@ function ProductTableRow({
   type
 }) {
   const productId = item?.id ?? item?.product_id
-  const name = item?.name ?? item?.mode ?? "—"
+  const name = item?.name ?? item?.mode ?? item.subcategory ?? "—"
   const status = item?.status ?? item?.is_active ? "active" : "inactive" ?? "_"
   const duration = item?.duration_minutes ?? "_"
   const createdAt = item?.created_at ?? item?.createdAt
   const totalSales = item?.total_sales ?? item?.totalSales
   const price = item?.price ?? "_"
   const currency = "₦"
-  const thumb = firstImageUrl(item?.images)
+  const thumb = firstImageUrl(item?.images ?? null)
   const menuOpen = productId != null && menuOpenId === productId
   const editHref =
     productId != null
@@ -93,14 +93,17 @@ function ProductTableRow({
   return (
     <tr>
       <td>{s_n}</td>
+
       <td>
         <div className="product-list-cell-product">
           {thumb ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img className="product-list-thumb" src={thumb} alt="" width={44} height={44} />
           ) : (
-            <span className="product-list-thumb-placeholder" aria-hidden />
+            null
+            // <span className="product-list-thumb-placeholder" aria-hidden />
           )}
+
           <span className="product-list-title">
             <span>{name.charAt(0).toUpperCase()}{name.slice(1)}</span>
             &nbsp;
@@ -183,7 +186,7 @@ export default function ProductListPage() {
   let [prods, setProds] = useState([]);
   let [services, setServices] = useState([]);
   let [appointments, setAppointments] = useState([]);
-  let [type, setType] = useState("product")
+  let [type, setType] = useState("products");
   let [loading, setLoading] = useState(true)
   let [listError, setListError] = useState("")
   let [menuOpenId, setMenuOpenId] = useState(null)
@@ -262,48 +265,48 @@ export default function ProductListPage() {
     return type === "products" ? prods : type === "services" ? services : appointments
   }
 
-    const onDeleteProduct = useCallback(
-      async (hash, productId) => {
-        setDeleteError("")
-        if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
-          return
-        }
-        try {
-          baseApi.delete("delete/folder-delete", {
-            data: {
-              product_id: hash
-            }
-          }).then(async(response) => {
-            if(response.data.success){
-              const {
-                data
-              } = await api.delete("products/delete", {
-                data: {
-                  product_id: productId
-                }
-              });
-              if(!data.success){
-                throw new Error("Error: ", data.message);
-                return;
+  const onDeleteProduct = useCallback(
+    async (hash, productId) => {
+      setDeleteError("")
+      if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
+        return
+      }
+      try {
+        baseApi.delete("delete/folder-delete", {
+          data: {
+            product_id: hash
+          }
+        }).then(async (response) => {
+          if (response.data.success) {
+            const {
+              data
+            } = await api.delete("products/delete", {
+              data: {
+                product_id: productId
               }
-              setProds((prev) =>
-                prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
-              )
-            }else{
-              throw new Error(response.data.message);
+            });
+            if (!data.success) {
+              throw new Error("Error: ", data.message);
+              return;
             }
-          }).catch(err => {
-            console.log(err);
-            alert("Error: ", err);
-          })
+            setProds((prev) =>
+              prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
+            )
+          } else {
+            throw new Error(response.data.message);
+          }
+        }).catch(err => {
+          console.log(err);
+          alert("Error: ", err);
+        })
 
-          setMenuOpenId(null)
-        } catch (err) {
-          setDeleteError(err?.message || "Could not delete product.")
-        }
-      },
-      [admin_id]
-    )
+        setMenuOpenId(null)
+      } catch (err) {
+        setDeleteError(err?.message || "Could not delete product.")
+      }
+    },
+    [admin_id]
+  )
 
   return (
     <div style={{
@@ -312,12 +315,8 @@ export default function ProductListPage() {
     }}>
       <div className="product-list-header">
         <span>
-          <select aria-label="Type" value={""} onChange={e => setType(e.target.value)}>
+          <select defaultChecked={type} aria-label="Type" value={""} onChange={e => setType(e.target.value)}>
             {[
-              {
-                name: "All",
-                value: "all"
-              },
               {
                 name: "Products",
                 value: "products"
@@ -341,7 +340,7 @@ export default function ProductListPage() {
         </span>
 
         <span className="add_btn">
-          <button onClick={e => window.location.href = `/admin/create?type=${type}`}>
+          <button onClick={e => window.location.href = `/admin/create/${type}`}>
             + Add {`${type.charAt(0).toUpperCase()}${type.slice(1)}`}
           </button>
         </span>
@@ -357,7 +356,12 @@ export default function ProductListPage() {
           <thead>
             <tr>
               <th scope="col">S/N</th>
-              <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
+              {
+                type === "appointment" || type === "products"
+                  ?
+                  <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
+                  : ""
+              }
               <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
               <th scope="col">Price</th>
               <th scope="col">Total sales</th>
@@ -380,7 +384,7 @@ export default function ProductListPage() {
                         prod?.product_id ??
                         `prod-${index}`
                       }
-                      s_n={index+1}
+                      s_n={index + 1}
                       item={prod}
                       menuOpenId={menuOpenId}
                       onToggleMenu={toggleActionMenu}

@@ -11,7 +11,7 @@ import {
 import Select from "react-select";
 import "./styles/xxl.css";
 import _SERVICES from "../../../../src/json/services.json";
-
+import { api } from "../../../api/config";
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -26,8 +26,9 @@ const DEFAULT_PREVIEW_IMAGE =
 
 export default function AddServicePage() {
     const [form, setForm] = useState({
-        name: "",
         description: "",
+        service: "",
+        subService: "",
         price: "",
         duration: "",
         imageUrl: "",
@@ -211,8 +212,8 @@ export default function AddServicePage() {
                 border: state.selectProps.hasError
                     ? "1px solid #dc2626"
                     : state.isFocused
-                    ? "1px solid #278A3D"
-                    : "1px solid #d9e1db",
+                        ? "1px solid #278A3D"
+                        : "1px solid #d9e1db",
 
                 boxShadow: state.isFocused
                     ? "0 0 0 3px rgba(39, 138, 61, 0.10)"
@@ -297,8 +298,8 @@ export default function AddServicePage() {
                 backgroundColor: state.isSelected
                     ? "#278A3D"
                     : state.isFocused
-                    ? "#E8F5EB"
-                    : "#ffffff",
+                        ? "#E8F5EB"
+                        : "#ffffff",
 
                 cursor: "pointer",
 
@@ -367,25 +368,11 @@ export default function AddServicePage() {
     const validate = () => {
         const newErrors = {};
 
-        const name = form.name.trim();
         const description = form.description.trim();
         const price = Number(form.price);
         const duration = Number(form.duration);
         const imageUrl = form.imageUrl.trim();
 
-        /*
-        | SERVICE NAME
-        */
-
-        if (!name) {
-            newErrors.name = "Service name is required.";
-        } else if (name.length < 3) {
-            newErrors.name =
-                "Service name must be at least 3 characters.";
-        } else if (name.length > 100) {
-            newErrors.name =
-                "Service name cannot exceed 100 characters.";
-        }
 
         /*
         | DESCRIPTION
@@ -440,28 +427,28 @@ export default function AddServicePage() {
         | IMAGE
         */
 
-        if (!image && !imageUrl) {
-            newErrors.image =
-                "Please upload an image or provide an image URL.";
-        }
+        // if (!image && !imageUrl) {
+        //     newErrors.image =
+        //         "Please upload an image or provide an image URL.";
+        // }
 
         /*
         | IMAGE URL
         */
 
-        if (imageUrl) {
-            try {
-                const url = new URL(imageUrl);
+        // if (imageUrl) {
+        //     try {
+        //         const url = new URL(imageUrl);
 
-                if (!["http:", "https:"].includes(url.protocol)) {
-                    newErrors.imageUrl =
-                        "Image URL must use HTTP or HTTPS.";
-                }
-            } catch {
-                newErrors.imageUrl =
-                    "Please enter a valid image URL.";
-            }
-        }
+        //         if (!["http:", "https:"].includes(url.protocol)) {
+        //             newErrors.imageUrl =
+        //                 "Image URL must use HTTP or HTTPS.";
+        //         }
+        //     } catch {
+        //         newErrors.imageUrl =
+        //             "Please enter a valid image URL.";
+        //     }
+        // }
 
         /*
         | SERVICE CATEGORY
@@ -527,74 +514,50 @@ export default function AddServicePage() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const isValid = validate();
-
-        if (!isValid) {
+        if (!validate()) {
             return;
         }
 
         try {
             setIsSubmitting(true);
 
+            setErrors((prev) => ({
+                ...prev,
+                submit: "",
+            }));
+
             const serviceData = {
-                name: form.name.trim(),
                 description: form.description.trim(),
-
                 price: Number(form.price),
-
-                duration: Number(form.duration),
-
-                category: service,
-
-                subcategory: subService,
-
-                imageUrl: form.imageUrl.trim() || null,
-
-                featured: form.featured,
+                duration_minutes: Number(form.duration),
+                service,
+                sub_service: subService,
             };
 
-            console.log("SERVICE DATA:", serviceData);
-            console.log("IMAGE:", image);
-
-            /*
-            |--------------------------------------------------------------------------
-            | API REQUEST
-            |--------------------------------------------------------------------------
-            |
-            | const formData = new FormData();
-            |
-            | formData.append("name", serviceData.name);
-            | formData.append("description", serviceData.description);
-            | formData.append("price", serviceData.price);
-            | formData.append("duration", serviceData.duration);
-            | formData.append("category", serviceData.category);
-            | formData.append("subcategory", serviceData.subcategory);
-            | formData.append("featured", serviceData.featured);
-            |
-            | if (image) {
-            |     formData.append("image", image);
-            | }
-            |
-            | if (serviceData.imageUrl) {
-            |     formData.append("imageUrl", serviceData.imageUrl);
-            | }
-            |
-            | await api.post("/admin/services", formData);
-            |
-            */
-
-            await new Promise((resolve) =>
-                setTimeout(resolve, 1000)
+            const { data } = await api.post(
+                "services/add",
+                serviceData
             );
 
-            alert("Service created successfully!");
-        } catch (error) {
-            console.error(error);
+            if (!data?.success) {
+                throw new Error(
+                    data?.message || "Failed to create service."
+                );
+            }
 
-            setErrors({
+            alert("Service created successfully!");
+            window.location.href ="/admin/catalog";
+        } catch (error) {
+            console.error("CREATE SERVICE ERROR:", error);
+
+            setErrors((prev) => ({
+                ...prev,
                 submit:
+                    error?.response?.data?.message ||
+                    error?.message ||
                     "Something went wrong. Please try again.",
-            });
+            }));
+
         } finally {
             setIsSubmitting(false);
         }
@@ -612,8 +575,8 @@ export default function AddServicePage() {
 
     const formattedPrice = form.price
         ? `₦${new Intl.NumberFormat("en-NG").format(
-              Number(form.price)
-          )}`
+            Number(form.price)
+        )}`
         : "₦25,000";
 
     /*
@@ -670,30 +633,87 @@ export default function AddServicePage() {
 
                         <div className="form-group">
 
-                            <label htmlFor="service-name">
-                                Service Name <span>*</span>
-                            </label>
+                            <div className="settings-row">
 
-                            <input
-                                id="service-name"
-                                type="text"
-                                name="name"
-                                value={form.name}
-                                onChange={handleChange}
-                                placeholder="e.g. Swedish Massage"
-                                maxLength={100}
-                                className={
-                                    errors.name
-                                        ? "input-error"
-                                        : ""
-                                }
-                            />
+                                {/* CATEGORY */}
 
-                            {errors.name && (
-                                <p className="error-message">
-                                    {errors.name}
-                                </p>
-                            )}
+                                <div className="form-group category-group">
+
+                                    <label>
+                                        Category <span>*</span>
+                                    </label>
+
+                                    <Select
+                                        options={serviceList}
+                                        isSearchable
+                                        isClearable
+                                        value={selectedServiceOption}
+                                        onChange={
+                                            handleServiceChange
+                                        }
+                                        placeholder="Select a category..."
+                                        styles={selectStyles}
+                                        hasError={Boolean(
+                                            errors.service
+                                        )}
+                                        noOptionsMessage={() =>
+                                            "No categories found"
+                                        }
+                                    />
+
+                                    {errors.service && (
+                                        <p className="error-message">
+                                            {errors.service}
+                                        </p>
+                                    )}
+
+                                </div>
+
+                                {/* SUB-CATEGORY */}
+
+                                <div className="form-group category-group">
+
+                                    <label>
+                                        Sub-Category <span>*</span>
+                                    </label>
+
+                                    <Select
+                                        options={serviceSubList}
+                                        isSearchable
+                                        isClearable
+                                        isDisabled={!service}
+                                        value={
+                                            selectedSubServiceOption
+                                        }
+                                        onChange={
+                                            handleSubServiceChange
+                                        }
+                                        placeholder={
+                                            service
+                                                ? "Select a sub-category..."
+                                                : "Select a category first..."
+                                        }
+                                        styles={selectStyles}
+                                        hasError={Boolean(
+                                            errors.subService
+                                        )}
+                                        noOptionsMessage={() =>
+                                            service
+                                                ? "No sub-categories found"
+                                                : "Select a category first"
+                                        }
+                                    />
+
+                                    {errors.subService && (
+                                        <p className="error-message">
+                                            {errors.subService}
+                                        </p>
+                                    )}
+
+                                </div>
+
+                            </div>
+
 
                         </div>
 
@@ -821,7 +841,7 @@ export default function AddServicePage() {
 
                         {/* IMAGE */}
 
-                        <div className="form-group image-section">
+                        {/* <div className="form-group image-section">
 
                             <label>
                                 Service Image <span>*</span>
@@ -887,114 +907,12 @@ export default function AddServicePage() {
                             {errors.image && (
                                 <p className="error-message">
                                     {errors.image}
-                                </p>
+                                </p> 
                             )}
 
-                        </div>
+                        </div> */}
 
                     </form>
-
-                    {/* =================================================
-                        ADDITIONAL SETTINGS
-                    ================================================= */}
-
-                    <section className="service-card additional-settings">
-
-                        <div className="section-heading">
-
-                            <h2>
-                                Service Classification
-                            </h2>
-
-                            <p>
-                                Organize the service so customers
-                                can find it easily.
-                            </p>
-
-                        </div>
-
-                        <div className="settings-row">
-
-                            {/* CATEGORY */}
-
-                            <div className="form-group category-group">
-
-                                <label>
-                                    Category <span>*</span>
-                                </label>
-
-                                <Select
-                                    options={serviceList}
-                                    isSearchable
-                                    isClearable
-                                    value={selectedServiceOption}
-                                    onChange={
-                                        handleServiceChange
-                                    }
-                                    placeholder="Select a category..."
-                                    styles={selectStyles}
-                                    hasError={Boolean(
-                                        errors.service
-                                    )}
-                                    noOptionsMessage={() =>
-                                        "No categories found"
-                                    }
-                                />
-
-                                {errors.service && (
-                                    <p className="error-message">
-                                        {errors.service}
-                                    </p>
-                                )}
-
-                            </div>
-
-                            {/* SUB-CATEGORY */}
-
-                            <div className="form-group category-group">
-
-                                <label>
-                                    Sub-Category <span>*</span>
-                                </label>
-
-                                <Select
-                                    options={serviceSubList}
-                                    isSearchable
-                                    isClearable
-                                    isDisabled={!service}
-                                    value={
-                                        selectedSubServiceOption
-                                    }
-                                    onChange={
-                                        handleSubServiceChange
-                                    }
-                                    placeholder={
-                                        service
-                                            ? "Select a sub-category..."
-                                            : "Select a category first..."
-                                    }
-                                    styles={selectStyles}
-                                    hasError={Boolean(
-                                        errors.subService
-                                    )}
-                                    noOptionsMessage={() =>
-                                        service
-                                            ? "No sub-categories found"
-                                            : "Select a category first"
-                                    }
-                                />
-
-                                {errors.subService && (
-                                    <p className="error-message">
-                                        {errors.subService}
-                                    </p>
-                                )}
-
-                            </div>
-
-                        </div>
-
-                    </section>
 
                 </section>
 
@@ -1060,6 +978,7 @@ export default function AddServicePage() {
                                 form="service-form"
                                 className="publish-button"
                                 disabled={isSubmitting}
+                            // onClick={handleSubmit}
                             >
                                 {isSubmitting
                                     ? "Publishing..."

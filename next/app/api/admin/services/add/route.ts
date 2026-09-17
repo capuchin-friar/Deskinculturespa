@@ -14,17 +14,19 @@ export const POST = async (req: NextRequest) => {
     try {
         const body = await req.json();
         const {
-            name,
+            // name,
             description,
             price,
             duration_minutes,
-            image_url,
+            // image_url,
+            service,
+            sub_service
         } = body;
 
         // Validate all fields
 
-        const serviceName =
-            typeof name === "string" ? name.trim() : false;
+        // const serviceName =
+        //     typeof name === "string" ? name.trim() : false;
 
         const serviceDescription =
             typeof description === "string" ? description.trim() : "";
@@ -35,18 +37,30 @@ export const POST = async (req: NextRequest) => {
         const servicePrice =
             typeof price === "number" ? price : "";
 
+        const serviceService =
+            typeof service === "string" ? service.trim() : false;
+        const serviceSubService =
+            typeof sub_service === "string" ? sub_service.trim() : false;
 
-        const serviceImageUrl =
-            typeof image_url === "string" ? image_url.trim() : false;
+        // const serviceImageUrl =
+        //     typeof image_url === "string" ? image_url.trim() : false;
 
-       
-        if (!serviceName) {
+
+        // if (!serviceName) {
+        //     throw new Error("Service name is required");
+        // }
+
+        if (!serviceService) {
             throw new Error("Service name is required");
         }
 
-        if (!serviceImageUrl) {
-            throw new Error("Service thumbnail is required");
+        if (!serviceSubService) {
+            throw new Error("Service name is required");
         }
+
+        // if (!serviceImageUrl) {
+        //     throw new Error("Service thumbnail is required");
+        // }
 
         if (!serviceDescription) {
             throw new Error("Service description is required");
@@ -62,28 +76,29 @@ export const POST = async (req: NextRequest) => {
 
         // Extract the admin id from the JWT
         const getCookie = req.cookies.get("admin_token");
-        if(!getCookie || !getCookie.value){
+        if (!getCookie || !getCookie.value) {
             return NextResponse.json(
                 { success: false, data: "Server error, cookie is missing!" },
                 { status: 500 }
             );
         }
-        const token = typeof(getCookie.value) === "string" ? getCookie.value :  "";
+        const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);  
+        const decoded = jwt.decode(token);
 
         const admin_id = decoded.id;
 
 
         // Final validation 
-        if (serviceName && serviceImageUrl && serviceDescription && serviceDuration && servicePrice) {
+        if (serviceService && serviceSubService && serviceDescription && serviceDuration && servicePrice) {
             // Create product
             const response = await ServiceModel.createServiceDoc({
-                name: serviceName,
+                // name: serviceName,
                 description: serviceDescription,
                 price: servicePrice,
                 duration_minutes: serviceDuration,
-                image_url: (serviceImageUrl),
+                service: (serviceService),
+                sub_service: serviceSubService,
                 admin_id
             });
 
@@ -94,7 +109,7 @@ export const POST = async (req: NextRequest) => {
             });
         } else {
             return NextResponse.json(
-                { success: false, data: "Service failed validation!" },
+                { success: false, message: "Service failed validation!" },
                 { status: 500 }
             );
         }
@@ -104,7 +119,7 @@ export const POST = async (req: NextRequest) => {
     } catch (err) {
         console.log("err: ", err)
         return NextResponse.json(
-            { success: false, data: "Something went wrong. Please try again in a moment." },
+            { success: false, message: "Something went wrong. Please try again in a moment." },
             { status: 500 }
         );
     }

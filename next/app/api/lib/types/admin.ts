@@ -21,11 +21,13 @@ export interface NewProductDoc {
 }
 
 export interface NewServiceDoc {
-    name: string,
+    // name: string,
     description: string,
     price: number,
     duration_minutes: number,
-    image_url: string,
+    // image_url: string,
+    service: string,
+    sub_service: string,
     admin_id: string | number
 }
 
