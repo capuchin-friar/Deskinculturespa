@@ -4,7 +4,7 @@ import './styles/s.css'
 import './styles/xxl.css'
 import Link from 'next/link'
 import { useDispatch } from 'react-redux'
-import location from "../../../json/location.json"
+import location from "../../../src/json/location.json"
 import axios from 'axios'
 
 const GENDER_SELECT_OPTIONS = [

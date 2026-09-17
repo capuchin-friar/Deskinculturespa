@@ -1,0 +1,247 @@
+{
+    "categories": [
+      {
+        "category": "Facial Treatment",
+        "subcategories": [
+          {
+            "name": "Facial Polish",
+            "price": 20000
+          },
+          {
+            "name": "Instant Brightening Facials",
+            "price": 25000
+          },
+          {
+            "name": "Acne Facials",
+            "price": 30000
+          },
+          {
+            "name": "Acne Treatment",
+            "price": 40000
+          },
+          {
+            "name": "Barrier Repair Facials",
+            "price": 30000
+          },
+          {
+            "name": "Anti-Aging Facials",
+            "price": 50000
+          },
+          {
+            "name": "Sun Burn Treatment",
+            "price": 50000
+          },
+          {
+            "name": "Chemical Peel",
+            "price": 80000
+          },
+          {
+            "name": "Carbon Facials",
+            "price": 40000
+          },
+          {
+            "name": "Micro Needling",
+            "price": 80000
+          }
+        ]
+      },
+      {
+        "category": "Body Treatments",
+        "subcategories": [
+          {
+            "name": "Body Wash",
+            "price": 40000
+          },
+          {
+            "name": "Body Polish",
+            "price": 50000
+          },
+          {
+            "name": "Eczema Treatment",
+            "price": 50000
+          },
+          {
+            "name": "Body Spot Treatment",
+            "price": 50000
+          }
+        ]
+      },
+      {
+        "category": "Body Massage",
+        "subcategories": [
+          {
+            "name": "Full Body Massage",
+            "price": 35000
+          },
+          {
+            "name": "Feet Massage",
+            "price": 10000
+          },
+          {
+            "name": "Back Massage",
+            "price": 15000
+          },
+          {
+            "name": "Head Massage",
+            "price": 15000
+          }
+        ]
+      },
+      {
+        "category": "Teeth Whitening",
+        "subcategories": [
+          {
+            "name": "Premium Teeth Whitening",
+            "price": 50000
+          },
+          {
+            "name": "1 Coating Whitening",
+            "price": 30000
+          },
+          {
+            "name": "Tartar Removal",
+            "price": 25000
+          },
+          {
+            "name": "Teeth Cleaning",
+            "price": 30000
+          }
+        ]
+      },
+      {
+        "category": "Pedicures",
+        "subcategories": [
+          {
+            "name": "Pedicure",
+            "price": 8000
+          },
+          {
+            "name": "Manicure",
+            "price": 4000
+          },
+          {
+            "name": "Athletic Foot Treatment",
+            "price": 20000
+          }
+        ]
+      },
+      {
+        "category": "Knuckles Treatment",
+        "subcategories": [
+          {
+            "name": "Knuckle Hand Treatment",
+            "price": 50000
+          },
+          {
+            "name": "Knuckle Leg Treatment",
+            "price": 50000
+          }
+        ]
+      },
+      {
+        "category": "Waxing",
+        "subcategories": [
+          {
+            "name": "Armpit Waxing",
+            "price": 10000
+          },
+          {
+            "name": "Jaw Waxing (Small)",
+            "price": 10000
+          },
+          {
+            "name": "Jaw Waxing (Medium)",
+            "price": 15000
+          },
+          {
+            "name": "Bumps and Jaw Waxing",
+            "price": 20000
+          },
+          {
+            "name": "Bumps Treatment",
+            "price": 15000
+          },
+          {
+            "name": "Vagcials",
+            "price": 35000
+          },
+          {
+            "name": "Body Waxing",
+            "price": 6000
+          }
+        ]
+      },
+      {
+        "category": "Lash Extensions",
+        "subcategories": [
+          {
+            "name": "Classic Lash Extensions",
+            "price": 15000
+          },
+          {
+            "name": "Hybrid Lash Extensions",
+            "price": 20000
+          },
+          {
+            "name": "Volume Lash Extensions",
+            "price": 25000
+          },
+          {
+            "name": "Micro Blading",
+            "price": 45000
+          },
+          {
+            "name": "Micro Shading",
+            "price": 40000
+          }
+        ]
+      },
+      {
+        "category": "Advanced Treatment",
+        "subcategories": [
+          {
+            "name": "Cavitation Tummy Fat Reduction",
+            "price": 40000
+          }
+        ]
+      },
+      {
+        "category": "Combination Bonus",
+        "subcategories": [
+          {
+            "name": "3 Months Acne Treatment Plan",
+            "price": 100000
+          },
+          {
+            "name": "10% on 3 Spa Services",
+            "price": null
+          },
+          {
+            "name": "10% Couples Spa",
+            "price": null
+          },
+          {
+            "name": "15% Off Spa Services for 5 Friends and Above",
+            "price": null
+          },
+          {
+            "name": "10% Discount on Referrers",
+            "price": null
+          }
+        ]
+      },
+      {
+        "category": "Consultation",
+        "subcategories": [
+          {
+            "name": "Consultation",
+            "price": 10000
+          },
+          {
+            "name": "Recommendation",
+            "price": 10000
+          }
+        ]
+      }
+    ]
+  }

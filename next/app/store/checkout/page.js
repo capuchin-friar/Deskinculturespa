@@ -2,7 +2,7 @@
 
 import "./styles/xxl.css";
 import "./styles/g.css";
-import locations from "../../../json/location.json";
+import locations from "../../../src/json/location.json";
 import { useEffect, useState } from "react";
 import CartSummary from "../../../src/components/customer/Checkout";
 

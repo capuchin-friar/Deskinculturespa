@@ -1,29 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-    IoArrowBack,
     IoCloudUploadOutline,
     IoTimeOutline,
     IoLinkOutline,
     IoCheckmarkCircle,
     IoBulbOutline,
-    IoChevronDown,
 } from "react-icons/io5";
-
+import Select from "react-select";
 import "./styles/xxl.css";
+import _SERVICES from "../../../../src/json/services.json";
 
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
-const categories = [
-    "Massage",
-    "Facial",
-    "Body Treatment",
-    "Skin Care",
-    "Wellness",
-    "Other",
+const ALLOWED_IMAGE_TYPES = [
+    "image/jpeg",
+    "image/png",
+    "image/webp",
 ];
+
+const DEFAULT_PREVIEW_IMAGE =
+    "https://images.pexels.com/photos/3757952/pexels-photo-3757952.jpeg";
 
 export default function AddServicePage() {
     const [form, setForm] = useState({
@@ -32,17 +31,73 @@ export default function AddServicePage() {
         price: "",
         duration: "",
         imageUrl: "",
-        category: "",
         featured: false,
     });
+
+    const [serviceList, setServiceList] = useState([]);
+    const [serviceSubList, setServiceSubList] = useState([]);
+
+    const [service, setService] = useState("");
+    const [subService, setSubService] = useState("");
 
     const [image, setImage] = useState(null);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    /* --------------------------------
-       FORM CHANGE
-    -------------------------------- */
+    /*
+    |--------------------------------------------------------------------------
+    | SERVICE OPTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+        const { categories: services = [] } = _SERVICES;
+
+        const servicesList = services.map(({ category }) => ({
+            label: category,
+            value: category,
+        }));
+
+        setServiceList(servicesList);
+    }, []);
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUB-SERVICE OPTIONS
+    |--------------------------------------------------------------------------
+    */
+
+    useEffect(() => {
+        const { categories: services = [] } = _SERVICES;
+
+        const selectedService = services.find(
+            ({ category }) => category === service
+        );
+
+        const subservices = selectedService?.subcategories || [];
+
+        const subserviceList = subservices.map(({ name }) => ({
+            label: name,
+            value: name,
+        }));
+
+        setServiceSubList(subserviceList);
+
+        // Reset selected sub-service whenever category changes
+        setSubService("");
+
+        // Remove sub-service error
+        setErrors((prev) => ({
+            ...prev,
+            subService: "",
+        }));
+    }, [service]);
+
+    /*
+    |--------------------------------------------------------------------------
+    | FORM CHANGE
+    |--------------------------------------------------------------------------
+    */
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -52,7 +107,7 @@ export default function AddServicePage() {
             [name]: type === "checkbox" ? checked : value,
         }));
 
-        // Clear field error while typing
+        // Clear field error when user starts correcting it
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
@@ -61,38 +116,36 @@ export default function AddServicePage() {
         }
     };
 
-    /* --------------------------------
-       IMAGE UPLOAD
-    -------------------------------- */
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGE UPLOAD
+    |--------------------------------------------------------------------------
+    */
 
     const handleImageUpload = (e) => {
         const file = e.target.files?.[0];
 
         if (!file) return;
 
-        // Validate file type
-        const allowedTypes = [
-            "image/jpeg",
-            "image/png",
-            "image/webp",
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
+        // File type
+        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
             setErrors((prev) => ({
                 ...prev,
                 image: "Only JPG, PNG, and WebP images are allowed.",
             }));
 
+            e.target.value = "";
             return;
         }
 
-        // Validate file size
+        // File size
         if (file.size > MAX_IMAGE_SIZE) {
             setErrors((prev) => ({
                 ...prev,
                 image: "Image size must not exceed 5MB.",
             }));
 
+            e.target.value = "";
             return;
         }
 
@@ -103,70 +156,329 @@ export default function AddServicePage() {
             image: "",
             imageUrl: "",
         }));
+
+        // Clear URL because uploaded image takes priority
+        setForm((prev) => ({
+            ...prev,
+            imageUrl: "",
+        }));
     };
 
-    /* --------------------------------
-       VALIDATION
-    -------------------------------- */
+    /*
+    |--------------------------------------------------------------------------
+    | IMAGE URL CHANGE
+    |--------------------------------------------------------------------------
+    */
+
+    const handleImageUrlChange = (e) => {
+        const { value } = e.target;
+
+        setForm((prev) => ({
+            ...prev,
+            imageUrl: value,
+        }));
+
+        // If user enters a URL, remove uploaded file
+        if (value.trim()) {
+            setImage(null);
+        }
+
+        if (errors.imageUrl || errors.image) {
+            setErrors((prev) => ({
+                ...prev,
+                imageUrl: "",
+                image: "",
+            }));
+        }
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | SELECT STYLES
+    |--------------------------------------------------------------------------
+    */
+
+    const selectStyles = useMemo(
+        () => ({
+            control: (base, state) => ({
+                ...base,
+
+                minHeight: "50px",
+                height: "50px",
+
+                borderRadius: "10px",
+
+                border: state.selectProps.hasError
+                    ? "1px solid #dc2626"
+                    : state.isFocused
+                    ? "1px solid #278A3D"
+                    : "1px solid #d9e1db",
+
+                boxShadow: state.isFocused
+                    ? "0 0 0 3px rgba(39, 138, 61, 0.10)"
+                    : "none",
+
+                backgroundColor: "#ffffff",
+
+                cursor: "pointer",
+
+                transition:
+                    "border-color 0.2s ease, box-shadow 0.2s ease",
+
+                "&:hover": {
+                    borderColor: state.selectProps.hasError
+                        ? "#dc2626"
+                        : "#278A3D",
+                },
+            }),
+
+            valueContainer: (base) => ({
+                ...base,
+                padding: "0 14px",
+            }),
+
+            singleValue: (base) => ({
+                ...base,
+                color: "#18301f",
+                fontSize: "14px",
+                fontWeight: 500,
+            }),
+
+            placeholder: (base) => ({
+                ...base,
+                color: "#98a59c",
+                fontSize: "14px",
+            }),
+
+            input: (base) => ({
+                ...base,
+                color: "#18301f",
+                fontSize: "14px",
+            }),
+
+            menu: (base) => ({
+                ...base,
+
+                marginTop: "6px",
+
+                borderRadius: "10px",
+
+                overflow: "hidden",
+
+                border: "1px solid #e3e9e4",
+
+                boxShadow:
+                    "0 12px 30px rgba(11, 59, 26, 0.10)",
+
+                zIndex: 100,
+            }),
+
+            menuList: (base) => ({
+                ...base,
+                padding: "6px",
+                maxHeight: "250px",
+            }),
+
+            option: (base, state) => ({
+                ...base,
+
+                padding: "10px 12px",
+
+                borderRadius: "7px",
+
+                marginBottom: "2px",
+
+                fontSize: "14px",
+
+                color: state.isSelected
+                    ? "#ffffff"
+                    : "#25352a",
+
+                backgroundColor: state.isSelected
+                    ? "#278A3D"
+                    : state.isFocused
+                    ? "#E8F5EB"
+                    : "#ffffff",
+
+                cursor: "pointer",
+
+                transition: "background-color 0.15s ease",
+
+                "&:active": {
+                    backgroundColor: "#278A3D",
+                    color: "#ffffff",
+                },
+            }),
+
+            indicatorSeparator: () => ({
+                display: "none",
+            }),
+
+            dropdownIndicator: (base, state) => ({
+                ...base,
+
+                color: state.isFocused
+                    ? "#278A3D"
+                    : "#829087",
+
+                paddingRight: "12px",
+
+                transition: "transform 0.2s ease, color 0.2s ease",
+
+                transform: state.selectProps.menuIsOpen
+                    ? "rotate(180deg)"
+                    : "rotate(0deg)",
+
+                "&:hover": {
+                    color: "#278A3D",
+                },
+            }),
+
+            clearIndicator: (base) => ({
+                ...base,
+                color: "#9aa59d",
+
+                "&:hover": {
+                    color: "#dc2626",
+                },
+            }),
+
+            noOptionsMessage: (base) => ({
+                ...base,
+                color: "#7a867d",
+                fontSize: "13px",
+            }),
+
+            loadingMessage: (base) => ({
+                ...base,
+                color: "#7a867d",
+                fontSize: "13px",
+            }),
+        }),
+        []
+    );
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDATION
+    |--------------------------------------------------------------------------
+    */
 
     const validate = () => {
         const newErrors = {};
 
-        // Service name
-        if (!form.name.trim()) {
+        const name = form.name.trim();
+        const description = form.description.trim();
+        const price = Number(form.price);
+        const duration = Number(form.duration);
+        const imageUrl = form.imageUrl.trim();
+
+        /*
+        | SERVICE NAME
+        */
+
+        if (!name) {
             newErrors.name = "Service name is required.";
-        } else if (form.name.trim().length < 3) {
-            newErrors.name = "Service name must be at least 3 characters.";
-        } else if (form.name.trim().length > 100) {
-            newErrors.name = "Service name cannot exceed 100 characters.";
+        } else if (name.length < 3) {
+            newErrors.name =
+                "Service name must be at least 3 characters.";
+        } else if (name.length > 100) {
+            newErrors.name =
+                "Service name cannot exceed 100 characters.";
         }
 
-        // Description
-        if (!form.description.trim()) {
+        /*
+        | DESCRIPTION
+        */
+
+        if (!description) {
             newErrors.description = "Description is required.";
-        } else if (form.description.trim().length < 20) {
+        } else if (description.length < 20) {
             newErrors.description =
                 "Description must be at least 20 characters.";
-        } else if (form.description.length > MAX_DESCRIPTION_LENGTH) {
+        } else if (description.length > MAX_DESCRIPTION_LENGTH) {
             newErrors.description =
                 `Description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters.`;
         }
 
-        // Price
-        if (!form.price) {
+        /*
+        | PRICE
+        */
+
+        if (form.price === "") {
             newErrors.price = "Price is required.";
-        } else if (Number(form.price) <= 0) {
+        } else if (!Number.isFinite(price)) {
+            newErrors.price = "Please enter a valid price.";
+        } else if (price <= 0) {
             newErrors.price = "Price must be greater than ₦0.";
+        } else if (price > 100000000) {
+            newErrors.price =
+                "Price cannot exceed ₦100,000,000.";
         }
 
-        // Duration
-        if (!form.duration) {
+        /*
+        | DURATION
+        */
+
+        if (form.duration === "") {
             newErrors.duration = "Duration is required.";
-        } else if (Number(form.duration) <= 0) {
-            newErrors.duration = "Duration must be greater than 0 minutes.";
-        } else if (Number(form.duration) > 1440) {
+        } else if (!Number.isFinite(duration)) {
+            newErrors.duration =
+                "Please enter a valid duration.";
+        } else if (!Number.isInteger(duration)) {
+            newErrors.duration =
+                "Duration must be a whole number of minutes.";
+        } else if (duration <= 0) {
+            newErrors.duration =
+                "Duration must be greater than 0 minutes.";
+        } else if (duration > 1440) {
             newErrors.duration =
                 "Duration cannot exceed 1,440 minutes.";
         }
 
-        // Image
-        if (!image && !form.imageUrl.trim()) {
+        /*
+        | IMAGE
+        */
+
+        if (!image && !imageUrl) {
             newErrors.image =
                 "Please upload an image or provide an image URL.";
         }
 
-        // Image URL
-        if (form.imageUrl.trim()) {
+        /*
+        | IMAGE URL
+        */
+
+        if (imageUrl) {
             try {
-                new URL(form.imageUrl.trim());
+                const url = new URL(imageUrl);
+
+                if (!["http:", "https:"].includes(url.protocol)) {
+                    newErrors.imageUrl =
+                        "Image URL must use HTTP or HTTPS.";
+                }
             } catch {
-                newErrors.imageUrl = "Please enter a valid image URL.";
+                newErrors.imageUrl =
+                    "Please enter a valid image URL.";
             }
         }
 
-        // Category
-        if (!form.category) {
-            newErrors.category = "Please select a category.";
+        /*
+        | SERVICE CATEGORY
+        */
+
+        if (!service) {
+            newErrors.service =
+                "Please select a service category.";
+        }
+
+        /*
+        | SUB-SERVICE
+        */
+
+        if (service && !subService) {
+            newErrors.subService =
+                "Please select a sub-category.";
         }
 
         setErrors(newErrors);
@@ -174,9 +486,43 @@ export default function AddServicePage() {
         return Object.keys(newErrors).length === 0;
     };
 
-    /* --------------------------------
-       SUBMIT
-    -------------------------------- */
+    /*
+    |--------------------------------------------------------------------------
+    | SELECT HANDLERS
+    |--------------------------------------------------------------------------
+    */
+
+    const handleServiceChange = (selected) => {
+        const value = selected?.value || "";
+
+        setService(value);
+
+        if (errors.service) {
+            setErrors((prev) => ({
+                ...prev,
+                service: "",
+            }));
+        }
+    };
+
+    const handleSubServiceChange = (selected) => {
+        const value = selected?.value || "";
+
+        setSubService(value);
+
+        if (errors.subService) {
+            setErrors((prev) => ({
+                ...prev,
+                subService: "",
+            }));
+        }
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | SUBMIT
+    |--------------------------------------------------------------------------
+    */
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -193,10 +539,17 @@ export default function AddServicePage() {
             const serviceData = {
                 name: form.name.trim(),
                 description: form.description.trim(),
+
                 price: Number(form.price),
+
                 duration: Number(form.duration),
-                category: form.category,
+
+                category: service,
+
+                subcategory: subService,
+
                 imageUrl: form.imageUrl.trim() || null,
+
                 featured: form.featured,
             };
 
@@ -204,24 +557,30 @@ export default function AddServicePage() {
             console.log("IMAGE:", image);
 
             /*
-              Your API request goes here.
-      
-              Example:
-      
-              const formData = new FormData();
-      
-              formData.append("name", serviceData.name);
-              formData.append("description", serviceData.description);
-              formData.append("price", serviceData.price);
-              formData.append("duration", serviceData.duration);
-              formData.append("category", serviceData.category);
-              formData.append("featured", serviceData.featured);
-      
-              if (image) {
-                formData.append("image", image);
-              }
-      
-              await api.post("/admin/services", formData);
+            |--------------------------------------------------------------------------
+            | API REQUEST
+            |--------------------------------------------------------------------------
+            |
+            | const formData = new FormData();
+            |
+            | formData.append("name", serviceData.name);
+            | formData.append("description", serviceData.description);
+            | formData.append("price", serviceData.price);
+            | formData.append("duration", serviceData.duration);
+            | formData.append("category", serviceData.category);
+            | formData.append("subcategory", serviceData.subcategory);
+            | formData.append("featured", serviceData.featured);
+            |
+            | if (image) {
+            |     formData.append("image", image);
+            | }
+            |
+            | if (serviceData.imageUrl) {
+            |     formData.append("imageUrl", serviceData.imageUrl);
+            | }
+            |
+            | await api.post("/admin/services", formData);
+            |
             */
 
             await new Promise((resolve) =>
@@ -233,44 +592,59 @@ export default function AddServicePage() {
             console.error(error);
 
             setErrors({
-                submit: "Something went wrong. Please try again.",
+                submit:
+                    "Something went wrong. Please try again.",
             });
         } finally {
             setIsSubmitting(false);
         }
     };
 
-    /* --------------------------------
-       PREVIEW
-    -------------------------------- */
+    /*
+    |--------------------------------------------------------------------------
+    | PREVIEW
+    |--------------------------------------------------------------------------
+    */
 
-    const previewImage =
-        image
-            ? URL.createObjectURL(image)
-            : form.imageUrl ||
-            "https://images.pexels.com/photos/3757952/pexels-photo-3757952.jpeg";
+    const previewImage = image
+        ? URL.createObjectURL(image)
+        : form.imageUrl || DEFAULT_PREVIEW_IMAGE;
 
     const formattedPrice = form.price
         ? `₦${new Intl.NumberFormat("en-NG").format(
-            Number(form.price)
-        )}`
+              Number(form.price)
+          )}`
         : "₦25,000";
 
+    /*
+    |--------------------------------------------------------------------------
+    | SELECT VALUES
+    |--------------------------------------------------------------------------
+    */
+
+    const selectedServiceOption =
+        serviceList.find(
+            (option) => option.value === service
+        ) || null;
+
+    const selectedSubServiceOption =
+        serviceSubList.find(
+            (option) => option.value === subService
+        ) || null;
+
+    /*
+    |--------------------------------------------------------------------------
+    | RENDER
+    |--------------------------------------------------------------------------
+    */
+
     return (
-        // <main className="service-page">
-
-
-        // </main>
-
         <>
-
-            {/* */}
-
-
-
             <div className="service-layout">
 
-                {/* LEFT */}
+                {/* =====================================================
+                    LEFT COLUMN
+                ===================================================== */}
 
                 <section className="left-column">
 
@@ -278,32 +652,41 @@ export default function AddServicePage() {
                         id="service-form"
                         className="service-card"
                         onSubmit={handleSubmit}
+                        noValidate
                     >
+
+                        {/* SERVICE INFORMATION */}
 
                         <div className="section-heading">
                             <h2>Service Information</h2>
 
                             <p>
-                                Fill in the details of your spa service.
+                                Add the details customers need to
+                                understand and book this service.
                             </p>
                         </div>
-
 
                         {/* SERVICE NAME */}
 
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="service-name">
                                 Service Name <span>*</span>
                             </label>
 
                             <input
+                                id="service-name"
                                 type="text"
                                 name="name"
                                 value={form.name}
                                 onChange={handleChange}
                                 placeholder="e.g. Swedish Massage"
-                                className={errors.name ? "input-error" : ""}
+                                maxLength={100}
+                                className={
+                                    errors.name
+                                        ? "input-error"
+                                        : ""
+                                }
                             />
 
                             {errors.name && (
@@ -314,23 +697,25 @@ export default function AddServicePage() {
 
                         </div>
 
-
                         {/* DESCRIPTION */}
 
                         <div className="form-group">
 
-                            <label>
+                            <label htmlFor="service-description">
                                 Description <span>*</span>
                             </label>
 
                             <div className="textarea-wrapper">
 
                                 <textarea
+                                    id="service-description"
                                     name="description"
                                     value={form.description}
                                     onChange={handleChange}
-                                    maxLength={MAX_DESCRIPTION_LENGTH}
-                                    placeholder="Describe the service, its benefits, what customers can expect, etc."
+                                    maxLength={
+                                        MAX_DESCRIPTION_LENGTH
+                                    }
+                                    placeholder="Describe the service, its benefits, what customers can expect, and who it is suitable for."
                                     className={
                                         errors.description
                                             ? "input-error"
@@ -353,26 +738,33 @@ export default function AddServicePage() {
 
                         </div>
 
-
                         {/* PRICE + DURATION */}
 
                         <div className="two-column">
 
+                            {/* PRICE */}
+
                             <div className="form-group">
 
-                                <label>
+                                <label htmlFor="service-price">
                                     Price (₦) <span>*</span>
                                 </label>
 
                                 <input
+                                    id="service-price"
                                     type="number"
                                     name="price"
                                     value={form.price}
                                     onChange={handleChange}
-                                    min="0"
-                                    placeholder="e.g. 25,000"
+                                    min="1"
+                                    max="100000000"
+                                    step="1"
+                                    inputMode="numeric"
+                                    placeholder="e.g. 25000"
                                     className={
-                                        errors.price ? "input-error" : ""
+                                        errors.price
+                                            ? "input-error"
+                                            : ""
                                     }
                                 />
 
@@ -384,22 +776,27 @@ export default function AddServicePage() {
 
                             </div>
 
+                            {/* DURATION */}
 
                             <div className="form-group">
 
-                                <label>
-                                    Duration (Minutes) <span>*</span>
+                                <label htmlFor="service-duration">
+                                    Duration (Minutes){" "}
+                                    <span>*</span>
                                 </label>
 
                                 <div className="icon-input">
 
                                     <input
+                                        id="service-duration"
                                         type="number"
                                         name="duration"
                                         value={form.duration}
                                         onChange={handleChange}
                                         min="1"
                                         max="1440"
+                                        step="1"
+                                        inputMode="numeric"
                                         placeholder="e.g. 60"
                                         className={
                                             errors.duration
@@ -422,18 +819,18 @@ export default function AddServicePage() {
 
                         </div>
 
-
                         {/* IMAGE */}
 
                         <div className="form-group image-section">
 
-                            <label>Service Image</label>
+                            <label>
+                                Service Image <span>*</span>
+                            </label>
 
                             <p className="field-description">
-                                Upload a beautiful image that represents this
-                                service.
+                                Upload a clear image that represents
+                                this treatment or service.
                             </p>
-
 
                             <label className="upload-box">
 
@@ -447,11 +844,11 @@ export default function AddServicePage() {
                                 <IoCloudUploadOutline />
 
                                 <strong>
-                                    Drag and drop an image here
+                                    Upload service image
                                 </strong>
 
                                 <span>
-                                    or click to browse
+                                    Click to browse your device
                                 </span>
 
                             </label>
@@ -459,7 +856,7 @@ export default function AddServicePage() {
                             <div className="upload-footer">
 
                                 <span>
-                                    Supports: JPG, PNG, WebP (Max 5MB)
+                                    JPG, PNG or WebP · Maximum 5MB
                                 </span>
 
                                 <label className="choose-image">
@@ -477,6 +874,16 @@ export default function AddServicePage() {
 
                             </div>
 
+                            {image && (
+                                <div className="selected-file">
+                                    <IoCheckmarkCircle />
+
+                                    <span>
+                                        {image.name}
+                                    </span>
+                                </div>
+                            )}
+
                             {errors.image && (
                                 <p className="error-message">
                                     {errors.image}
@@ -484,7 +891,6 @@ export default function AddServicePage() {
                             )}
 
                         </div>
-
 
                         {/* OR */}
 
@@ -494,22 +900,26 @@ export default function AddServicePage() {
                             <span />
                         </div>
 
-
                         {/* IMAGE URL */}
 
                         <div className="form-group">
 
-                            <label>Image URL</label>
+                            <label htmlFor="service-image-url">
+                                Image URL
+                            </label>
 
                             <div className="icon-input">
 
                                 <IoLinkOutline />
 
                                 <input
+                                    id="service-image-url"
                                     type="url"
                                     name="imageUrl"
                                     value={form.imageUrl}
-                                    onChange={handleChange}
+                                    onChange={
+                                        handleImageUrlChange
+                                    }
                                     placeholder="https://example.com/image.jpg"
                                     className={
                                         errors.imageUrl
@@ -521,7 +931,8 @@ export default function AddServicePage() {
                             </div>
 
                             <p className="field-description">
-                                You can also paste an image URL from the web.
+                                Alternatively, paste a publicly
+                                accessible image URL.
                             </p>
 
                             {errors.imageUrl && (
@@ -534,20 +945,24 @@ export default function AddServicePage() {
 
                     </form>
 
-
-                    {/* ADDITIONAL SETTINGS */}
+                    {/* =================================================
+                        ADDITIONAL SETTINGS
+                    ================================================= */}
 
                     <section className="service-card additional-settings">
 
                         <div className="section-heading">
 
                             <h2>
-                                Additional Settings{" "}
-                                <small>(Optional)</small>
+                                Service Classification
                             </h2>
 
-                        </div>
+                            <p>
+                                Organize the service so customers
+                                can find it easily.
+                            </p>
 
+                        </div>
 
                         <div className="settings-row">
 
@@ -555,75 +970,76 @@ export default function AddServicePage() {
 
                             <div className="form-group category-group">
 
-                                <label>Category</label>
+                                <label>
+                                    Category <span>*</span>
+                                </label>
 
-                                <div className="select-wrapper">
+                                <Select
+                                    options={serviceList}
+                                    isSearchable
+                                    isClearable
+                                    value={selectedServiceOption}
+                                    onChange={
+                                        handleServiceChange
+                                    }
+                                    placeholder="Select a category..."
+                                    styles={selectStyles}
+                                    hasError={Boolean(
+                                        errors.service
+                                    )}
+                                    noOptionsMessage={() =>
+                                        "No categories found"
+                                    }
+                                />
 
-                                    <select
-                                        name="category"
-                                        value={form.category}
-                                        onChange={handleChange}
-                                        className={
-                                            errors.category
-                                                ? "input-error"
-                                                : ""
-                                        }
-                                    >
-
-                                        <option value="">
-                                            Select a category
-                                        </option>
-
-                                        {categories.map((category) => (
-                                            <option
-                                                value={category}
-                                                key={category}
-                                            >
-                                                {category}
-                                            </option>
-                                        ))}
-
-                                    </select>
-
-                                    <IoChevronDown />
-
-                                </div>
-
-                                {errors.category && (
+                                {errors.service && (
                                     <p className="error-message">
-                                        {errors.category}
+                                        {errors.service}
                                     </p>
                                 )}
 
                             </div>
 
+                            {/* SUB-CATEGORY */}
 
-                            {/* FEATURED */}
+                            <div className="form-group category-group">
 
-                            <div className="featured-setting">
+                                <label>
+                                    Sub-Category <span>*</span>
+                                </label>
 
-                                <label>Featured Service</label>
+                                <Select
+                                    options={serviceSubList}
+                                    isSearchable
+                                    isClearable
+                                    isDisabled={!service}
+                                    value={
+                                        selectedSubServiceOption
+                                    }
+                                    onChange={
+                                        handleSubServiceChange
+                                    }
+                                    placeholder={
+                                        service
+                                            ? "Select a sub-category..."
+                                            : "Select a category first..."
+                                    }
+                                    styles={selectStyles}
+                                    hasError={Boolean(
+                                        errors.subService
+                                    )}
+                                    noOptionsMessage={() =>
+                                        service
+                                            ? "No sub-categories found"
+                                            : "Select a category first"
+                                    }
+                                />
 
-                                <div className="toggle-row">
-
-                                    <label className="switch">
-
-                                        <input
-                                            type="checkbox"
-                                            name="featured"
-                                            checked={form.featured}
-                                            onChange={handleChange}
-                                        />
-
-                                        <span className="slider" />
-
-                                    </label>
-
-                                    <span>
-                                        Show this service on your homepage
-                                    </span>
-
-                                </div>
+                                {errors.subService && (
+                                    <p className="error-message">
+                                        {errors.subService}
+                                    </p>
+                                )}
 
                             </div>
 
@@ -633,75 +1049,11 @@ export default function AddServicePage() {
 
                 </section>
 
-
-                {/* RIGHT */}
+                {/* =====================================================
+                    RIGHT COLUMN
+                ===================================================== */}
 
                 <section className="right-column">
-
-                    {/* PREVIEW */}
-
-                    {/* <section className="preview-card">
-
-                        <div className="section-heading">
-
-                            <h2>Preview</h2>
-
-                            <p>
-                                This is how your service will appear to customers.
-                            </p>
-
-                        </div>
-
-
-                        <div className="service-preview">
-
-                            <img
-                                src={previewImage}
-                                alt={form.name || "Spa service"}
-                            />
-
-                            <div className="preview-content">
-
-                                <div className="preview-title-row">
-
-                                    <h3>
-                                        {form.name || "Swedish Massage"}
-                                    </h3>
-
-                                    <strong>
-                                        {formattedPrice}
-                                    </strong>
-
-                                </div>
-
-
-                                <div className="preview-duration">
-
-                                    <IoTimeOutline />
-
-                                    <span>
-                                        {form.duration || 60} mins
-                                    </span>
-
-                                </div>
-
-
-                                <p>
-                                    {form.description ||
-                                        "A relaxing full-body massage that helps reduce stress, improve circulation, and promote overall wellness..."}
-                                </p>
-
-
-                                <button type="button">
-                                    Book Now
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                    </section> */}
-
 
                     {/* TIPS */}
 
@@ -716,50 +1068,43 @@ export default function AddServicePage() {
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Use a clear and attractive image
+                                Use a clear, professional image
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Write a detailed and engaging description
+                                Explain the treatment clearly
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Set a competitive price
+                                Set the correct service price
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Be specific about the duration
+                                Specify the treatment duration
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Highlight unique benefits
+                                Highlight important benefits
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Keep information up to date
+                                Keep service information updated
                             </li>
 
                         </ul>
 
                     </section>
 
+                    {/* FOOTER */}
+
                     <div className="service-footer">
 
-
                         <div className="footer-actions">
-                            {/* 
-                            <button
-                                type="button"
-                                className="draft-button"
-                                disabled={isSubmitting}
-                            >
-                                Save as Draft
-                            </button> */}
 
                             <button
                                 type="submit"
@@ -773,19 +1118,18 @@ export default function AddServicePage() {
                             </button>
 
                         </div>
+
                     </div>
+
                 </section>
 
             </div>
 
-            {
-                errors.submit && (
-                    <div className="submit-error">
-                        {errors.submit}
-                    </div>
-                )
-            }
-
+            {errors.submit && (
+                <div className="submit-error">
+                    {errors.submit}
+                </div>
+            )}
         </>
     );
 }
