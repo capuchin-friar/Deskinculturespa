@@ -5,10 +5,14 @@ CREATE TABLE services (
     name VARCHAR(150) NOT NULL,
     description TEXT,
 
+    category VARCHAR(100),
+    subcategory VARCHAR(100),
+    
     price NUMERIC(12, 2) NOT NULL
         CHECK (price >= 0),
 
     duration_minutes INTEGER,
+
 
     image_url TEXT,
 

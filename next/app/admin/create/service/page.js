@@ -892,57 +892,6 @@ export default function AddServicePage() {
 
                         </div>
 
-                        {/* OR */}
-
-                        <div className="or-divider">
-                            <span />
-                            <p>OR</p>
-                            <span />
-                        </div>
-
-                        {/* IMAGE URL */}
-
-                        <div className="form-group">
-
-                            <label htmlFor="service-image-url">
-                                Image URL
-                            </label>
-
-                            <div className="icon-input">
-
-                                <IoLinkOutline />
-
-                                <input
-                                    id="service-image-url"
-                                    type="url"
-                                    name="imageUrl"
-                                    value={form.imageUrl}
-                                    onChange={
-                                        handleImageUrlChange
-                                    }
-                                    placeholder="https://example.com/image.jpg"
-                                    className={
-                                        errors.imageUrl
-                                            ? "input-error"
-                                            : ""
-                                    }
-                                />
-
-                            </div>
-
-                            <p className="field-description">
-                                Alternatively, paste a publicly
-                                accessible image URL.
-                            </p>
-
-                            {errors.imageUrl && (
-                                <p className="error-message">
-                                    {errors.imageUrl}
-                                </p>
-                            )}
-
-                        </div>
-
                     </form>
 
                     {/* =================================================
