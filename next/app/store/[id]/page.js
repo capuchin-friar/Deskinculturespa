@@ -24,7 +24,7 @@ export async function generateMetadata({ params }) {
     );
 
     if (!res.ok) {
-      throw new Error("Failed to fetch product data");
+      return;
     }
 
     const { data: product } = await res.json();
@@ -125,7 +125,7 @@ export default async function ProductPage({ params }) {
   );
 
   if (!res.ok) {
-    throw new Error("Failed to fetch product data");
+    return;
   }
 
   const { data: product } = await res.json();
