@@ -9,8 +9,8 @@ import {
 
 import "./similar_products.css";
 import useToggler from "../../../hooks/toggler";
-import { baseApi } from "../../../../app/api/config";
 import { useRouter } from "next/navigation";
+import useProductHandler from "../../../hooks/product";
 
 export default function SimilarProducts() {
     const carouselRef = useRef(null);
@@ -38,21 +38,13 @@ export default function SimilarProducts() {
     } = useToggler();
 
 
+    const {
+        products: prods
+    } = useProductHandler();
+
     useEffect(() => {
-        (async () => {
-            let {
-                data
-            } = await baseApi.get("products");
-
-            if (data.success) {
-                setProducts(data.data.splice(0, 8))
-            }
-            if (!data.success) {
-                setProducts([])
-            }
-        })();
-    }, []);
-
+        setProducts(prods.splice(0, 4))
+    }, [prods]);
 
     return (
         <section className="similar-products">

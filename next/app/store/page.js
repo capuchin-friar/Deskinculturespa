@@ -2,12 +2,12 @@
 import { useRouter } from "next/navigation";
 import "./styles/xxl.css";
 import { useEffect, useState } from "react";
-import { baseApi } from "../api/config";
 import Formatter from "../../src/utils/formatter";
 import useToggler from "../../src/hooks/toggler";
 import { useSelector } from "react-redux";
+import useProductHandler from "../../src/hooks/product";
 
-export default function Store({}) {
+export default function Store({ }) {
 
     let {
         filters
@@ -22,28 +22,21 @@ export default function Store({}) {
         rmFromCart,
         isCarted
     } = useToggler();
+    const {
+        products: prods
+    } = useProductHandler();
 
     useEffect(() => {
-        (async () => {
-            let {
-                data
-            } = await baseApi.get("products");
+        setProducts(prods)
+    }, [prods]);
 
-            if (data.success) {
-                setProducts(data.data);
-            }
-            if (!data.success) {
-                setProducts([])
-            }
-        })();
-    }, []);
-    useEffect(() => {implementFilter(filters)}, [filters, products]);
+    useEffect(() => { implementFilter(filters) }, [filters, products]);
 
 
 
     function implementFilter(filter) {
         let filtered = products;
-    
+
         if (filter.price) {
             filtered = filtered.filter(
                 (p) =>
@@ -51,7 +44,7 @@ export default function Store({}) {
                     Number(p.price) <= Number(filter.price.max)
             );
         }
-    
+
         if (filter.category && filter.category !== "") {
             filtered = filtered.filter(
                 (p) =>
@@ -59,7 +52,7 @@ export default function Store({}) {
                     filter.category.toLowerCase()
             );
         }
-    
+
         if (filter.subCategory && filter.subCategory !== "") {
             filtered = filtered.filter(
                 (p) =>
@@ -67,7 +60,7 @@ export default function Store({}) {
                     filter.subCategory.toLowerCase()
             );
         }
-    
+
         if (filter.brand && filter.brand !== "") {
             filtered = filtered.filter(
                 (p) =>
@@ -75,7 +68,7 @@ export default function Store({}) {
                     filter.brand.toLowerCase()
             );
         }
-    
+
         console.log("filtered: ", filtered)
         setFilteredProducts(filtered);
     }

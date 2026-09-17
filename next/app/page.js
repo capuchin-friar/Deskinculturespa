@@ -6,9 +6,9 @@ import "./styles/testimonial.css"
 import Link from "next/link";
 import WhyChooseUs from "@/src/components/customer/Why"
 import { useEffect, useState } from "react";
-import { baseApi } from "./api/config";
 import Formatter from "../src/utils/formatter";
 import useToggler from "../src/hooks/toggler";
+import useProductHandler from "../src/hooks/product";
 import { useRouter } from "next/navigation";
 export default function Home() {
 
@@ -21,21 +21,13 @@ export default function Home() {
     isCarted
   } = useToggler();
 
+  const {
+    products: prods
+  } = useProductHandler();
 
   useEffect(() => {
-    (async () => {
-      let {
-        data
-      } = await baseApi.get("products");
-
-      if (data.success) {
-        setProducts(data.data.splice(0, 4))
-      }
-      if (!data.success) {
-        setProducts([])
-      }
-    })();
-  }, []);
+    setProducts(prods.splice(0, 4))
+  }, [prods]);
 
   const services = [
     {

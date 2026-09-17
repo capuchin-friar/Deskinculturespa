@@ -5,102 +5,40 @@ import {
 } from "react-icons/io5";
 
 import Link from "next/link";
+import useProductHandler from "@/src/hooks/product";
+import useServiceHandler from "@/src/hooks/service";
+import { useEffect, useState } from "react";
 
 
 export function Header() {
+    const [products, setProducts] = useState([]);
+    const [services, setServices] = useState([]);
+    const [appointments, setAppointments] = useState([]);
+
+    const {
+        products: prods
+    } = useProductHandler();
+
+    const {
+        services: servs
+    } = useServiceHandler();
+
+    useEffect(() => {
+        setProducts(prods.splice(0, 4))
+    }, [prods]);
+    useEffect(() => {
+        setServices(servs.splice(0, 4))
+    }, [servs]);
 
     const offers = [
         {
-            products: [
-                {
-                    id: 1,
-                    name: "Lavender Aromatherapy Oil",
-                    price: 12000,
-                    image: "/images/products/lavender-oil.jpg"
-                },
-                {
-                    id: 2,
-                    name: "Shea Butter Body Cream",
-                    price: 8500,
-                    image: "/images/products/shea-butter.jpg"
-                },
-                {
-                    id: 3,
-                    name: "Relaxation Bath Salt",
-                    price: 6500,
-                    image: "/images/products/bath-salt.jpg"
-                },
-                {
-                    id: 4,
-                    name: "Deep Moisture Face Mask",
-                    price: 7500,
-                    image: "/images/products/face-mask.jpg"
-                }
-            ]
+            products: products
         },
         {
-            services: [
-                {
-                    id: 1,
-                    name: "Full Body Massage",
-                    duration: "60 minutes",
-                    price: 30000,
-                    image: "/images/services/full-body-massage.jpg"
-                },
-                {
-                    id: 2,
-                    name: "Facial Treatment",
-                    duration: "45 minutes",
-                    price: 22000,
-                    image: "/images/services/facial-treatment.jpg"
-                },
-                {
-                    id: 3,
-                    name: "Aromatherapy Session",
-                    duration: "30 minutes",
-                    price: 18000,
-                    image: "/images/services/aromatherapy.jpg"
-                },
-                {
-                    id: 4,
-                    name: "Hot Stone Massage",
-                    duration: "90 minutes",
-                    price: 45000,
-                    image: "/images/services/hot-stone.jpg"
-                }
-            ]
+            services: services
         },
         {
-            appointments: [
-                {
-                    id: 1,
-                    name: "Spa Consultation",
-                    mode: "physical",
-                    duration: "30 minutes",
-                    price: 10000
-                },
-                {
-                    id: 2,
-                    name: "Wellness Consultation",
-                    mode: "online",
-                    duration: "20 minutes",
-                    price: 7000
-                },
-                {
-                    id: 3,
-                    name: "Skincare Consultation",
-                    mode: "physical",
-                    duration: "45 minutes",
-                    price: 15000
-                },
-                {
-                    id: 4,
-                    name: "Virtual Spa Consultation",
-                    mode: "online",
-                    duration: "30 minutes",
-                    price: 9000
-                }
-            ]
+            appointments: appointments
         }
     ];
 
@@ -108,14 +46,34 @@ export function Header() {
     const resources = [
         {
             resource: [
-                "About Us",
-                "Our Story",
-                "Blogs",
-                "FAQ",
-                "Contact Us",
-                "Newsletter",
-                "Referral Program",
-                "Shipping & Returns"
+                {
+                    name: "About Us",
+                    href: "/about"
+                },
+                {
+                    name: "Blogs",
+                    href: "/blogs"
+                },
+                // {
+                //     name: "FAQ",
+                //     href: "/faq"
+                // },
+                {
+                    name: "Contact Us",
+                    href: "/contact"
+                },
+                {
+                    name: "Newsletter",
+                    href: "/newsletter"
+                },
+                // {
+                //     name: "Referral Program",
+                //     href: "/referral"
+                // },
+                {
+                    name: "Shipping & Returns",
+                    href: "/shipping-returns"
+                }
             ]
         }
     ];
@@ -205,7 +163,7 @@ export function Header() {
                                                         key={item.id}
                                                     >
 
-                                                        <Link href="#">
+                                                        <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? `/services/${item.id}` : type === "appointments" ? `/appointments/${item.id}` : "#"}>
                                                             {item.name}
                                                         </Link>
 
@@ -216,7 +174,7 @@ export function Header() {
                                             </ul>
 
                                             <Link
-                                                href="#"
+                                                href={type === "products" ? `/store` : type === "services" ? `/services` : type === "appointments" ? `/appointments` : "#"}
                                                 className="mega-menu-view-all"
                                             >
                                                 View all
@@ -297,8 +255,8 @@ export function Header() {
                                                         key={itemIndex}
                                                     >
 
-                                                        <Link href="#">
-                                                            {item}
+                                                        <Link href={`${item.href}`}>
+                                                            {item.name}
                                                         </Link>
 
                                                     </li>
@@ -451,7 +409,7 @@ export function Header() {
                 </button>
 
 
-                <button
+                {/* <button
                     type="button"
                     aria-label="Search"
                     onClick={() => {
@@ -461,7 +419,7 @@ export function Header() {
                     <IoSearchOutline
                         size={23}
                     />
-                </button>
+                </button> */}
 
 
                 <button

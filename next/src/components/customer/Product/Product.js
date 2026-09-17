@@ -20,10 +20,10 @@ import Link from 'next/link'
 import axios from 'axios'
 import { IoCart, IoCartOutline, IoCubeOutline, IoImageOutline } from 'react-icons/io5'
 import StarRating from '../../../utils/star'
-import { baseApi } from '../../../../app/api/config'
 import { set_cart } from '../../../../redux/customer/cart'
 import QuantityCounter from '../QuantityCounter'
 import { data } from 'react-router-dom'
+import useProductHandler from "../../../hooks/product";
 import useToggler from "../../../hooks/toggler"
 let BtnStyles = {
     height: '35px',
