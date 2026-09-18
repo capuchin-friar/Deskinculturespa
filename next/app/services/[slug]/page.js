@@ -1,70 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "./styles/xxl.css";
 import { useRouter } from "next/navigation";
-const services = [
-    {
-        id: 1,
-        title: "Relaxing Massage",
-        description:
-            "A soothing massage using Swedish techniques. Gentle strokes and relaxing oils relieve tired muscles.",
-        price: "£50",
-        duration: "60 minutes",
-        image:
-            "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=900&q=85",
-    },
-    {
-        id: 2,
-        title: "Energising Massage",
-        description:
-            "Feel refreshed with this uplifting massage designed to improve circulation and give you a much needed boost. Supercharge yourself ahead of a busy period or feel renewed after a hectic week.",
-        price: "£50",
-        duration: "60 minutes",
-        image:
-            "https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=900&q=85",
-    },
-    {
-        id: 3,
-        title: "Deep Tissue Massage",
-        description:
-            "A full body massage with firm pressure and slow strokes to reach deep layers of muscle and tissue and relieve aches and pains.",
-        price: "£50",
-        duration: "60 minutes",
-        image:
-            "https://images.unsplash.com/photo-1600334089648-b0d9d3028eb2?auto=format&fit=crop&w=900&q=85",
-    },
-    {
-        id: 4,
-        title: "Lymphatic Drainage",
-        description:
-            "A gentle lymphatic drainage massage to stimulate the body's lymphatic system. Benefits include reducing water retention, promoting healing, boosting the immune system and detoxification.",
-        price: "£50",
-        duration: "60 minutes",
-        image:
-            "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=900&q=85",
-    },
-    {
-        id: 5,
-        title: "Hot Stone Massage",
-        description:
-            "A deeply relaxing treatment using warm stones and therapeutic massage techniques to ease muscle tension and promote relaxation.",
-        price: "£60",
-        duration: "75 minutes",
-        image:
-            "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=85",
-    },
-    {
-        id: 6,
-        title: "Aromatherapy Massage",
-        description:
-            "A calming full-body massage combined with carefully selected essential oils to help relax the body and mind.",
-        price: "£55",
-        duration: "60 minutes",
-        image:
-            "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=900&q=85",
-    },
-];
+import _SERVICES from "../../../src/json/services.json";
+import useServiceHandler from "../../../src/hooks/service";
+import Formatter from "../../../src/utils/formatter";
 
 const bookings = [
     {
@@ -204,7 +145,10 @@ function CloseIcon() {
 }
 
 export default function Page({ params }) {
-    // const { slug } = await params;
+    let {
+        services: s
+    } = useServiceHandler();
+    let [services, setServices] = useState([]);
     const router = useRouter();
     const [selectedService, setSelectedService] = useState(null);
 
@@ -215,6 +159,12 @@ export default function Page({ params }) {
     const closeServiceModal = () => {
         setSelectedService(null);
     };
+
+    useEffect(() => {
+        let r = window.location.pathname.split("/").splice(-1)[0].replace("-", " ");
+        let filteredServices = s.filter(s => s.category.toLowerCase() === r);
+        setServices(filteredServices);
+    }, [s]);
 
 
     const handleBookService = (service) => {
@@ -275,20 +225,33 @@ export default function Page({ params }) {
                                 >
                                     <div className="service-card-content">
 
-                                        <h2>{service.title}</h2>
+                                        <h2>{service.subcategory}</h2>
 
                                         <p>{service.description}</p>
 
                                     </div>
 
                                     <div className="service-card-footer">
+                                        <div className="service-meta">
+                                            <div className="price-container">
+                                                <span className="price-label">
+                                                    Start from
+                                                </span>
 
-                                        <div className="price-container">
-                                            <span className="price-label">
-                                                Start from
-                                            </span>
+                                                <strong>
+                                                    ₦{Number(service.price).toLocaleString("en-NG", {
+                                                        maximumFractionDigits: 2,
+                                                    })}
+                                                </strong>
+                                            </div>
 
-                                            <strong>{service.price}</strong>
+                                            <div className="duration-container">
+                                                <ClockIcon />
+
+                                                <span>
+                                                    {service.duration_minutes} Mins
+                                                </span>
+                                            </div>
                                         </div>
 
                                         <button
@@ -301,7 +264,6 @@ export default function Page({ params }) {
                                         >
                                             Book Service
                                         </button>
-
                                     </div>
                                 </article>
                             ))}
