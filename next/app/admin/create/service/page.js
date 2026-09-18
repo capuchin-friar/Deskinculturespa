@@ -11,7 +11,9 @@ import {
 import Select from "react-select";
 import "./styles/xxl.css";
 import _SERVICES from "../../../../src/json/services.json";
-import { api } from "../../../api/config";
+import uuidV4 from "uuid-v4";
+import { api, baseApi } from "../../../api/config";
+
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
@@ -41,9 +43,15 @@ export default function AddServicePage() {
     const [service, setService] = useState("");
     const [subService, setSubService] = useState("");
 
-    const [image, setImage] = useState(null);
+    const [image, setImage] = useState([]);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const [productId, setProductId] = useState("");
+
+    useEffect(() => {
+        setProductId(uuidV4());
+    }, []);
 
     /*
     |--------------------------------------------------------------------------
@@ -84,10 +92,8 @@ export default function AddServicePage() {
 
         setServiceSubList(subserviceList);
 
-        // Reset selected sub-service whenever category changes
         setSubService("");
 
-        // Remove sub-service error
         setErrors((prev) => ({
             ...prev,
             subService: "",
@@ -108,7 +114,6 @@ export default function AddServicePage() {
             [name]: type === "checkbox" ? checked : value,
         }));
 
-        // Clear field error when user starts correcting it
         if (errors[name]) {
             setErrors((prev) => ({
                 ...prev,
@@ -123,73 +128,285 @@ export default function AddServicePage() {
     |--------------------------------------------------------------------------
     */
 
-    const handleImageUpload = (e) => {
-        const file = e.target.files?.[0];
+    const handleImageUpload = async (e) => {
+        if(image.length === 1) {
+            alert("You can upload only one image!");
+            return;
+        };
+        const files = Array.from(e.target.files || []);
 
-        if (!file) return;
-
-        // File type
-        if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
-            setErrors((prev) => ({
-                ...prev,
-                image: "Only JPG, PNG, and WebP images are allowed.",
-            }));
-
-            e.target.value = "";
+        if (!files.length) {
             return;
         }
 
-        // File size
-        if (file.size > MAX_IMAGE_SIZE) {
+        try {
+            setIsSubmitting(true);
+
             setErrors((prev) => ({
                 ...prev,
-                image: "Image size must not exceed 5MB.",
+                image: "",
+                images: "",
             }));
 
+            /*
+             * Validate ALL selected files before uploading
+             * any of them.
+             */
+
+            for (const file of files) {
+                if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+                    throw new Error(
+                        `${file.name}: Only JPEG, PNG, or WebP images are allowed.`
+                    );
+                }
+
+                if (file.size > MAX_IMAGE_SIZE) {
+                    throw new Error(
+                        `${file.name}: Image must not exceed 5MB.`
+                    );
+                }
+            }
+
+            /*
+             * Upload each image individually.
+             *
+             * Each uploaded image is appended to the
+             * existing image array.
+             */
+
+            for (const file of files) {
+                const formData = new FormData();
+
+                formData.append("file", file);
+
+                formData.append(
+                    "product_id",
+                    productId
+                );
+
+                const {
+                    data,
+                    status,
+                } = await baseApi.post(
+                    "upload",
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type":
+                                "multipart/form-data",
+                        },
+                    }
+                );
+
+                if (
+                    status !== 200 ||
+                    !data?.url
+                ) {
+                    throw new Error(
+                        data?.error ||
+                        `Failed to upload ${file.name}`
+                    );
+                }
+
+                /*
+                 * Store the Cloudinary URL,
+                 * public ID and original file name.
+                 */
+
+                const uploadedImage = {
+                    url: data.url,
+                    publicId:
+                        data.publicId ||
+                        extractPublicId(data.url),
+                    name: file.name,
+                };
+
+                /*
+                 * IMPORTANT:
+                 *
+                 * Do NOT replace the previous images.
+                 * Append the new image to the existing array.
+                 */
+
+                setImage((prev) => [
+                    ...prev,
+                    uploadedImage,
+                ]);
+            }
+        } catch (error) {
+            console.error(
+                "Image upload error:",
+                error
+            );
+
+            setErrors((prev) => ({
+                ...prev,
+                image:
+                    error?.message ||
+                    "Image upload failed.",
+            }));
+        } finally {
+            setIsSubmitting(false);
+
+            /*
+             * Allows the user to select the same
+             * image again if necessary.
+             */
+
             e.target.value = "";
-            return;
         }
-
-        setImage(file);
-
-        setErrors((prev) => ({
-            ...prev,
-            image: "",
-            imageUrl: "",
-        }));
-
-        // Clear URL because uploaded image takes priority
-        setForm((prev) => ({
-            ...prev,
-            imageUrl: "",
-        }));
     };
 
     /*
     |--------------------------------------------------------------------------
-    | IMAGE URL CHANGE
+    | EXTRACT CLOUDINARY PUBLIC ID
     |--------------------------------------------------------------------------
     */
 
-    const handleImageUrlChange = (e) => {
-        const { value } = e.target;
+    const extractPublicId = (url) => {
+        try {
+            const pathname =
+                new URL(url).pathname;
 
-        setForm((prev) => ({
-            ...prev,
-            imageUrl: value,
-        }));
+            const uploadIndex =
+                pathname.indexOf("/upload/");
 
-        // If user enters a URL, remove uploaded file
-        if (value.trim()) {
-            setImage(null);
+            if (uploadIndex === -1) {
+                return null;
+            }
+
+            let publicId =
+                pathname.substring(
+                    uploadIndex +
+                        "/upload/".length
+                );
+
+            /*
+             * Remove Cloudinary version.
+             *
+             * v123456789/
+             */
+
+            publicId =
+                publicId.replace(
+                    /^v\d+\//,
+                    ""
+                );
+
+            /*
+             * Remove file extension.
+             */
+
+            publicId =
+                publicId.replace(
+                    /\.[^/.]+$/,
+                    ""
+                );
+
+            return publicId;
+        } catch (error) {
+            return null;
+        }
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE IMAGE FROM CLOUDINARY
+    |--------------------------------------------------------------------------
+    */
+
+    const deleteImage = async (publicId) => {
+        if (!publicId) {
+            throw new Error(
+                "Image public ID is required."
+            );
         }
 
-        if (errors.imageUrl || errors.image) {
+        const {
+            data,
+            status,
+        } = await baseApi.delete(
+            "delete",
+            {
+                data: {
+                    publicId,
+                },
+            }
+        );
+
+        if (
+            status !== 200 ||
+            !data?.success
+        ) {
+            throw new Error(
+                data?.error ||
+                    "Failed to delete image."
+            );
+        }
+
+        return data;
+    };
+
+    /*
+    |--------------------------------------------------------------------------
+    | DELETE INDIVIDUAL IMAGE
+    |--------------------------------------------------------------------------
+    */
+
+    const handleDeleteImage = async (index) => {
+        const selectedImage = image[index];
+
+        if (!selectedImage) {
+            return;
+        }
+
+        const publicId =
+            typeof selectedImage === "string"
+                ? extractPublicId(selectedImage)
+                : selectedImage.publicId;
+
+        try {
+            setIsSubmitting(true);
+
             setErrors((prev) => ({
                 ...prev,
-                imageUrl: "",
                 image: "",
+                images: "",
             }));
+
+            /*
+             * Delete from Cloudinary first.
+             *
+             * If the public ID exists.
+             */
+
+            if (publicId) {
+                await deleteImage(publicId);
+            }
+
+            /*
+             * Remove the image from local state.
+             */
+
+            setImage((prev) =>
+                prev.filter(
+                    (_, i) => i !== index
+                )
+            );
+        } catch (error) {
+            console.error(
+                "Delete image error:",
+                error
+            );
+
+            setErrors((prev) => ({
+                ...prev,
+                image:
+                    error?.message ||
+                    "Failed to delete image.",
+            }));
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -227,9 +444,10 @@ export default function AddServicePage() {
                     "border-color 0.2s ease, box-shadow 0.2s ease",
 
                 "&:hover": {
-                    borderColor: state.selectProps.hasError
-                        ? "#dc2626"
-                        : "#278A3D",
+                    borderColor:
+                        state.selectProps.hasError
+                            ? "#dc2626"
+                            : "#278A3D",
                 },
             }),
 
@@ -295,15 +513,17 @@ export default function AddServicePage() {
                     ? "#ffffff"
                     : "#25352a",
 
-                backgroundColor: state.isSelected
-                    ? "#278A3D"
-                    : state.isFocused
-                        ? "#E8F5EB"
-                        : "#ffffff",
+                backgroundColor:
+                    state.isSelected
+                        ? "#278A3D"
+                        : state.isFocused
+                            ? "#E8F5EB"
+                            : "#ffffff",
 
                 cursor: "pointer",
 
-                transition: "background-color 0.15s ease",
+                transition:
+                    "background-color 0.15s ease",
 
                 "&:active": {
                     backgroundColor: "#278A3D",
@@ -315,7 +535,10 @@ export default function AddServicePage() {
                 display: "none",
             }),
 
-            dropdownIndicator: (base, state) => ({
+            dropdownIndicator: (
+                base,
+                state
+            ) => ({
                 ...base,
 
                 color: state.isFocused
@@ -324,11 +547,13 @@ export default function AddServicePage() {
 
                 paddingRight: "12px",
 
-                transition: "transform 0.2s ease, color 0.2s ease",
+                transition:
+                    "transform 0.2s ease, color 0.2s ease",
 
-                transform: state.selectProps.menuIsOpen
-                    ? "rotate(180deg)"
-                    : "rotate(0deg)",
+                transform:
+                    state.selectProps.menuIsOpen
+                        ? "rotate(180deg)"
+                        : "rotate(0deg)",
 
                 "&:hover": {
                     color: "#278A3D",
@@ -368,51 +593,74 @@ export default function AddServicePage() {
     const validate = () => {
         const newErrors = {};
 
-        const description = form.description.trim();
-        const price = Number(form.price);
-        const duration = Number(form.duration);
-        const imageUrl = form.imageUrl.trim();
+        const description =
+            form.description.trim();
 
+        const price = Number(form.price);
+
+        const duration =
+            Number(form.duration);
+
+        const imageUrl =
+            form.imageUrl.trim();
 
         /*
+        |--------------------------------------------------------------------------
         | DESCRIPTION
+        |--------------------------------------------------------------------------
         */
 
         if (!description) {
-            newErrors.description = "Description is required.";
+            newErrors.description =
+                "Description is required.";
         } else if (description.length < 20) {
             newErrors.description =
                 "Description must be at least 20 characters.";
-        } else if (description.length > MAX_DESCRIPTION_LENGTH) {
+        } else if (
+            description.length >
+            MAX_DESCRIPTION_LENGTH
+        ) {
             newErrors.description =
                 `Description cannot exceed ${MAX_DESCRIPTION_LENGTH} characters.`;
         }
 
         /*
+        |--------------------------------------------------------------------------
         | PRICE
+        |--------------------------------------------------------------------------
         */
 
         if (form.price === "") {
-            newErrors.price = "Price is required.";
+            newErrors.price =
+                "Price is required.";
         } else if (!Number.isFinite(price)) {
-            newErrors.price = "Please enter a valid price.";
+            newErrors.price =
+                "Please enter a valid price.";
         } else if (price <= 0) {
-            newErrors.price = "Price must be greater than ₦0.";
+            newErrors.price =
+                "Price must be greater than ₦0.";
         } else if (price > 100000000) {
             newErrors.price =
                 "Price cannot exceed ₦100,000,000.";
         }
 
         /*
+        |--------------------------------------------------------------------------
         | DURATION
+        |--------------------------------------------------------------------------
         */
 
         if (form.duration === "") {
-            newErrors.duration = "Duration is required.";
-        } else if (!Number.isFinite(duration)) {
+            newErrors.duration =
+                "Duration is required.";
+        } else if (
+            !Number.isFinite(duration)
+        ) {
             newErrors.duration =
                 "Please enter a valid duration.";
-        } else if (!Number.isInteger(duration)) {
+        } else if (
+            !Number.isInteger(duration)
+        ) {
             newErrors.duration =
                 "Duration must be a whole number of minutes.";
         } else if (duration <= 0) {
@@ -424,34 +672,48 @@ export default function AddServicePage() {
         }
 
         /*
+        |--------------------------------------------------------------------------
         | IMAGE
+        |--------------------------------------------------------------------------
         */
 
-        // if (!image && !imageUrl) {
-        //     newErrors.image =
-        //         "Please upload an image or provide an image URL.";
-        // }
+        if (image.length === 0) {
+            newErrors.image =
+                "Please upload at least one image.";
+        }
 
         /*
+        |--------------------------------------------------------------------------
         | IMAGE URL
+        |--------------------------------------------------------------------------
         */
 
-        // if (imageUrl) {
-        //     try {
-        //         const url = new URL(imageUrl);
+        if (imageUrl) {
+            try {
+                const url =
+                    new URL(imageUrl);
 
-        //         if (!["http:", "https:"].includes(url.protocol)) {
-        //             newErrors.imageUrl =
-        //                 "Image URL must use HTTP or HTTPS.";
-        //         }
-        //     } catch {
-        //         newErrors.imageUrl =
-        //             "Please enter a valid image URL.";
-        //     }
-        // }
+                if (
+                    ![
+                        "http:",
+                        "https:",
+                    ].includes(
+                        url.protocol
+                    )
+                ) {
+                    newErrors.imageUrl =
+                        "Image URL must use HTTP or HTTPS.";
+                }
+            } catch {
+                newErrors.imageUrl =
+                    "Please enter a valid image URL.";
+            }
+        }
 
         /*
+        |--------------------------------------------------------------------------
         | SERVICE CATEGORY
+        |--------------------------------------------------------------------------
         */
 
         if (!service) {
@@ -460,17 +722,25 @@ export default function AddServicePage() {
         }
 
         /*
+        |--------------------------------------------------------------------------
         | SUB-SERVICE
+        |--------------------------------------------------------------------------
         */
 
-        if (service && !subService) {
+        if (
+            service &&
+            !subService
+        ) {
             newErrors.subService =
                 "Please select a sub-category.";
         }
 
         setErrors(newErrors);
 
-        return Object.keys(newErrors).length === 0;
+        return (
+            Object.keys(newErrors)
+                .length === 0
+        );
     };
 
     /*
@@ -479,8 +749,11 @@ export default function AddServicePage() {
     |--------------------------------------------------------------------------
     */
 
-    const handleServiceChange = (selected) => {
-        const value = selected?.value || "";
+    const handleServiceChange = (
+        selected
+    ) => {
+        const value =
+            selected?.value || "";
 
         setService(value);
 
@@ -492,8 +765,11 @@ export default function AddServicePage() {
         }
     };
 
-    const handleSubServiceChange = (selected) => {
-        const value = selected?.value || "";
+    const handleSubServiceChange = (
+        selected
+    ) => {
+        const value =
+            selected?.value || "";
 
         setSubService(value);
 
@@ -527,37 +803,63 @@ export default function AddServicePage() {
             }));
 
             const serviceData = {
-                description: form.description.trim(),
-                price: Number(form.price),
-                duration_minutes: Number(form.duration),
+                description:
+                    form.description.trim(),
+
+                price:
+                    Number(form.price),
+
+                duration_minutes:
+                    Number(form.duration),
+
                 service,
-                sub_service: subService,
+
+                sub_service:
+                    subService,
+                specifications: ({
+                    hash: productId
+                }),
+                /*
+                 * All uploaded images.
+                 */
+
+                image_url: image[0].url,
             };
 
-            const { data } = await api.post(
-                "services/add",
-                serviceData
-            );
+            const { data } =
+                await api.post(
+                    "services/add",
+                    serviceData
+                );
 
             if (!data?.success) {
                 throw new Error(
-                    data?.message || "Failed to create service."
+                    data?.message ||
+                        "Failed to create service."
                 );
             }
 
-            alert("Service created successfully!");
-            window.location.href ="/admin/catalog";
+            alert(
+                "Service created successfully!"
+            );
+
+            window.location.href =
+                "/admin/catalog";
         } catch (error) {
-            console.error("CREATE SERVICE ERROR:", error);
+            console.error(
+                "CREATE SERVICE ERROR:",
+                error
+            );
 
             setErrors((prev) => ({
                 ...prev,
+
                 submit:
-                    error?.response?.data?.message ||
+                    error?.response
+                        ?.data?.message ||
                     error?.message ||
                     "Something went wrong. Please try again.",
             }));
-
         } finally {
             setIsSubmitting(false);
         }
@@ -569,15 +871,20 @@ export default function AddServicePage() {
     |--------------------------------------------------------------------------
     */
 
-    const previewImage = image
-        ? URL.createObjectURL(image)
-        : form.imageUrl || DEFAULT_PREVIEW_IMAGE;
+    const previewImage =
+        image.length > 0
+            ? image[0]?.url
+            : form.imageUrl ||
+              DEFAULT_PREVIEW_IMAGE;
 
-    const formattedPrice = form.price
-        ? `₦${new Intl.NumberFormat("en-NG").format(
-            Number(form.price)
-        )}`
-        : "₦25,000";
+    const formattedPrice =
+        form.price
+            ? `₦${new Intl.NumberFormat(
+                "en-NG"
+            ).format(
+                Number(form.price)
+            )}`
+            : "₦25,000";
 
     /*
     |--------------------------------------------------------------------------
@@ -587,12 +894,16 @@ export default function AddServicePage() {
 
     const selectedServiceOption =
         serviceList.find(
-            (option) => option.value === service
+            (option) =>
+                option.value ===
+                service
         ) || null;
 
     const selectedSubServiceOption =
         serviceSubList.find(
-            (option) => option.value === subService
+            (option) =>
+                option.value ===
+                subService
         ) || null;
 
     /*
@@ -614,22 +925,30 @@ export default function AddServicePage() {
                     <form
                         id="service-form"
                         className="service-card"
-                        onSubmit={handleSubmit}
+                        onSubmit={
+                            handleSubmit
+                        }
                         noValidate
                     >
 
                         {/* SERVICE INFORMATION */}
 
                         <div className="section-heading">
-                            <h2>Service Information</h2>
+
+                            <h2>
+                                Service Information
+                            </h2>
 
                             <p>
-                                Add the details customers need to
-                                understand and book this service.
+                                Add the details
+                                customers need to
+                                understand and book
+                                this service.
                             </p>
+
                         </div>
 
-                        {/* SERVICE NAME */}
+                        {/* CATEGORY + SUB-CATEGORY */}
 
                         <div className="form-group">
 
@@ -640,19 +959,26 @@ export default function AddServicePage() {
                                 <div className="form-group category-group">
 
                                     <label>
-                                        Category <span>*</span>
+                                        Category{" "}
+                                        <span>*</span>
                                     </label>
 
                                     <Select
-                                        options={serviceList}
+                                        options={
+                                            serviceList
+                                        }
                                         isSearchable
                                         isClearable
-                                        value={selectedServiceOption}
+                                        value={
+                                            selectedServiceOption
+                                        }
                                         onChange={
                                             handleServiceChange
                                         }
                                         placeholder="Select a category..."
-                                        styles={selectStyles}
+                                        styles={
+                                            selectStyles
+                                        }
                                         hasError={Boolean(
                                             errors.service
                                         )}
@@ -663,7 +989,9 @@ export default function AddServicePage() {
 
                                     {errors.service && (
                                         <p className="error-message">
-                                            {errors.service}
+                                            {
+                                                errors.service
+                                            }
                                         </p>
                                     )}
 
@@ -674,14 +1002,19 @@ export default function AddServicePage() {
                                 <div className="form-group category-group">
 
                                     <label>
-                                        Sub-Category <span>*</span>
+                                        Sub-Category{" "}
+                                        <span>*</span>
                                     </label>
 
                                     <Select
-                                        options={serviceSubList}
+                                        options={
+                                            serviceSubList
+                                        }
                                         isSearchable
                                         isClearable
-                                        isDisabled={!service}
+                                        isDisabled={
+                                            !service
+                                        }
                                         value={
                                             selectedSubServiceOption
                                         }
@@ -693,7 +1026,9 @@ export default function AddServicePage() {
                                                 ? "Select a sub-category..."
                                                 : "Select a category first..."
                                         }
-                                        styles={selectStyles}
+                                        styles={
+                                            selectStyles
+                                        }
                                         hasError={Boolean(
                                             errors.subService
                                         )}
@@ -706,14 +1041,15 @@ export default function AddServicePage() {
 
                                     {errors.subService && (
                                         <p className="error-message">
-                                            {errors.subService}
+                                            {
+                                                errors.subService
+                                            }
                                         </p>
                                     )}
 
                                 </div>
 
                             </div>
-
 
                         </div>
 
@@ -722,7 +1058,8 @@ export default function AddServicePage() {
                         <div className="form-group">
 
                             <label htmlFor="service-description">
-                                Description <span>*</span>
+                                Description{" "}
+                                <span>*</span>
                             </label>
 
                             <div className="textarea-wrapper">
@@ -730,8 +1067,12 @@ export default function AddServicePage() {
                                 <textarea
                                     id="service-description"
                                     name="description"
-                                    value={form.description}
-                                    onChange={handleChange}
+                                    value={
+                                        form.description
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     maxLength={
                                         MAX_DESCRIPTION_LENGTH
                                     }
@@ -744,15 +1085,26 @@ export default function AddServicePage() {
                                 />
 
                                 <span className="character-count">
-                                    {form.description.length}/
-                                    {MAX_DESCRIPTION_LENGTH}
+
+                                    {
+                                        form
+                                            .description
+                                            .length
+                                    }
+                                    /
+                                    {
+                                        MAX_DESCRIPTION_LENGTH
+                                    }
+
                                 </span>
 
                             </div>
 
                             {errors.description && (
                                 <p className="error-message">
-                                    {errors.description}
+                                    {
+                                        errors.description
+                                    }
                                 </p>
                             )}
 
@@ -767,15 +1119,20 @@ export default function AddServicePage() {
                             <div className="form-group">
 
                                 <label htmlFor="service-price">
-                                    Price (₦) <span>*</span>
+                                    Price (₦){" "}
+                                    <span>*</span>
                                 </label>
 
                                 <input
                                     id="service-price"
                                     type="number"
                                     name="price"
-                                    value={form.price}
-                                    onChange={handleChange}
+                                    value={
+                                        form.price
+                                    }
+                                    onChange={
+                                        handleChange
+                                    }
                                     min="1"
                                     max="100000000"
                                     step="1"
@@ -790,7 +1147,9 @@ export default function AddServicePage() {
 
                                 {errors.price && (
                                     <p className="error-message">
-                                        {errors.price}
+                                        {
+                                            errors.price
+                                        }
                                     </p>
                                 )}
 
@@ -801,7 +1160,8 @@ export default function AddServicePage() {
                             <div className="form-group">
 
                                 <label htmlFor="service-duration">
-                                    Duration (Minutes){" "}
+                                    Duration
+                                    (Minutes){" "}
                                     <span>*</span>
                                 </label>
 
@@ -811,8 +1171,12 @@ export default function AddServicePage() {
                                         id="service-duration"
                                         type="number"
                                         name="duration"
-                                        value={form.duration}
-                                        onChange={handleChange}
+                                        value={
+                                            form.duration
+                                        }
+                                        onChange={
+                                            handleChange
+                                        }
                                         min="1"
                                         max="1440"
                                         step="1"
@@ -831,7 +1195,9 @@ export default function AddServicePage() {
 
                                 {errors.duration && (
                                     <p className="error-message">
-                                        {errors.duration}
+                                        {
+                                            errors.duration
+                                        }
                                     </p>
                                 )}
 
@@ -841,52 +1207,69 @@ export default function AddServicePage() {
 
                         {/* IMAGE */}
 
-                        {/* <div className="form-group image-section">
+                        <div className="form-group image-section">
 
                             <label>
-                                Service Image <span>*</span>
+                                Service Images{" "}
+                                <span>*</span>
                             </label>
 
                             <p className="field-description">
-                                Upload a clear image that represents
-                                this treatment or service.
+                                Upload one or more
+                                clear images that
+                                represent this
+                                treatment or service.
                             </p>
+
+                            {/* UPLOAD BOX */}
 
                             <label className="upload-box">
 
                                 <input
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
-                                    onChange={handleImageUpload}
+                                    multiple
+                                    onChange={
+                                        handleImageUpload
+                                    }
                                     hidden
                                 />
 
                                 <IoCloudUploadOutline />
 
                                 <strong>
-                                    Upload service image
+                                    Upload service
+                                    images
                                 </strong>
 
                                 <span>
-                                    Click to browse your device
+                                    Click to browse
+                                    your device
                                 </span>
 
                             </label>
 
+                            {/* UPLOAD FOOTER */}
+
                             <div className="upload-footer">
 
                                 <span>
-                                    JPG, PNG or WebP · Maximum 5MB
+                                    JPG, PNG or WebP ·
+                                    Maximum 5MB per
+                                    image
                                 </span>
 
                                 <label className="choose-image">
 
-                                    Choose Image
+                                    Choose Images
 
                                     <input
                                         type="file"
                                         accept="image/jpeg,image/png,image/webp"
-                                        onChange={handleImageUpload}
+                                        multiple
+                                        onChange={
+                                            handleImageUpload
+                                        }
                                         hidden
                                     />
 
@@ -894,23 +1277,216 @@ export default function AddServicePage() {
 
                             </div>
 
-                            {image && (
-                                <div className="selected-file">
-                                    <IoCheckmarkCircle />
+                            {/* =================================================
+                                IMAGE PREVIEWS
+                            ================================================= */}
 
-                                    <span>
-                                        {image.name}
-                                    </span>
+                            {image.length > 0 && (
+                                <div
+                                    className="image-preview-grid"
+                                    style={{
+                                        display: "grid",
+                                        gridTemplateColumns:
+                                            "repeat(auto-fill, minmax(140px, 1fr))",
+                                        gap: "12px",
+                                        marginTop: "16px",
+                                    }}
+                                >
+
+                                    {image.map(
+                                        (
+                                            item,
+                                            index
+                                        ) => (
+                                            <div
+                                                key={
+                                                    item.publicId ||
+                                                    item.url ||
+                                                    index
+                                                }
+                                                style={{
+                                                    position:
+                                                        "relative",
+                                                    width:
+                                                        "100%",
+                                                    aspectRatio:
+                                                        "1 / 1",
+                                                    borderRadius:
+                                                        "12px",
+                                                    overflow:
+                                                        "hidden",
+                                                    border:
+                                                        "1px solid #d9e1db",
+                                                    background:
+                                                        "#f5f8f5",
+                                                }}
+                                            >
+
+                                                {/* IMAGE */}
+
+                                                <img
+                                                    src={
+                                                        item.url
+                                                    }
+                                                    alt={
+                                                        item.name ||
+                                                        `Service image ${index + 1}`
+                                                    }
+                                                    style={{
+                                                        width:
+                                                            "100%",
+                                                        height:
+                                                            "100%",
+                                                        objectFit:
+                                                            "cover",
+                                                        display:
+                                                            "block",
+                                                    }}
+                                                />
+
+                                                {/* IMAGE OVERLAY */}
+
+                                                <div
+                                                    style={{
+                                                        position:
+                                                            "absolute",
+                                                        left:
+                                                            0,
+                                                        right:
+                                                            0,
+                                                        bottom:
+                                                            0,
+                                                        padding:
+                                                            "8px",
+                                                        display:
+                                                            "flex",
+                                                        alignItems:
+                                                            "center",
+                                                        justifyContent:
+                                                            "space-between",
+                                                        gap:
+                                                            "8px",
+                                                        background:
+                                                            "linear-gradient(transparent, rgba(0,0,0,0.75))",
+                                                        paddingTop:
+                                                            "30px",
+                                                    }}
+                                                >
+
+                                                    <span
+                                                        style={{
+                                                            color:
+                                                                "#ffffff",
+                                                            fontSize:
+                                                                "12px",
+                                                            fontWeight:
+                                                                500,
+                                                            overflow:
+                                                                "hidden",
+                                                            textOverflow:
+                                                                "ellipsis",
+                                                            whiteSpace:
+                                                                "nowrap",
+                                                            flex:
+                                                                1,
+                                                        }}
+                                                    >
+                                                        {
+                                                            item.name ||
+                                                            `Image ${index + 1}`
+                                                        }
+                                                    </span>
+
+                                                    <button
+                                                        type="button"
+                                                        onClick={() =>
+                                                            handleDeleteImage(
+                                                                index
+                                                            )
+                                                        }
+                                                        disabled={
+                                                            isSubmitting
+                                                        }
+                                                        aria-label={`Delete image ${index + 1}`}
+                                                        style={{
+                                                            width:
+                                                                "28px",
+                                                            height:
+                                                                "28px",
+                                                            minWidth:
+                                                                "28px",
+                                                            border:
+                                                                "none",
+                                                            borderRadius:
+                                                                "50%",
+                                                            background:
+                                                                "rgba(255,255,255,0.95)",
+                                                            color:
+                                                                "#dc2626",
+                                                            fontSize:
+                                                                "20px",
+                                                            lineHeight:
+                                                                "1",
+                                                            cursor:
+                                                                isSubmitting
+                                                                    ? "not-allowed"
+                                                                    : "pointer",
+                                                            display:
+                                                                "flex",
+                                                            alignItems:
+                                                                "center",
+                                                            justifyContent:
+                                                                "center",
+                                                            padding:
+                                                                0,
+                                                        }}
+                                                    >
+                                                        ×
+                                                    </button>
+
+                                                </div>
+
+                                            </div>
+                                        )
+                                    )}
+
                                 </div>
                             )}
 
-                            {errors.image && (
-                                <p className="error-message">
-                                    {errors.image}
-                                </p> 
+                            {/* IMAGE COUNT */}
+
+                            {image.length > 0 && (
+                                <div
+                                    style={{
+                                        marginTop:
+                                            "10px",
+                                        fontSize:
+                                            "13px",
+                                        color:
+                                            "#68756c",
+                                    }}
+                                >
+                                    {image.length}{" "}
+                                    {image.length === 1
+                                        ? "image"
+                                        : "images"}{" "}
+                                    uploaded
+                                </div>
                             )}
 
-                        </div> */}
+                            {/* IMAGE ERROR */}
+
+                            {(errors.image ||
+                                errors.images) && (
+                                <p className="error-message">
+                                    {
+                                        errors.image ||
+                                        errors.images
+                                    }
+                                </p>
+                            )}
+
+                        </div>
 
                     </form>
 
@@ -927,40 +1503,62 @@ export default function AddServicePage() {
                     <section className="tips-card">
 
                         <h3>
+
                             <IoBulbOutline />
-                            Tips for a great service listing
+
+                            Tips for a great
+                            service listing
+
                         </h3>
 
                         <ul>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Use a clear, professional image
+
+                                Use a clear,
+                                professional image
+
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Explain the treatment clearly
+
+                                Explain the
+                                treatment clearly
+
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Set the correct service price
+
+                                Set the correct
+                                service price
+
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Specify the treatment duration
+
+                                Specify the
+                                treatment duration
+
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Highlight important benefits
+
+                                Highlight
+                                important benefits
+
                             </li>
 
                             <li>
                                 <IoCheckmarkCircle />
-                                Keep service information updated
+
+                                Keep service
+                                information updated
+
                             </li>
 
                         </ul>
@@ -977,12 +1575,15 @@ export default function AddServicePage() {
                                 type="submit"
                                 form="service-form"
                                 className="publish-button"
-                                disabled={isSubmitting}
-                            // onClick={handleSubmit}
+                                disabled={
+                                    isSubmitting
+                                }
                             >
+
                                 {isSubmitting
                                     ? "Publishing..."
                                     : "Publish Service"}
+
                             </button>
 
                         </div>

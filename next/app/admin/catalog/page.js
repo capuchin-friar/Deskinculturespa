@@ -82,7 +82,7 @@ function ProductTableRow({
   const totalSales = item?.total_sales ?? item?.totalSales
   const price = item?.price ?? "_"
   const currency = "₦"
-  const thumb = firstImageUrl(item?.images ?? null)
+  const thumb = firstImageUrl(item?.images ?? [item.image_url])
   const menuOpen = productId != null && menuOpenId === productId
   const editHref =
     productId != null
@@ -207,34 +207,20 @@ export default function ProductListPage() {
   }, [menuOpenId])
 
   useEffect(() => {
-    // if (admin_id == null) {
-    //   setLoading(false)
-    //   setProds([])
-    //   return
-    // }
-
-    // let cancelled = false;
+   
     (async () => {
       setLoading(true)
       setListError("")
       try {
-        // if (cancelled) return
         await getCatalog(type);
 
         setLoading(false);
       } catch (e) {
-        // if (!cancelled) {
-        //   setProds([])
-        //   setListError(e?.message || "Could not load products.")
-        // }
+       
       } finally {
-        // if (!cancelled) setLoading(false)
       }
     })()
 
-    // return () => {
-    //   cancelled = true
-    // }
   }, [type])
 
 
@@ -250,8 +236,6 @@ export default function ProductListPage() {
       setAppointments(appointments.data);
     }
   }
-
-
 
   const toggleActionMenu = useCallback((id) => {
     if (id == null) {
@@ -315,7 +299,7 @@ export default function ProductListPage() {
     }}>
       <div className="product-list-header">
         <span>
-          <select defaultChecked={type} aria-label="Type" value={""} onChange={e => setType(e.target.value)}>
+          <select aria-label="Type" value={""} onChange={e => setType(e.target.value)}>
             {[
               {
                 name: "Products",
@@ -331,7 +315,7 @@ export default function ProductListPage() {
               }
             ].map(({ name, value }, index) => {
               return (
-                <option value={value} key={index}>
+                <option selected={value.toLowerCase() === type.toLowerCase()} value={value} key={index}>
                   {name}
                 </option>
               )
@@ -340,7 +324,7 @@ export default function ProductListPage() {
         </span>
 
         <span className="add_btn">
-          <button onClick={e => window.location.href = `/admin/create/${type}`}>
+          <button onClick={e => window.location.href = `/admin/create/${type === "appointment" ? "appointment": type.slice(0, type.length - 1)}`}>
             + Add {`${type.charAt(0).toUpperCase()}${type.slice(1)}`}
           </button>
         </span>
@@ -356,12 +340,7 @@ export default function ProductListPage() {
           <thead>
             <tr>
               <th scope="col">S/N</th>
-              {
-                type === "appointment" || type === "products"
-                  ?
-                  <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
-                  : ""
-              }
+              <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
               <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
               <th scope="col">Price</th>
               <th scope="col">Total sales</th>

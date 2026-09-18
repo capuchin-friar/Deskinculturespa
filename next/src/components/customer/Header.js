@@ -169,7 +169,14 @@ export function Header() {
                                                     >
 
                                                         <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? `/services/${item.id}` : type === "appointments" ? `/appointments/${item.id}` : "#"}>
-                                                            {item.name}
+                                                            {
+                                                                type === "products" ? 
+                                                                item.name 
+                                                                : type === "services" ? 
+                                                                item.subcategory ?? "service"
+                                                                : type === "appointments" ? 
+                                                                "" : "#"
+                                                            }
                                                         </Link>
 
                                                     </li>

@@ -25,6 +25,7 @@ import QuantityCounter from '../QuantityCounter'
 import { data } from 'react-router-dom'
 import useProductHandler from "../../../hooks/product";
 import useToggler from "../../../hooks/toggler"
+import { baseApi } from '../../../../app/api/config'
 let BtnStyles = {
     height: '35px',
     width: '100%',

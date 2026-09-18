@@ -14,11 +14,11 @@ export const POST = async (req: NextRequest) => {
     try {
         const body = await req.json();
         const {
-            // name,
+            specifications,
             description,
             price,
             duration_minutes,
-            // image_url,
+            image_url,
             service,
             sub_service
         } = body;
@@ -39,11 +39,12 @@ export const POST = async (req: NextRequest) => {
 
         const serviceService =
             typeof service === "string" ? service.trim() : false;
+
         const serviceSubService =
             typeof sub_service === "string" ? sub_service.trim() : false;
 
-        // const serviceImageUrl =
-        //     typeof image_url === "string" ? image_url.trim() : false;
+        const serviceImageUrl =
+            typeof image_url === "string" ? image_url.trim() : false;
 
 
         // if (!serviceName) {
@@ -58,9 +59,9 @@ export const POST = async (req: NextRequest) => {
             throw new Error("Service name is required");
         }
 
-        // if (!serviceImageUrl) {
-        //     throw new Error("Service thumbnail is required");
-        // }
+        if (!serviceImageUrl) {
+            throw new Error("Service thumbnail is required");
+        }
 
         if (!serviceDescription) {
             throw new Error("Service description is required");
@@ -90,15 +91,16 @@ export const POST = async (req: NextRequest) => {
 
 
         // Final validation 
-        if (serviceService && serviceSubService && serviceDescription && serviceDuration && servicePrice) {
+        if (serviceService && serviceSubService && serviceDescription && serviceDuration && servicePrice && serviceImageUrl) {
             // Create product
             const response = await ServiceModel.createServiceDoc({
-                // name: serviceName,
+                specifications: specifications,
                 description: serviceDescription,
                 price: servicePrice,
                 duration_minutes: serviceDuration,
                 service: (serviceService),
                 sub_service: serviceSubService,
+                image_url: serviceImageUrl,
                 admin_id
             });
 

@@ -11,6 +11,8 @@ CREATE TABLE services (
         CHECK (price >= 0),
 
     duration_minutes INTEGER,
+    specifications JSONB DEFAULT '{}',
+
 
 
     image_url TEXT,
