@@ -1,0 +1,864 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+  
+    background: #fff8f8;
+  
+    font-family: Arial, Helvetica, sans-serif;
+  
+    color: #10182b;
+  }
+  
+  .massage-page {
+    width: 100%;
+    min-height: 100vh;
+  
+    padding: 30px 0 60px;
+  
+    background: #fff8f8;
+  }
+  
+  /* =========================================
+     MAIN LAYOUT
+  ========================================= */
+  
+  .page-layout {
+    width: 1350px;
+  
+    margin: 0 auto;
+  
+    display: grid;
+    grid-template-columns: 950px 435px;
+  
+    column-gap: 30px;
+  
+    align-items: start;
+  }
+  
+  /* =========================================
+     LEFT CATEGORY SECTION
+  ========================================= */
+  
+  .category-section {
+    width: 950px;
+  
+    overflow: hidden;
+  }
+  
+  /* =========================================
+     HERO
+  ========================================= */
+  
+  .category-hero {
+    position: relative;
+  
+    width: 950px;
+    height: 387px;
+  
+    overflow: hidden;
+  
+    border-radius: 15px 15px 0 0;
+  
+    background-image: url("https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=1500&q=90");
+  
+    background-size: cover;
+    background-position: center 48%;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .hero-overlay {
+    position: absolute;
+  
+    inset: 0;
+  
+    background: rgba(10, 20, 37, 0.44);
+  }
+  
+  .hero-content {
+    position: relative;
+  
+    z-index: 2;
+  
+    margin-top: 18px;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  
+    color: #ffffff;
+  }
+  
+  .hero-content h1 {
+    margin: 0;
+  
+    font-size: 42px;
+    line-height: 1.1;
+  
+    font-weight: 700;
+  
+    letter-spacing: -1.3px;
+  }
+  
+  .hero-content p {
+    margin: 24px 0 25px;
+  
+    font-size: 16px;
+    font-weight: 400;
+  }
+  
+  .hero-collapse-button {
+    width: 54px;
+    height: 54px;
+  
+    padding: 0;
+  
+    border: none;
+    border-radius: 50%;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    background: rgba(255, 255, 255, 0.28);
+  
+    cursor: pointer;
+  
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+  
+  .hero-collapse-button:hover {
+    background: rgba(255, 255, 255, 0.4);
+  
+    transform: translateY(-2px);
+  }
+  
+  /* =========================================
+     SERVICES BACKGROUND
+  ========================================= */
+  
+  .services-container {
+    width: 100%;
+  
+    padding: 18px;
+  
+    background: #eadedd;
+  }
+  
+  /* =========================================
+     SERVICES GRID
+  ========================================= */
+  
+  .services-grid {
+    width: 100%;
+  
+    display: grid;
+  
+    grid-template-columns: repeat(2, 1fr);
+  
+    gap: 18px;
+  }
+  
+  /* =========================================
+     SERVICE CARD
+  ========================================= */
+  
+  .service-card {
+    min-height: 304px;
+  
+    padding: 26px 34px 20px;
+  
+    border-radius: 14px;
+  
+    background: #ffffff;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  
+    cursor: pointer;
+  
+    box-shadow:
+      0 1px 2px rgba(20, 20, 30, 0.02);
+  
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  
+  .service-card:hover {
+    transform: translateY(-2px);
+  
+    box-shadow:
+      0 8px 25px rgba(30, 20, 30, 0.08);
+  }
+  
+  .service-card-content h2 {
+    margin: 0;
+  
+    color: #10182b;
+  
+    font-size: 30px;
+    line-height: 1.25;
+  
+    font-weight: 700;
+  
+    letter-spacing: -1px;
+  }
+  
+  .service-card-content p {
+    max-width: 590px;
+  
+    margin: 23px 0 0;
+  
+    color: #6d7078;
+  
+    font-size: 21px;
+    line-height: 1.55;
+  
+    font-weight: 400;
+  }
+  
+  /* =========================================
+     SERVICE FOOTER
+  ========================================= */
+  
+  .service-card-footer {
+    width: 100%;
+  
+    display: flex;
+  
+    align-items: flex-end;
+    justify-content: space-between;
+  
+    margin-top: 25px;
+  }
+  
+  .price-container {
+    display: flex;
+    flex-direction: column;
+  
+    gap: 6px;
+  }
+  
+  .price-label {
+    color: #1c1f28;
+  
+    font-size: 16px;
+    line-height: 1;
+  }
+  
+  .price-container strong {
+    color: #b20e5b;
+  
+    font-size: 30px;
+    line-height: 1;
+  
+    font-weight: 700;
+  }
+  
+  /* =========================================
+     BOOK SERVICE BUTTON
+  ========================================= */
+  
+  .book-service-button {
+    min-width: 233px;
+    height: 56px;
+  
+    padding: 0 28px;
+  
+    border: 2px solid #c20b61;
+  
+    border-radius: 999px;
+  
+    background: #fff1f6;
+  
+    color: #b20e5b;
+  
+    font-size: 20px;
+    font-weight: 400;
+  
+    cursor: pointer;
+  
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+  }
+  
+  .book-service-button:hover {
+    background: #b20e5b;
+  
+    color: #ffffff;
+  }
+  
+  /* =========================================
+     RIGHT BOOKING SIDEBAR
+  ========================================= */
+  
+  .booking-sidebar {
+    width: 435px;
+  }
+  
+  .booking-panel {
+    width: 100%;
+  
+    padding: 36px 26px 26px;
+  
+    border-radius: 20px;
+  
+    background: #ffffff;
+  
+    box-shadow:
+      0 1px 12px rgba(25, 20, 30, 0.025);
+  }
+  
+  /* =========================================
+     BOOKING TITLE
+  ========================================= */
+  
+  .booking-title {
+    margin: 0 0 29px;
+  
+    color: #10182b;
+  
+    font-size: 23px;
+    line-height: 1.2;
+  
+    font-weight: 700;
+  
+    letter-spacing: -0.5px;
+  }
+  
+  /* =========================================
+     ADDRESS
+  ========================================= */
+  
+  .booking-address {
+    width: 100%;
+    min-height: 67px;
+  
+    padding: 11px 13px;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: space-between;
+  
+    background: #fdfdfd;
+  
+    border-bottom: 1px solid #f0f0f0;
+  }
+  
+  .address-left {
+    display: flex;
+  
+    align-items: flex-start;
+  
+    gap: 12px;
+  
+    color: #111827;
+  }
+  
+  .address-left svg {
+    margin-top: 2px;
+  }
+  
+  .address-left div {
+    display: flex;
+    flex-direction: column;
+  
+    gap: 3px;
+  }
+  
+  .address-left strong {
+    font-size: 14px;
+  
+    line-height: 1.1;
+  }
+  
+  .address-left span {
+    color: #888b91;
+  
+    font-size: 12px;
+  
+    line-height: 1.2;
+  }
+  
+  .edit-address-button {
+    width: 35px;
+    height: 35px;
+  
+    padding: 0;
+  
+    border: none;
+  
+    background: transparent;
+  
+    color: #b20e5b;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: center;
+  
+    cursor: pointer;
+  }
+  
+  /* =========================================
+     BOOKING ITEMS
+  ========================================= */
+  
+  .booking-items {
+    width: 100%;
+  }
+  
+  .booking-item {
+    width: 100%;
+  
+    padding: 20px 13px 0;
+  
+    border-bottom: 1px solid #eeeeee;
+  }
+  
+  .booking-item:last-child {
+    padding-bottom: 17px;
+  }
+  
+  .booking-item-header {
+    width: 100%;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .booking-item-header strong {
+    color: #121722;
+  
+    font-size: 14px;
+  
+    line-height: 1.2;
+  
+    font-weight: 700;
+  }
+  
+  /* =========================================
+     BOOKING MIDDLE
+  ========================================= */
+  
+  .booking-item-middle {
+    margin-top: 13px;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .booking-item-middle span {
+    color: #85878c;
+  
+    font-size: 12px;
+  }
+  
+  .remove-button {
+    padding: 0;
+  
+    border: none;
+  
+    background: transparent;
+  
+    color: #a62b59;
+  
+    font-size: 12px;
+  
+    text-decoration: underline;
+  
+    cursor: pointer;
+  }
+  
+  /* =========================================
+     PROFESSIONAL
+  ========================================= */
+  
+  .professional-row {
+    min-height: 51px;
+  
+    margin-top: 11px;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .professional-label {
+    color: #85878c;
+  
+    font-size: 12px;
+  }
+  
+  .professional {
+    display: flex;
+  
+    align-items: center;
+  
+    gap: 8px;
+  }
+  
+  .professional-avatar {
+    width: 22px;
+    height: 22px;
+  
+    overflow: hidden;
+  
+    border-radius: 50%;
+  }
+  
+  .professional-avatar img {
+    width: 100%;
+    height: 100%;
+  
+    display: block;
+  
+    object-fit: cover;
+  }
+  
+  .professional span {
+    color: #121722;
+  
+    font-size: 12px;
+  
+    font-weight: 700;
+  }
+  
+  /* =========================================
+     TOTAL
+  ========================================= */
+  
+  .booking-total {
+    width: 100%;
+  
+    padding: 30px 13px 22px;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .booking-total strong:first-child {
+    color: #121722;
+  
+    font-size: 14px;
+  
+    font-weight: 700;
+  }
+  
+  .booking-total strong:last-child {
+    color: #b20e5b;
+  
+    font-size: 14px;
+  
+    font-weight: 700;
+  }
+  
+  /* =========================================
+     SELECT TIME
+  ========================================= */
+  
+  .select-time-button {
+    width: 100%;
+    height: 43px;
+  
+    border: none;
+  
+    border-radius: 999px;
+  
+    background: #b82961;
+  
+    color: #ffffff;
+  
+    font-size: 14px;
+  
+    font-weight: 600;
+  
+    cursor: pointer;
+  
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+  
+  .select-time-button:hover {
+    background: #a91f56;
+  
+    transform: translateY(-1px);
+  }
+  
+  /* =========================================
+     SERVICE DETAILS MODAL
+  ========================================= */
+  
+  .service-modal-backdrop {
+    position: fixed;
+  
+    inset: 0;
+  
+    z-index: 1000;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: center;
+  
+    padding: 30px;
+  
+    background: rgba(8, 15, 29, 0.58);
+  
+    backdrop-filter: blur(4px);
+  }
+  
+  /* =========================================
+     MODAL
+  ========================================= */
+  
+  .service-modal {
+    width: 620px;
+  
+    max-height: 90vh;
+  
+    overflow: hidden;
+  
+    border-radius: 22px;
+  
+    background: #ffffff;
+  
+    box-shadow:
+      0 25px 80px rgba(0, 0, 0, 0.22);
+  
+    animation: serviceModalIn 0.22s ease-out;
+  }
+  
+  @keyframes serviceModalIn {
+    from {
+      opacity: 0;
+  
+      transform: translateY(15px) scale(0.98);
+    }
+  
+    to {
+      opacity: 1;
+  
+      transform: translateY(0) scale(1);
+    }
+  }
+  
+  /* =========================================
+     MODAL IMAGE
+  ========================================= */
+  
+  .modal-image-container {
+    position: relative;
+  
+    width: 100%;
+    height: 280px;
+  
+    overflow: hidden;
+  }
+  
+  .modal-image {
+    width: 100%;
+    height: 100%;
+  
+    display: block;
+  
+    object-fit: cover;
+  
+    object-position: center;
+  }
+  
+  /* =========================================
+     CLOSE BUTTON
+  ========================================= */
+  
+  .modal-close-button {
+    position: absolute;
+  
+    top: 18px;
+    right: 18px;
+  
+    width: 42px;
+    height: 42px;
+  
+    padding: 0;
+  
+    border: none;
+  
+    border-radius: 50%;
+  
+    display: flex;
+  
+    align-items: center;
+    justify-content: center;
+  
+    background: rgba(255, 255, 255, 0.94);
+  
+    color: #10182b;
+  
+    cursor: pointer;
+  
+    box-shadow:
+      0 3px 12px rgba(0, 0, 0, 0.12);
+  
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+  
+  .modal-close-button:hover {
+    background: #ffffff;
+  
+    transform: rotate(3deg);
+  }
+  
+  /* =========================================
+     MODAL CONTENT
+  ========================================= */
+  
+  .modal-content {
+    padding: 30px 32px 32px;
+  }
+  
+  .modal-content h2 {
+    margin: 0;
+  
+    color: #10182b;
+  
+    font-size: 30px;
+  
+    line-height: 1.2;
+  
+    font-weight: 700;
+  
+    letter-spacing: -0.8px;
+  }
+  
+  .modal-description {
+    margin: 16px 0 0;
+  
+    color: #6d7078;
+  
+    font-size: 16px;
+  
+    line-height: 1.6;
+  }
+  
+  /* =========================================
+     MODAL SERVICE INFO
+  ========================================= */
+  
+  .modal-service-info {
+    margin-top: 27px;
+  
+    padding: 18px 0;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    border-top: 1px solid #eeeeee;
+  
+    border-bottom: 1px solid #eeeeee;
+  }
+  
+  .modal-info-item {
+    flex: 1;
+  
+    display: flex;
+  
+    flex-direction: column;
+  
+    gap: 7px;
+  }
+  
+  .modal-info-label {
+    color: #777b83;
+  
+    font-size: 13px;
+  }
+  
+  .modal-price {
+    color: #b20e5b;
+  
+    font-size: 22px;
+  }
+  
+  .modal-info-divider {
+    width: 1px;
+    height: 43px;
+  
+    margin: 0 28px;
+  
+    background: #e7e7e7;
+  }
+  
+  .duration-value {
+    display: flex;
+  
+    align-items: center;
+  
+    gap: 7px;
+  
+    color: #10182b;
+  
+    font-size: 15px;
+  }
+  
+  .duration-value svg {
+    color: #b20e5b;
+  }
+  
+  /* =========================================
+     MODAL BOOK BUTTON
+  ========================================= */
+  
+  .modal-book-button {
+    width: 100%;
+    height: 52px;
+  
+    margin-top: 25px;
+  
+    border: none;
+  
+    border-radius: 999px;
+  
+    background: #b82961;
+  
+    color: #ffffff;
+  
+    font-size: 16px;
+  
+    font-weight: 600;
+  
+    cursor: pointer;
+  
+    transition:
+      background 0.2s ease,
+      transform 0.2s ease;
+  }
+  
+  .modal-book-button:hover {
+    background: #a91f56;
+  
+    transform: translateY(-1px);
+  }
