@@ -151,7 +151,9 @@ export default function Home() {
           }
         </div>
 
-        <button className="customer-service-view-btn">
+        <button className="customer-service-view-btn" onClick={e => {
+          window.location.href = `/services`
+        }}>
           View All
         </button>
 

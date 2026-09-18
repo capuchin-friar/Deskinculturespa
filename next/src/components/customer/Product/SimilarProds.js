@@ -43,7 +43,7 @@ export default function SimilarProducts() {
     } = useProductHandler();
 
     useEffect(() => {
-        setProducts(prods.splice(0, 4))
+        setProducts(prods)
     }, [prods]);
 
     return (
