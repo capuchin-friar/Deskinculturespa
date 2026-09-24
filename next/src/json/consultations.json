@@ -1,0 +1,42 @@
+[
+  {
+    "id": "skincare",
+    "name": "Skincare Consultation",
+    "subtitle": "Healthy, glowing skin",
+    "icon": "♙",
+    "description": "Take a closer look at your skin with personalized guidance from a skincare specialist. Discuss concerns such as acne, dryness, sensitivity, uneven tone, pigmentation, or signs of aging. Together, you can identify suitable skincare routines, products, and professional treatments designed to support healthier, clearer, smoother, and more radiant-looking skin.",
+    "image": "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=500&q=85"
+  },
+  {
+    "id": "haircare",
+    "name": "Haircare Consultation",
+    "subtitle": "Stronger, healthier hair",
+    "icon": "♧",
+    "description": "Get personalized guidance for your hair and scalp based on your individual concerns and goals. Discuss issues such as dryness, breakage, dandruff, thinning, scalp discomfort, or damaged hair. Your consultation includes recommendations for suitable products, daily routines, treatments, and practical care practices to help maintain stronger, healthier, and more manageable hair.",
+    "image": "https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=500&q=85"
+  },
+  {
+    "id": "wellness",
+    "name": "Wellness Consultation",
+    "subtitle": "Lifestyle & self-care",
+    "icon": "♢",
+    "description": "Create a more balanced approach to your overall wellbeing with personalized lifestyle and self-care guidance. Discuss your wellness goals, daily habits, relaxation needs, stress management, sleep routines, and personal self-care practices. Receive practical recommendations designed to help you build healthier routines, prioritize yourself, and create sustainable habits that fit naturally into your lifestyle.",
+    "image": "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=500&q=85"
+  },
+  {
+    "id": "body",
+    "name": "Body Treatment Consultation",
+    "subtitle": "Tailored body treatments",
+    "icon": "♙",
+    "description": "Discover body care options tailored to your individual needs, concerns, and desired results. During your consultation, discuss areas such as uneven skin tone, dryness, texture, body acne, pigmentation, or general skin maintenance. A specialist will help you understand available treatment options and recommend suitable approaches for a personalized body care experience.",
+    "image": "https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=500&q=85"
+  },
+  {
+    "id": "nutrition",
+    "name": "Nutrition Consultation",
+    "subtitle": "Personalized nutrition advice",
+    "icon": "◉",
+    "description": "Explore your nutrition and wellness goals with personalized guidance designed around your lifestyle and everyday needs. Discuss your current eating habits, meal choices, routines, and areas you would like to improve. Receive practical recommendations for developing healthier eating patterns and sustainable nutrition habits that can support your overall wellbeing and long-term goals.",
+    "image": "https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&fit=crop&w=500&q=85"
+  }
+]
