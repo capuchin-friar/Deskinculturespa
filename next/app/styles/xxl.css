@@ -384,7 +384,8 @@
   height: 95vh;
   width: 100%;
 
-  background-color: var(--brand-green-light);
+  /* background-color: var(--brand-green); */
+  background-color: #fff;
 }
 
 .customer-appointment-content {
@@ -401,6 +402,13 @@
   /* background-color: rgba(0, 0, 0, 0.2); */
 }
 
+.customer-appointment-content .appointment-left{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
 .customer-appointment-content .appointment-right,
 .customer-appointment-content .appointment-left {
   height: fit-content;
@@ -410,7 +418,7 @@
 .appointment-feature-cnt {
   display: flex;
   align-items: center;
-  height: 40px;
+  height: 60px;
   padding: 0px 0px 0px 65px;
   gap: 28px;
   position: absolute;
@@ -450,7 +458,7 @@
 
   margin-bottom: 3px;
 
-  color: #fff;
+  color: var(--brand-green);
 
   font-size: 11px;
 }
@@ -471,10 +479,11 @@
   background-repeat: no-repeat;
   height: 100%;
   width: 50%;
+  border-radius: 10px;
   background-size: cover;
-  position: absolute;
+  /* position: absolute;
   right: 0;
-  top: 0;
+  top: 0; */
 }
 
 .customer-appointment-title {
@@ -489,19 +498,19 @@
   height: fit-content;
   /* font-weight: lighter; */
   font-size: 20px;
-  color: #fff;
+  color: #000;
 }
 
 .customer-appointment-btn {
   border: 1px solid var(--brand-green);
   border-radius: var(--radius);
   padding: 10px 15px;
-  color: #fff;
-  background-color: var(--brand-green);
+  color: var(--brand-green);
+  background-color: #fff;
 }
 
 .customer-appointment-btn:hover {
-  background-color: var(--brand-green);
+    background-color: var(--brand-green);
   border-radius: var(--radius);
   color: #fff;
 }
