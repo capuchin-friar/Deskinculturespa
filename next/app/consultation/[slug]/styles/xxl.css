@@ -589,6 +589,7 @@ body {
 
 .selected-consultation-text {
   flex: 1;
+  min-width: 0;
 }
 
 
@@ -606,7 +607,8 @@ body {
 
 
 .selected-consultation p {
-  width: 480px;
+  width: 100%;
+  max-width: 480px;
 
   margin: 0;
 
@@ -866,7 +868,7 @@ body {
   color: #ffffff;
 
   font-size: 10px;
-  float: right;
+  margin-left: auto;
   padding: 10px 15px;
 
   cursor: pointer;
