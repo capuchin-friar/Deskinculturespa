@@ -444,7 +444,7 @@ export default function GalleryPage() {
 
                 </div>
 
-                <Link href="/appointments">
+                <Link href="consultation">
                     Book a Consultation →
                 </Link>
 

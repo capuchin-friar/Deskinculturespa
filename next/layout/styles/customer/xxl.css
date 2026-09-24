@@ -40,6 +40,10 @@
     align-items: center;
 }
 
+.customer-main{
+    width: 100%;
+}
+
 .customer-content {
     display: flex;
     flex-direction: column;

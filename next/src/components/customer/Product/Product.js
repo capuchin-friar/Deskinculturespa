@@ -201,7 +201,7 @@ const Product = ({ item }) => {
 
 
                             <h3 style={{ fontSize: 'small', fontWeight: 'bold', textDecoration: 'underline', padding: '0px', textTransform: 'capitalize', color: '#278A3D', marginBottom: '10px', display: "flex", alignItems: 'center', justifyContent: 'flex-start' }}>
-                                <IoCubeOutline size={25} /> &nbsp; {item?.stock} units availble
+                                <IoCubeOutline size={25} /> &nbsp; {item?.stock} units available
                             </h3>
                             <br />
 

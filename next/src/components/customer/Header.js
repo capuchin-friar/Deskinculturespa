@@ -168,7 +168,7 @@ export function Header() {
                                                         key={item.id}
                                                     >
 
-                                                        <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? `/services/${item.id}` : type === "appointments" ? `/appointments/${item.id}` : "#"}>
+                                                        <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? `/services/${item.id}` : type === "appointments" ? `consultation/${item.id}` : "#"}>
                                                             {
                                                                 type === "products" ? 
                                                                 item.name 
@@ -186,7 +186,7 @@ export function Header() {
                                             </ul>
 
                                             <Link
-                                                href={type === "products" ? `/store` : type === "services" ? `/services` : type === "appointments" ? `/appointments` : "#"}
+                                                href={type === "products" ? `/store` : type === "services" ? `/services` : type === "appointments" ? `consultation` : "#"}
                                                 className="mega-menu-view-all"
                                             >
                                                 View all
@@ -386,7 +386,11 @@ export function Header() {
                 BRAND
             ========================== */}
 
-            <div className="customer-welcome-box">
+            <div style={{
+                cursor: "pointer"
+            }} className="customer-welcome-box" onClick={e => {
+                window.location.href = "/"
+            }}>
 
                 <span className="customer-logo">
 
