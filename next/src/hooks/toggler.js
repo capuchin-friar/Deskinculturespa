@@ -1,155 +1,91 @@
 import { useDispatch, useSelector } from "react-redux";
 
 import { baseApi } from "../../app/api/config";
-
 import { set_cart } from "../../redux/customer/cart";
 
-
 export default function useToggler() {
+  const dispatch = useDispatch();
 
-    const dispatch = useDispatch();
+  const { cart } = useSelector((state) => state.cart);
 
-    const { cart } = useSelector(
-        (state) => state.cart
-    );
+  const refreshCart = async () => {
+    const { data } = await baseApi.get("cart");
 
+    if (!data.success) {
+      console.log("Error:", data.message);
+      return false;
+    }
 
-    const addToCart = async ({ item, qty }) => {
+    dispatch(set_cart(data.data));
 
-        try {
+    return true;
+  };
 
-            const { data } = await baseApi.post(
-                "cart/add",
-                {
-                    product_id: item.id,
-                    qty: qty
-                }
-            );
+  const addToCart = async ({ item, qty = 1, type = "product" }) => {
+    try {
+      const { data } = await baseApi.post("cart/add", {
+        product_id: item.id,
+        qty,
+        type,
+      });
 
+      if (!data.success) {
+        console.log("Error:", data.message);
+        return false;
+      }
 
-            if (!data.success) {
+      await refreshCart();
 
-                console.log(
-                    "Error:",
-                    data.message
-                );
+      return true;
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      return false;
+    }
+  };
 
-                return;
-            }
+  const rmFromCart = async (itemId, type = "product") => {
+    try {
+      const cartItem = cart.find(
+        (c) => c.product_id === itemId && c.type === type,
+      );
 
+      if (!cartItem) {
+        console.log("Item is not in cart.");
+        return false;
+      }
 
-            // Get updated cart
+      const { data } = await baseApi.delete("cart/delete", {
+        data: {
+          id: cartItem.id,
+          type: type,
+        },
+      });
 
-            const { data: cartResponse } =
-                await baseApi.get("cart");
+      if (!data.success) {
+        console.log("Error:", data.message);
+        return false;
+      }
 
+      dispatch(
+        set_cart(cart.filter((c) => c.type === type && c.id !== cartItem.id)),
+      );
 
-            if (!cartResponse.success) {
+      return true;
+    } catch (error) {
+      console.error("Remove from cart error:", error);
 
-                console.log(
-                    "Error:",
-                    cartResponse.message
-                );
+      return false;
+    }
+  };
 
-                return;
-            }
+  const isCarted = (itemId, type = "product") => {
+    return cart.some((c) => c.product_id === itemId && c.type === type);
+  };
 
-
-            dispatch(
-                set_cart(
-                    cartResponse.data
-                )
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Add to cart error:",
-                error
-            );
-
-        }
-
-    };
-
-
-    const rmFromCart = async (itemId) => {
-
-        try {
-
-            const cartItem = cart.find(
-                (c) =>
-                    c.product_id === itemId
-            );
-
-
-            if (!cartItem) {
-
-                console.log(
-                    "Product is not in cart."
-                );
-
-                return;
-            }
-
-
-            const { data } =
-                await baseApi.delete(
-                    "cart/delete",
-                    {
-                        data: {
-                            id: cartItem.id
-                        }
-                    }
-                );
-
-
-            if (!data.success) {
-
-                console.log(
-                    "Error:",
-                    data.message
-                );
-
-                return;
-            }
-
-
-            dispatch(
-                set_cart(
-                    cart.filter(
-                        (c) =>
-                            c.id !== cartItem.id
-                    )
-                )
-            );
-
-        } catch (error) {
-
-            console.error(
-                "Remove from cart error:",
-                error
-            );
-
-        }
-
-    };
-
-
-    const isCarted = (itemId) => {
-
-        return cart.some(
-            (c) =>
-                c.product_id === itemId
-        );
-
-    };
-
-
-    return {
-        addToCart,
-        rmFromCart,
-        isCarted
-    };
-
+  return {
+    addToCart,
+    rmFromCart,
+    isCarted,
+    refreshCart,
+  };
 }

@@ -79,12 +79,22 @@ export const POST = async (req: NextRequest) => {
         // Remove password from response
         const { password: _, ...userWithoutPassword } = user;
 
-        return NextResponse.json({
+        const response = NextResponse.json({
             success: true,
             message: "Login successful",
             cookie: token,
             user: userWithoutPassword,
         });
+
+        response.cookies.set("user_token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            maxAge: 60 * 60 * 24 * 7,
+        });
+
+        return response;
     } catch (err) {
         return NextResponse.json(
             { success: false, data: "Something went wrong. Please try again in a moment." },

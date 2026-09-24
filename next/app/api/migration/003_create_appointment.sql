@@ -14,7 +14,7 @@ CREATE TYPE appointment_payment_status AS ENUM (
 );
 
 CREATE TABLE appointments (
-    appointment_id SERIAL PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
 
     customer_id BIGINT NOT NULL,
     consultant_id BIGINT NOT NULL,

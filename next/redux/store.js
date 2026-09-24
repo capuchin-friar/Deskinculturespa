@@ -14,6 +14,7 @@
 import { configureStore } from "@reduxjs/toolkit";
 import AdminCookieReducer from "./admin/cookie";
 import cartReducer from "./customer/cart";
+import serviceReducer from "./customer/service";
 import filtersReducer from "./customer/filter";
 // ============================================================================
 // STORE CONFIGURATION
@@ -28,6 +29,7 @@ const store = configureStore({
     
 
     cart: cartReducer,
+    service: serviceReducer,
     filters: filtersReducer
   }
 });

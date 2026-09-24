@@ -5,8 +5,12 @@ CREATE TYPE consultation_mode AS ENUM (
     'chat'
 );
 
-CREATE TABLE consultation_offerings (
+CREATE TABLE consultations (
     id SERIAL PRIMARY KEY,
+
+    slug VARCHAR(44) NOT NULL,
+    
+    thumbnail_url VARCHAR(44) NOT NULL,
 
     consultant_id BIGINT NOT NULL,
 

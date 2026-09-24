@@ -60,7 +60,7 @@ export const GET = async (request: NextRequest) => {
         return NextResponse.json(
             {
                 success: false,
-                data: "Something went wrong. Please try again in a moment.",
+                data: error,
             },
             { status: 500 }
         );
