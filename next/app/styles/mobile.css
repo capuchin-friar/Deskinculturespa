@@ -1,0 +1,78 @@
+/* Responsive layer for phones: 0–480px.
+   Loaded separately from xxl.css so desktop styles remain untouched. */
+@media (max-width: 480px) {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+  body { min-width: 0; }
+  main, section, article, div { max-width: 100%; }
+  img, video, canvas, svg { max-width: 100%; }
+  input, select, textarea, button { max-width: 100%; font-size: 16px; }
+  table { display: block; max-width: 100%; overflow-x: auto; }
+
+  /* Customer home / shared customer sections */
+  .customer-hero-section,
+  .customer-products-section,
+  .customer-admin-section,
+  .customer-testimonials-section,
+  .customer-services-section,
+  .customer-appointment-section,
+  .customer-packages-section {
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 16px !important;
+  }
+
+  .customer-hero-section { min-height: 720px !important; background-position: center; }
+  .customer-hero { height: auto !important; min-height: 620px; }
+  .customer-hero-content { padding: 24px 16px !important; text-align: center; }
+  .customer-hero-title,
+  .customer-product-tag,
+  .customer-service-tag,
+  .customer-package-tag,
+  .customer-appointment-title { font-size: 34px !important; line-height: 1.08; }
+  .customer-hero-summary,
+  .customer-appointment-summary { width: 100% !important; font-size: 16px !important; }
+  .customer-product-view-btn,
+  .customer-service-view-btn,
+  .customer-package-view-btn { width: 100%; padding: 12px 16px !important; text-align: center; }
+  .customer-product-cnt,
+  .customer-service-cnt,
+  .customer-package-cnt { height: auto !important; display: grid !important; grid-template-columns: 1fr !important; gap: 16px; overflow: visible !important; }
+  .customer-product-card,
+  .customer-service-card,
+  .customer-package-card { width: 100% !important; height: auto !important; min-height: 320px; margin: 0 !important; }
+  .customer-product-thumbnail { height: 240px !important; }
+  .customer-product-body { height: auto !important; min-height: 90px; }
+  .customer-service-thumbnail,
+  .customer-package-thumbnail { min-height: 320px; }
+  .customer-admin-section { flex-direction: column !important; gap: 24px; }
+  .customer-admin-section .left,
+  .customer-admin-section .right,
+  .customer-appointment-content .appointment-left,
+  .customer-appointment-content .appointment-right { width: 100% !important; height: auto !important; padding: 16px !important; }
+  .customer-appointment-content { flex-direction: column !important; gap: 20px; padding: 16px !important; }
+  .customer-appointment-content .appointment-right { min-height: 300px; background-size: cover; }
+  .appointment-feature-cnt { position: static !important; height: auto !important; padding: 16px 0 !important; flex-wrap: wrap; gap: 14px; }
+  .customer-testimonials-headline { font-size: 28px !important; margin-bottom: 32px !important; text-align: center; }
+
+  /* Admin shell */
+  .admin-cnt { width: 100% !important; height: auto !important; min-height: 100vh; flex-direction: column !important; align-items: stretch !important; }
+  .admin-cnt > aside, .admin-cnt aside { width: 100% !important; height: auto !important; max-height: 92px; padding: 12px !important; overflow-x: auto; overflow-y: hidden; }
+  .admin-cnt aside a { display: inline-flex !important; white-space: nowrap; margin: 0 6px 0 0 !important; }
+  .admin-content { width: 100% !important; height: auto !important; min-height: calc(100vh - 92px); }
+  .admin-header { height: auto !important; min-height: 60px; padding: 12px 16px !important; gap: 10px; }
+  .admin-header .admin-welcome-box { width: auto !important; flex: 1; }
+  .admin-main { height: auto !important; min-height: calc(100vh - 60px); padding: 16px !important; overflow-x: hidden; }
+  .overview-cnt { overflow-x: auto !important; }
+  .summary-cnt { flex-direction: column !important; gap: 16px; }
+  .chart-cnt, .activity-cnt { width: 100% !important; }
+  .admin-metric-card { min-width: 220px; }
+
+  /* Generic route-level responsive safety */
+  [class*="container"], [class*="content"], [class*="wrapper"], [class*="cnt"] { max-width: 100%; }
+  [class*="grid"] { grid-template-columns: 1fr !important; }
+  [class*="row"] { flex-wrap: wrap !important; }
+  [class*="card"] { max-width: 100%; }
+  [class*="form"] { width: 100%; }
+  [class*="modal"] { max-width: calc(100vw - 24px) !important; width: calc(100vw - 24px) !important; }
+}
