@@ -1,36 +1,132 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Deskinculture Spa
+
+Next.js application for products, spa services, and consultation appointments.
+
+## Payment configuration
+
+Payments use Paystack. The secret key is server-side only.
+
+Required environment variables:
+
+```env
+PAYSTACK_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxx
+PAYSTACK_CALLBACK_URL=https://your-domain.com/payment/callback
+```
+
+`PAYSTACK_CALLBACK_URL` is optional. Payment confirmation does not depend on the browser callback; the Paystack webhook is the source of truth.
+
+Configure the Paystack webhook URL as:
+
+```text
+https://your-domain.com/api/payments/paystack/webhook
+```
+
+Use the test secret key while testing and the live secret key only when the application is ready for production.
+
+## Checkout APIs
+
+### Products
+
+```http
+POST /api/checkout/cart
+```
+
+Creates a product order from the authenticated customer's cart, snapshots the order items, creates a local payment transaction, and initializes Paystack. The response contains `authorization_url`, `access_code`, and the internal transaction reference.
+
+### Services
+
+```http
+POST /api/checkout/service
+Content-Type: application/json
+
+{
+  "service_id": 123,
+  "scheduled_at": "2026-10-01T10:00:00+01:00",
+  "notes": "Optional notes"
+}
+```
+
+Creates the service booking and its order before initializing Paystack.
+
+### Consultations
+
+```http
+POST /api/checkout/appointment
+Content-Type: application/json
+
+{
+  "offering_id": 123,
+  "appointment_date": "2026-10-01",
+  "start_time": "10:00",
+  "notes": "Optional notes"
+}
+```
+
+The consultant is resolved from the selected consultation offering on the server. The endpoint checks for an overlapping appointment before creating the order and payment transaction.
+
+### Payment verification
+
+```http
+POST /api/payments/verify
+Content-Type: application/json
+
+{
+  "reference": "dsc_product_123_..."
+}
+```
+
+The server verifies the transaction directly with Paystack and reconciles it with the local transaction and order.
+
+## Payment lifecycle
+
+```text
+Customer
+   |
+   v
+Checkout API
+   |
+   +--> create order/domain record
+   |
+   +--> create local transaction (pending)
+   |
+   +--> Paystack initialize
+   |
+   v
+Paystack Checkout
+   |
+   +----------------------+
+   |                      |
+   v                      v
+Webhook               Verify API
+   |                      |
+   +----------+-----------+
+              v
+      Validate reference
+      Validate amount/currency
+              |
+              v
+      transactions = success
+      paystack_transactions = recorded
+      orders = paid/confirmed
+              |
+       +------+------+
+       |             |
+    booking       appointment
+     paid/          paid/
+    confirmed     confirmed
+```
+
+Successful payments are reconciled through the signed Paystack webhook. Webhook processing is idempotent using the local transaction reference and Paystack transaction identifiers. The server also validates the paid amount and currency before marking an order as paid.
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000`.
 
 ## Getting Started
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The application uses PostgreSQL. Configure the existing database environment variables used by `app/api/lib/database.ts`, then run the SQL migrations in `app/api/migration` in order.
