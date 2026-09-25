@@ -13,11 +13,10 @@ export async function recordPaystackPayment(
       `SELECT
          t.id,
          t.order_id,
+         t.customer_id,
          t.amount,
          t.currency,
-         t.status AS transaction_status,
          o.order_type,
-         o.total_amount,
          o.payment_status AS order_payment_status
        FROM transactions t
        INNER JOIN orders o ON o.id = t.order_id
@@ -36,19 +35,9 @@ export async function recordPaystackPayment(
 
     await client.query(
       `INSERT INTO paystack_transactions (
-         transaction_id,
-         paystack_id,
-         reference,
-         status,
-         amount,
-         currency,
-         channel,
-         gateway_response,
-         paid_at,
-         customer_email,
-         authorization,
-         raw_response,
-         updated_at
+         transaction_id, paystack_id, reference, status, amount, currency,
+         channel, gateway_response, paid_at, customer_email, authorization,
+         raw_response, updated_at
        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,NOW())
        ON CONFLICT (reference) DO UPDATE SET
          paystack_id = EXCLUDED.paystack_id,
@@ -101,6 +90,15 @@ export async function recordPaystackPayment(
          WHERE id = $2`,
         [reference, transaction.order_id],
       );
+
+      if (transaction.order_type === "product") {
+        // The order contains immutable product snapshots, so the cart can be cleared
+        // safely and repeated webhooks remain idempotent.
+        await client.query(
+          `DELETE FROM cart_items WHERE user_id = $1`,
+          [transaction.customer_id],
+        );
+      }
 
       if (transaction.order_type === "service") {
         await client.query(
