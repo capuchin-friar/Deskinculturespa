@@ -1,8 +1,8 @@
 /**
  * User Types
- * 
+ *
  * Type definitions for user-related operations.
- * 
+ *
  * @module app/api/lib/types/user
  */
 
@@ -81,10 +81,8 @@ export interface User {
     profileCompletion?: number;
 }
 
-
 export interface NewCartDoc {
-    product_id?: string;
-    qty?: number;
-    user_id?: string;
-    type?: string
+    product_id: string;
+    qty: number;
+    user_id: string;
 }
