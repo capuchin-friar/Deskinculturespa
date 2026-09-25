@@ -1,9 +1,3 @@
-/**
- * Admin Add Blogs API Route
- *
- * @module app/api/admin/blogs/add/route
- */
-
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { CartModel } from "../../lib/models/cart";
@@ -11,89 +5,41 @@ import { CartModel } from "../../lib/models/cart";
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
+    const { product_id, qty } = body;
 
-    const { product_id, qty, type } = body;
-
-    // Validate fields
-    const cartItem = product_id ? product_id : false;
-
-    const cartQty = qty ? qty : false;
-
-    const cartType = type ? type : false;
-
-    // Required field validation
-    if (!cartItem) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Cart item is required",
-        },
-        { status: 400 },
-      );
+    if (!product_id) {
+      return NextResponse.json({ success: false, data: "Product ID is required" }, { status: 400 });
     }
 
-    if (!cartQty) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Cart quantity is required",
-        },
-        { status: 400 },
-      );
+    if (!Number.isInteger(qty) || qty < 1 || qty > 99) {
+      return NextResponse.json({ success: false, data: "Quantity must be between 1 and 99" }, { status: 400 });
     }
 
-    // Extract admin token
-    const getCookie = req.cookies.get("user_token"); //Update to user token
-
-    if (!getCookie?.value) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Authentication required",
-        },
-        { status: 401 },
-      );
+    const cookie = req.cookies.get("user_token");
+    if (!cookie?.value) {
+      return NextResponse.json({ success: false, data: "Authentication required" }, { status: 401 });
     }
 
-    // Decode JWT
-    const decoded = jwt.decode(getCookie.value);
-
+    const decoded = jwt.decode(cookie.value);
     if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
-      return NextResponse.json(
-        {
-          success: false,
-          data: "Invalid authentication token",
-        },
-        { status: 401 },
-      );
+      return NextResponse.json({ success: false, data: "Invalid authentication token" }, { status: 401 });
     }
 
-    const user_id = decoded.id;
-
-    // Create blog
     const response = await CartModel.createCartDoc({
-      product_id: cartItem,
-      qty: cartQty,
-      type: cartType,
-      user_id,
+      product_id: String(product_id),
+      qty,
+      user_id: String(decoded.id),
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Cart item created successfully",
-        cart_id: response.id,
-      },
-      { status: 201 },
-    );
+    return NextResponse.json({
+      success: true,
+      message: "Product added to cart successfully",
+      cart_id: response.id,
+    }, { status: 201 });
   } catch (err) {
-    return NextResponse.json(
-      {
-        success: false,
-        data: `Something went wrong. Please try again in a moment. ${err}`,
-      },
-      { status: 500 },
-      
-    );
+    return NextResponse.json({
+      success: false,
+      data: "Something went wrong. Please try again in a moment.",
+    }, { status: 500 });
   }
 };
