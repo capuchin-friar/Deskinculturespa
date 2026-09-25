@@ -1,7 +1,7 @@
 CREATE TABLE transactions (
     id BIGSERIAL PRIMARY KEY,
-    order_id BIGINT NOT NULL REFERENCES orders(id) ON DELETE RESTRICT,
-    customer_id BIGINT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+    order_id INT NOT NULL REFERENCES orders(id) ON DELETE RESTRICT,
+    customer_id INT NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
     provider VARCHAR(30) NOT NULL DEFAULT 'paystack',
     reference VARCHAR(255) NOT NULL UNIQUE,
     amount NUMERIC(12, 2) NOT NULL CHECK (amount >= 0),
