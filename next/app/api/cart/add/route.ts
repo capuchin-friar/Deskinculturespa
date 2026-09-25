@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { CartModel } from "../../lib/models/cart";
+import { query } from "../../lib/database";
 
 export const POST = async (req: NextRequest) => {
   try {
@@ -13,6 +14,15 @@ export const POST = async (req: NextRequest) => {
 
     if (!Number.isInteger(qty) || qty < 1 || qty > 99) {
       return NextResponse.json({ success: false, data: "Quantity must be between 1 and 99" }, { status: 400 });
+    }
+
+    const product = await query(
+      `SELECT id FROM products WHERE id = $1`,
+      [product_id],
+    );
+
+    if (!product.rows[0]) {
+      return NextResponse.json({ success: false, data: "Product not found" }, { status: 404 });
     }
 
     const cookie = req.cookies.get("user_token");
@@ -36,7 +46,7 @@ export const POST = async (req: NextRequest) => {
       message: "Product added to cart successfully",
       cart_id: response.id,
     }, { status: 201 });
-  } catch (err) {
+  } catch {
     return NextResponse.json({
       success: false,
       data: "Something went wrong. Please try again in a moment.",
