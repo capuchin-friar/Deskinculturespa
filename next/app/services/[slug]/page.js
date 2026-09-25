@@ -2,12 +2,9 @@
 
 import { useEffect, useState } from "react";
 import "./styles/xxl.css";
-import { useRouter } from "next/navigation";
-import _SERVICES from "../../../src/json/services.json";
 import useServiceHandler from "../../../src/hooks/service";
 import Formatter from "../../../src/utils/formatter";
 import useToggler from "../../../src/hooks/toggler";
-import { set_service } from "../../../redux/customer/service";
 import { useDispatch, useSelector } from "react-redux";
 // const bookings = [
 //   {
@@ -131,8 +128,10 @@ function CloseIcon() {
 }
 
 export default function Page({ params }) {
-  const dispatch = useDispatch();
-  const { service: bookings } = useSelector((s) => s.service);
+  const {
+    cart
+  } = useSelector(s => s.cart);
+  let bookings = Array.isArray(cart) ? cart.filter(b => b.type === "service") : [];
   const { addToCart, rmFromCart } = useToggler();
 
   const { services: s } = useServiceHandler();
@@ -157,27 +156,14 @@ export default function Page({ params }) {
   }, [s]);
 
   const handleBookService = async (service) => {
-    /*
-          Add your booking/cart logic here.
-    
-          For example:
-          - add service to cart
-          - open booking date/time selector
-          - update booking sidebar
-          - etc.
-        */
-
-    // console.log("Book service:", service);
+ 
     let checkIfExist = bookings.some((b) => b.id === service.id);
     if (checkIfExist) {
-      await rmFromCart(service.id, "service");
-      let newList = bookings.filter((b) => b.id !== service.id);
-      dispatch(set_service(newList));
+      await rmFromCart(service.product_id, "service");
       return;
     }
-    let item = { id: service.id };
+    let item = { id: service.product_id ?? service.id };
     await addToCart({ item, qty: 1, type: "service" });
-    dispatch(set_service([...bookings, service]));
     closeServiceModal();
   };
 
@@ -186,10 +172,6 @@ export default function Page({ params }) {
       return a + Number(c.price);
     }, 0);
   }
-
-  useEffect(() => {
-    dispatch(set_service(bookings));
-  }, [bookings, dispatch]);
 
   return (
     <main className="massage-page">
@@ -228,7 +210,7 @@ export default function Page({ params }) {
                   onClick={() => openServiceModal(service)}
                 >
                   <div className="service-card-content">
-                    <h2>{service.subcategory}</h2>
+                    <h2>{service.subcategory ?? service.name}</h2>
 
                     <p>{service.description}</p>
                   </div>
@@ -261,7 +243,7 @@ export default function Page({ params }) {
                         handleBookService(service);
                       }}
                     >
-                      {bookings.some((b) => b.id === service.id)
+                      {bookings.some((b) => b.id === service.product_id ?? service.id)
                         ? "Unbook Service"
                         : "Book Service"}
                     </button>
@@ -306,7 +288,7 @@ export default function Page({ params }) {
               {bookings.map((booking) => (
                 <div className="booking-item" key={booking.id}>
                   <div className="booking-item-header">
-                    <strong>{booking.title ?? booking.subcategory}</strong>
+                    <strong>{booking.name ?? booking.subcategory}</strong>
 
                     <strong>
                       ₦

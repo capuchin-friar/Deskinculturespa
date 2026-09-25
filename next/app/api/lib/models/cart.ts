@@ -89,7 +89,12 @@ export class CartModel {
           CASE
             WHEN c.type = 'product' THEN p.stock
             ELSE NULL
-          END AS stock
+          END AS stock,
+
+          CASE
+            WHEN c.type = 'service' THEN s.duration_minutes
+            ELSE NULL
+          END AS duration_minutes
 
         FROM cart_items AS c
 
