@@ -1,9 +1,3 @@
-/**
- *
- * Admin Delete Carts API Route
- * @module app/api/user/blogs/add/route
- */
-
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { CartModel } from "../../lib/models/cart";
@@ -11,59 +5,33 @@ import { CartModel } from "../../lib/models/cart";
 export const DELETE = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    const { id, type } = body;
-    const cartType = type ? type : false;
-    console.log("type.......", type, id);
+    const { id } = body;
 
-    // Validate all fields
     if (!id) {
-      return NextResponse.json(
-        { message: "Cart ID is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({ success: false, message: "Cart ID is required" }, { status: 400 });
     }
 
-    if (!cartType) {
-      return NextResponse.json(
-        { message: "Cart Type is required" },
-        { status: 400 },
-      );
+    const cookie = req.cookies.get("user_token");
+    if (!cookie?.value) {
+      return NextResponse.json({ success: false, data: "Authentication required" }, { status: 401 });
     }
 
-    // Extract the user id from the JWT
-    const getCookie = req.cookies.get("user_token");
-    if (!getCookie || !getCookie.value) {
-      return NextResponse.json(
-        { success: false, data: "Server error, cookie is missing!" },
-        { status: 500 },
-      );
+    const decoded = jwt.decode(cookie.value);
+    if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
+      return NextResponse.json({ success: false, data: "Invalid authentication token" }, { status: 401 });
     }
-    const token = typeof getCookie.value === "string" ? getCookie.value : "";
 
-    const decoded = jwt.decode(token);
+    const deleted = await CartModel.deleteCartDoc({
+      id: String(id),
+      user_id: String(decoded.id),
+    });
 
-    const user_id = decoded.id;
-
-    // Final validation
-    if (id && user_id) {
-      // Create blog
-      await CartModel.deleteCartDoc({
-        id: id,
-        type: cartType,
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: "Cart item deleted successfully",
-      });
-    } else {
-      return NextResponse.json(
-        { success: false, data: "Cart failed validation!" },
-        { status: 500 },
-      );
+    if (!deleted) {
+      return NextResponse.json({ success: false, message: "Cart item not found" }, { status: 404 });
     }
+
+    return NextResponse.json({ success: true, message: "Cart item deleted successfully" });
   } catch (err) {
-    console.log(err);
-    return NextResponse.json({ success: false, data: err }, { status: 500 });
+    return NextResponse.json({ success: false, data: "Something went wrong. Please try again in a moment." }, { status: 500 });
   }
 };
