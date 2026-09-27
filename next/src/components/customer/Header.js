@@ -1,26 +1,26 @@
 import {
+    IoChevronBack,
+    IoChevronForward,
+    IoClose,
     IoCartOutline,
     IoMenu,
-    IoPersonOutline,
-    IoSearchOutline
+    IoPersonOutline
 } from "react-icons/io5";
 
 import Link from "next/link";
 import useProductHandler from "@/src/hooks/product";
 import useServiceHandler from "@/src/hooks/service";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 
 export function Header() {
     const [products, setProducts] = useState([]);
     const [services, setServices] = useState([]);
-    const [screenWidth, setScreenWidth] = useState(0);
     const [appointments, setAppointments] = useState([]);
-
-    useEffect(() => {
-        setScreenWidth(window.screen.width);
-    }, []);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [mobileMenuStack, setMobileMenuStack] = useState([]);
+    const mobileMenuCloseRef = useRef(null);
 
     let {
         cart
@@ -103,9 +103,137 @@ export function Header() {
         }
     ];
 
+    const mobileNavigation = [
+        { name: "Home", href: "/" },
+        {
+            name: "Shop",
+            children: [
+                {
+                    name: "Products",
+                    children: [
+                        ...products.map((item) => ({
+                            name: item.name,
+                            href: `/customer/store/${item.id}`,
+                        })),
+                        { name: "View all", href: "/customer/store" },
+                    ],
+                },
+                {
+                    name: "Services",
+                    children: [
+                        ...services.map((item) => ({
+                            name: item.subcategory ?? "service",
+                            href: `/customer/services/${item.id}`,
+                        })),
+                        { name: "View all", href: "/customer/services" },
+                    ],
+                },
+                {
+                    name: "Appointments",
+                    children: [
+                        ...appointments.map((item) => ({
+                            name: item.name ?? item.title ?? "Appointment",
+                            href: `/customer/consultation/${item.id}`,
+                        })),
+                        { name: "View all", href: "/customer/consultation" },
+                    ],
+                },
+            ],
+        },
+        {
+            name: "Resources",
+            children: resources[0].resource.map((item) => ({
+                name: item.name,
+                href: item.href,
+            })),
+        },
+        { name: "Gallery", href: "/customer/gallery" },
+    ];
+
+    const closeMobileMenu = () => {
+        setMobileMenuOpen(false);
+        setMobileMenuStack([]);
+    };
+
+    const handleMobileMenuKeyDown = (event) => {
+        if (event.key !== "Tab") return;
+
+        const focusable = Array.from(
+            event.currentTarget.querySelectorAll('a[href], button:not([disabled])')
+        );
+        if (focusable.length === 0) return;
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+        }
+    };
+
+    useEffect(() => {
+        if (!mobileMenuOpen) return undefined;
+
+        const bodyStyle = {
+            position: document.body.style.position,
+            top: document.body.style.top,
+            left: document.body.style.left,
+            right: document.body.style.right,
+            width: document.body.style.width,
+            overflow: document.body.style.overflow,
+        };
+        const htmlOverflow = document.documentElement.style.overflow;
+        const scrollY = window.scrollY;
+        const closeFromEffect = () => {
+            setMobileMenuOpen(false);
+            setMobileMenuStack([]);
+        };
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") closeFromEffect();
+        };
+        const handleResize = () => {
+            if (window.innerWidth > 480) closeFromEffect();
+        };
+
+        document.body.style.overflow = "hidden";
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = "0";
+        document.body.style.right = "0";
+        document.body.style.width = "100%";
+        document.documentElement.style.overflow = "hidden";
+        document.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("resize", handleResize);
+        mobileMenuCloseRef.current?.focus();
+
+        return () => {
+            Object.assign(document.body.style, bodyStyle);
+            document.documentElement.style.overflow = htmlOverflow;
+            document.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("resize", handleResize);
+            window.scrollTo(0, scrollY);
+        };
+    }, [mobileMenuOpen]);
+
 
     return (
         <header className="customer-header">
+
+            <button
+                type="button"
+                className="customer-mobile-menu-trigger"
+                aria-label="Open navigation menu"
+                aria-expanded={mobileMenuOpen}
+                onClick={() => {
+                    setMobileMenuStack([]);
+                    setMobileMenuOpen(true);
+                }}
+            >
+                <IoMenu size={25} aria-hidden="true" />
+            </button>
 
             {/* =========================
                 LEFT NAVIGATION
@@ -117,10 +245,6 @@ export function Header() {
                 {/* =========================
                     SHOP
                 ========================== */}
-
-                {
-                    screenWidth <= 480 ? <IoMenu size={30} /> : ''
-                }
 
                 <div className="nav-item">
 
@@ -486,6 +610,94 @@ export function Header() {
                 </button>
 
             </div>
+
+            {mobileMenuOpen && (
+                <div className="customer-mobile-menu-overlay">
+                    <button
+                        type="button"
+                        className="customer-mobile-menu-backdrop"
+                        aria-label="Close navigation menu"
+                        onClick={closeMobileMenu}
+                    />
+                    <section
+                        className="customer-mobile-menu-panel"
+                        role="dialog"
+                        aria-modal="true"
+                        aria-label="Customer navigation"
+                        onKeyDown={handleMobileMenuKeyDown}
+                    >
+                        <div className="customer-mobile-menu-header">
+                            {mobileMenuStack.length > 0 ? (
+                                <button
+                                    type="button"
+                                    className="customer-mobile-menu-back"
+                                    aria-label="Go back to previous menu"
+                                    onClick={() => setMobileMenuStack((stack) => stack.slice(0, -1))}
+                                >
+                                    <IoChevronBack size={22} aria-hidden="true" />
+                                    <span>Back</span>
+                                </button>
+                            ) : (
+                                <span className="customer-mobile-menu-kicker">DE SKIN CULTURE</span>
+                            )}
+
+                            <h2>
+                                {mobileMenuStack.length > 0
+                                    ? mobileMenuStack[mobileMenuStack.length - 1].name
+                                    : "Main Menu"}
+                            </h2>
+
+                            <button
+                                ref={mobileMenuCloseRef}
+                                type="button"
+                                className="customer-mobile-menu-close"
+                                aria-label="Close navigation menu"
+                                onClick={closeMobileMenu}
+                            >
+                                <IoClose size={25} aria-hidden="true" />
+                            </button>
+                        </div>
+
+                        <nav className="customer-mobile-menu-nav" aria-label="Customer navigation">
+                            <ul
+                                className="customer-mobile-menu-list"
+                                key={mobileMenuStack.map((item) => item.name).join("/") || "main"}
+                            >
+                                {(mobileMenuStack.length > 0
+                                    ? mobileMenuStack[mobileMenuStack.length - 1].children
+                                    : mobileNavigation
+                                ).map((item) => (
+                                    <li key={`${item.name}-${item.href ?? "submenu"}`}>
+                                        {item.children ? (
+                                            <button
+                                                type="button"
+                                                className="customer-mobile-menu-item customer-mobile-menu-parent"
+                                                aria-haspopup="true"
+                                                onClick={() => setMobileMenuStack((stack) => [...stack, item])}
+                                            >
+                                                <span>{item.name}</span>
+                                                <IoChevronForward size={19} aria-hidden="true" />
+                                            </button>
+                                        ) : (
+                                            <Link
+                                                className="customer-mobile-menu-item"
+                                                href={item.href}
+                                                onClick={closeMobileMenu}
+                                            >
+                                                <span>{item.name}</span>
+                                            </Link>
+                                        )}
+                                    </li>
+                                ))}
+                            </ul>
+                        </nav>
+
+                        <div className="customer-mobile-menu-footer">
+                            <span>Thoughtful care, made personal.</span>
+                        </div>
+                    </section>
+                </div>
+            )}
 
         </header>
     );

@@ -17,6 +17,7 @@ import "./styles/customer/xxl.css";
 import "./styles/customer/why.css";
 import "./styles/customer/footer.css"
 import "./styles/customer/mega-header.css"
+import "./styles/customer/mobile-menu.css"
 import { Aside } from "@/src/components/customer/Aside";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
