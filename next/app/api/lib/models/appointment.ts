@@ -24,7 +24,7 @@ export class AppointmentModel {
             const values = [admin_id, mode, duration_minutes, price, true, new Date()];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
-            const sql = `INSERT INTO consultation_offerings (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;
+            const sql = `INSERT INTO consultations (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;
             const { rows } = await query(sql, values);
 
             return rows[0];
@@ -38,7 +38,7 @@ export class AppointmentModel {
             } = payload;
 
             const { rowCount } = await query(
-                `DELETE FROM consultation_offerings WHERE id = $1`,
+                `DELETE FROM consultations WHERE id = $1`,
                 [id]
             );
 
@@ -53,7 +53,7 @@ export class AppointmentModel {
             } = payload;
 
             const { rows } = await query(
-                `UPDATE consultation_offerings SET mode=$1, duration_minutes=$2, price=$3, is_active=$4, updated_at=NOW()  WHERE id = $5 RETURNING *`,
+                `UPDATE consultations SET mode=$1, duration_minutes=$2, price=$3, is_active=$4, updated_at=NOW()  WHERE id = $5 RETURNING *`,
                 [mode, duration_minutes, price, true, appointment_id]
             );
 
@@ -67,7 +67,7 @@ export class AppointmentModel {
                 id
             } = payload;
             const { rows } = await query(
-                `SELECT * FROM consultation_offerings WHERE consultant_id = $1`,
+                `SELECT * FROM consultations WHERE consultant_id = $1`,
                 [id]
             );
 

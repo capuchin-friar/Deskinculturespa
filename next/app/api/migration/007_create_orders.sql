@@ -5,9 +5,6 @@ CREATE TABLE orders (
         REFERENCES users(id)
         ON DELETE RESTRICT,
 
-    order_type VARCHAR(20) NOT NULL
-        CHECK (order_type IN ('product', 'service', 'appointment')),
-
     status VARCHAR(30) NOT NULL DEFAULT 'pending'
         CHECK (
             status IN (

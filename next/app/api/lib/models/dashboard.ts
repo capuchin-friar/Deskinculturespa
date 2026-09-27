@@ -24,21 +24,27 @@ export class DashboardModel {
             const { rows: [orderBreakdown = {}] } = await query(`
                 SELECT
                     COUNT(*) AS total_orders,
-            
-                    COUNT(*) FILTER (
-                        WHERE order_type = 'product'
-                    ) AS products,
-            
-                    COUNT(*) FILTER (
-                        WHERE order_type = 'service'
-                    ) AS services,
-            
-                    COUNT(*) FILTER (
-                        WHERE order_type = 'appointment'
-                    ) AS appointments
-            
+                    COUNT(*) AS products
                 FROM orders
                 WHERE payment_status = 'paid';
+            `);
+
+            const { rows: [bookingBreakdown = {}] } = await query(`
+                SELECT
+                    COUNT(*) AS total_bookings,
+                    COUNT(*) FILTER (
+                        WHERE payment_status = 'paid'
+                    ) AS paid_bookings
+                FROM bookings;
+            `);
+
+            const { rows: [appointmentBreakdown = {}] } = await query(`
+                SELECT
+                    COUNT(*) AS total_appointments,
+                    COUNT(*) FILTER (
+                        WHERE payment_status = 'paid'
+                    ) AS paid_appointments
+                FROM appointments;
             `);
 
             const { rows: [catalogue = {}] } = await query(`
@@ -52,7 +58,7 @@ export class DashboardModel {
                      WHERE is_active = true) AS services,
 
                     (SELECT COUNT(*)
-                     FROM consultation_offerings
+                     FROM consultations
                      WHERE is_active = true) AS appoinment_offerings;
             `);
 
@@ -73,6 +79,8 @@ export class DashboardModel {
             return {
                 overview,
                 orderBreakdown,
+                bookingBreakdown,
+                appointmentBreakdown,
                 catalogue,
                 operations
             };

@@ -16,9 +16,9 @@ CREATE TYPE appointment_payment_status AS ENUM (
 CREATE TABLE appointments (
     id SERIAL PRIMARY KEY,
 
-    customer_id BIGINT NOT NULL,
-    consultant_id BIGINT NOT NULL,
-    offering_id BIGINT NOT NULL,
+    customer_id INTEGER NOT NULL,
+    consultant_id INTEGER NOT NULL,
+    offering_id INTEGER NOT NULL,
 
     appointment_date DATE NOT NULL,
     start_time TIME NOT NULL,
@@ -41,5 +41,5 @@ CREATE TABLE appointments (
         REFERENCES users(id),
 
     FOREIGN KEY (offering_id)
-        REFERENCES consultation_offerings(id)
+        REFERENCES consultations(id)
 );

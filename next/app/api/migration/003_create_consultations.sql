@@ -12,7 +12,7 @@ CREATE TABLE consultations (
     
     thumbnail_url VARCHAR(44) NOT NULL,
 
-    consultant_id BIGINT NOT NULL,
+    consultant_id INTEGER NOT NULL,
 
     mode consultation_mode NOT NULL,
 
