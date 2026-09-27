@@ -5,6 +5,7 @@
  * @module app/api/shared/auth/signin/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -24,7 +25,7 @@ export const POST = async (req: NextRequest) => {
             );
         }
 
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const { email: rawEmail, password } = body;
         const email =
             typeof rawEmail === "string" ? rawEmail.trim() : "";

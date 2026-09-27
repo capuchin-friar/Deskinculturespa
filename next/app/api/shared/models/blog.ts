@@ -30,7 +30,7 @@ export class BlogModel {
     );
 
     static deleteBlogDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;
@@ -53,12 +53,12 @@ export class BlogModel {
                 [title, summary, content, image_urls, thumbnail_url, category, blog_id]
             );
 
-            return rows;
+            return rows[0];
         }
     );
 
     static getAllBlogtDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;

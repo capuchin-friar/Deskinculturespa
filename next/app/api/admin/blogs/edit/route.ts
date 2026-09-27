@@ -4,15 +4,17 @@
  * @module app/api/admin/blogs/edit/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { BlogModel } from "@/app/api/shared/models/blog";
+import { isStringArray } from "@/app/api/shared/utils/request";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             title,
             summary,
@@ -23,7 +25,7 @@ export const PATCH = async (req: NextRequest) => {
             blog_id
         } = body;
 
-        if (!blog_id) {
+        if (typeof blog_id !== "string" || !blog_id.trim()) {
             return NextResponse.json(
                 { message: "Blog ID is required" },
                 { status: 400 }
@@ -43,8 +45,7 @@ export const PATCH = async (req: NextRequest) => {
         const blogCategory =
             typeof category === "string" ? category.trim() : false;
 
-        const blogImageUrls =
-            Array.isArray(image_urls) && image_urls.length > 0 ? image_urls : false;
+        const blogImageUrls = isStringArray(image_urls) && image_urls.length > 0 ? image_urls : false;
 
         const blogThumbnailUrl =
             typeof thumbnail_url === "string"
@@ -113,20 +114,20 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
-        const admin_id = decoded.id;
+        const admin_id = decoded?.id;
 
 
         // Edit blog
         const response = await BlogModel.updateBlogDoc({
             title: blogTitle,
-            summary: blogSummary || "",
+            summary: blogSummary || null,
             content: blogContent,
             image_urls: blogImageUrls,
             thumbnail_url: blogThumbnailUrl || "",
             category: blogCategory,
-            blog_id
+            blog_id: blog_id.trim()
         });
 
         return NextResponse.json(

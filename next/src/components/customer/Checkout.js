@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { PaystackButton } from "react-paystack"
 import { useDispatch, useSelector } from "react-redux";

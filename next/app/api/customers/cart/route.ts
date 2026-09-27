@@ -5,7 +5,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeUserId } from "../../shared/jwt";
 import { CartModel } from "../../shared/models/cart";
 
 
@@ -25,13 +25,8 @@ export const GET = async (request: NextRequest) => {
         }
 
         // Decode JWT
-        const decoded = jwt.decode(getCookie.value);
-
-        if (
-            !decoded ||
-            typeof decoded !== "object" ||
-            !("id" in decoded)
-        ) {
+        const user_id = decodeUserId(getCookie.value);
+        if (!user_id) {
             return NextResponse.json(
                 {
                     success: false,
@@ -40,8 +35,6 @@ export const GET = async (request: NextRequest) => {
                 { status: 401 }
             );
         }
-
-        const user_id = decoded.id;
 
         // Get appointments offerings
         const response = await CartModel.getAllCartDoc({ id: user_id});

@@ -4,15 +4,16 @@
  * @module app/api/admin/services/edit/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ServiceModel } from "@/app/api/shared/models/service";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             name,
             description,
@@ -22,7 +23,7 @@ export const PATCH = async (req: NextRequest) => {
             service_id
         } = body;
 
-        if (!service_id) {
+        if (typeof service_id !== "string" || !service_id.trim()) {
             return NextResponse.json(
                 { message: "Service ID is required" },
                 { status: 400 }
@@ -79,7 +80,7 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -88,12 +89,11 @@ export const PATCH = async (req: NextRequest) => {
         if (serviceName && serviceImageUrl && serviceDescription && serviceDuration && servicePrice) {
             // Create service
             const response = await ServiceModel.updateServiceDoc({
-                name: serviceName,
                 description: serviceDescription,
                 price: servicePrice,
                 duration_minutes: serviceDuration,
                 image_url: (serviceImageUrl),
-                service_id
+                service_id: service_id.trim()
             });
 
             return NextResponse.json({

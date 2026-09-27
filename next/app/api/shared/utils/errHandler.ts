@@ -6,14 +6,14 @@
  * @module app/api/shared/utils/errHandler
  */
 
-type AsyncFunction = (...args: any[]) => Promise<any>;
-
-export const withErrorHandling = <T extends AsyncFunction>(fn: T): T => {
-  return (async (...args: Parameters<T>): Promise<ReturnType<T>> => {
+export const withErrorHandling = <Args extends unknown[], Result>(
+  fn: (...args: Args) => Promise<Result>,
+): ((...args: Args) => Promise<Result>) => {
+  return async (...args: Args): Promise<Result> => {
     try {
       return await fn(...args);
     } catch (err) {
       throw new Error(`Error: ${err instanceof Error ? err.message : String(err)}`);
     }
-  }) as T;
+  };
 };

@@ -32,7 +32,7 @@ export class ServiceModel {
     );
 
     static deleteServiceDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;
@@ -47,22 +47,22 @@ export class ServiceModel {
     )
 
     static updateServiceDoc = withErrorHandling(
-        async (payload: Omit<NewServiceDoc, "admin_id"> & { service_id: string }) => {
+        async (payload: Pick<NewServiceDoc, "description" | "price" | "duration_minutes" | "image_url"> & { service_id: string }) => {
             const {
-                service_id, description, price, duration_minutes, service, sub_service,  specifications, image_url
+                service_id, description, price, duration_minutes, image_url
             } = payload;
 
             const { rows } = await query(
-                `UPDATE services SET description=$1, category=$2, subcategory=$3, price=$4, duration_minutes=$5, specifications=$6, image_url=$7, updated_at=NOW()  WHERE id = $8 RETURNING *`,
-                [description, service, sub_service, price, duration_minutes, specifications, image_url, service_id]
+                `UPDATE services SET description=$1, price=$2, duration_minutes=$3, image_url=$4, updated_at=NOW() WHERE id = $5 RETURNING *`,
+                [description, price, duration_minutes, image_url, service_id]
             );
 
-            return rows;
+            return rows[0];
         }
     );
 
     static getAllServiceDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;

@@ -4,15 +4,17 @@
  * @module app/api/admin/products/edit/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ProductModel } from "@/app/api/shared/models/product";
+import { isStringArray, isStringRecord } from "@/app/api/shared/utils/request";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             name,
             price,
@@ -26,7 +28,7 @@ export const PATCH = async (req: NextRequest) => {
             product_id
         } = body;
 
-        if (!product_id) {
+        if (typeof product_id !== "string" || !product_id.trim()) {
             return NextResponse.json(
                 { message: "Product ID is required" },
                 { status: 400 }
@@ -55,23 +57,18 @@ export const PATCH = async (req: NextRequest) => {
         const thumbnailUrl =
             typeof thumbnail_url === "string" ? thumbnail_url.trim() : false;
 
-        const productImages = Array.isArray(images) ? images : false /** Suppose to be [] but used boolean for faster validation */;
+        const productImages = isStringArray(images) ? images : false;
 
         const productBrand =
             typeof brand === "string" ? brand.trim() : "";
 
-        const productSpecifications =
-            specifications &&
-                typeof specifications === "object" &&
-                !Array.isArray(specifications)
-                ? specifications
-                : {};
+        const productSpecifications = isStringRecord(specifications) ? specifications : {};
 
         if (!productName) {
             throw new Error("Product name is required");
         }
 
-        if(!productPrice){
+        if (productPrice === false) {
             throw new Error("Product price is required");
         }
 
@@ -97,7 +94,7 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -115,7 +112,7 @@ export const PATCH = async (req: NextRequest) => {
                 images: (productImages),
                 thumbnail_url: thumbnailUrl,
                 specifications: productSpecifications,
-                product_id
+                product_id: product_id.trim()
             });
 
             return NextResponse.json({

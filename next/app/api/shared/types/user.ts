@@ -12,7 +12,7 @@ export interface NewUserDocument {
     email: string,
     phone?: string | null,
     password: string,
-    role: string
+    role: UserRole
 }
 
 export interface AuthData {
@@ -20,7 +20,7 @@ export interface AuthData {
     password: string;
 }
 
-export type UserRole = "customer" | "user";
+export type UserRole = "admin" | "customer" | "user";
 
 export type AccountStatus = "active" | "suspended" | "banned" | "deleted";
 

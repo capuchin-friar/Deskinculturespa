@@ -6,7 +6,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ProductModel } from "../../shared/models/product";
 
 
@@ -26,7 +26,7 @@ export const GET = async (request: NextRequest) => {
         }
 
         // Decode JWT
-        const decoded = jwt.decode(getCookie.value);
+        const decoded = decodeAdminPayload(getCookie.value);
 
         if (
             !decoded ||

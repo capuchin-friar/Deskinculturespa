@@ -32,7 +32,7 @@ export class AppointmentModel {
     );
 
     static deleteAppointmentDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;
@@ -57,12 +57,12 @@ export class AppointmentModel {
                 [mode, duration_minutes, price, true, appointment_id]
             );
 
-            return rows;
+            return rows[0];
         }
     );
 
     static getAllAppointmentDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;

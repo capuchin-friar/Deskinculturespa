@@ -5,9 +5,14 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import "./styles/g.css";
+import dynamic from "next/dynamic";
 import locations from "../../../../src/json/location.json";
 import { useEffect, useState } from "react";
-import CartSummary from "../../../../src/components/customer/Checkout";
+
+const CartSummary = dynamic(
+    () => import("../../../../src/components/customer/Checkout"),
+    { ssr: false },
+);
 
 export default function () {
 

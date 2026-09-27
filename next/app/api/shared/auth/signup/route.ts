@@ -6,17 +6,19 @@
  * @module app/api/shared/auth/signup/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../models/user";
 import { getJwtSecret } from "../../jwt";
+import type { UserRole } from "../../types/user";
 
 const SALT_ROUNDS = 10;
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const body = await readJsonObject(request);
         const {
             fname,
             lname,
@@ -26,9 +28,34 @@ export async function POST(request: NextRequest) {
             role,
         } = body;
 
+        if (
+            typeof fname !== "string" || !fname.trim() ||
+            typeof lname !== "string" || !lname.trim() ||
+            typeof email !== "string" || !email.trim() ||
+            typeof password !== "string" || password.length === 0 ||
+            (role !== "customer" && role !== "user") ||
+            (phone !== undefined && phone !== null && typeof phone !== "string")
+        ) {
+            return NextResponse.json(
+                { success: false, data: { mssg: "Valid name, email, password, role, and phone fields are required" } },
+                { status: 400 },
+            );
+        }
+
+        const secretValue = process.env.ADMIN_JWT_SECRET;
+        if (!secretValue?.trim()) {
+            return NextResponse.json(
+                { success: false, data: { mssg: "Server configuration error (JWT)" } },
+                { status: 500 },
+            );
+        }
+
+        const normalizedEmail = email.trim();
+        const userRole: Exclude<UserRole, "admin"> = role;
+
         // Local registration
         // Check if user exists with deleted account
-        const existingUsers = await UserModel.findUserByEmail(email);
+        const existingUsers = await UserModel.findUserByEmail(normalizedEmail);
 
         if (existingUsers.length > 0) {
             return NextResponse.json(
@@ -53,12 +80,12 @@ export async function POST(request: NextRequest) {
 
         // Create user
         const user = await UserModel.createUserDoc({
-            fname,
-            lname,
-            email,
+            fname: fname.trim(),
+            lname: lname.trim(),
+            email: normalizedEmail,
             phone: phone || null,
             password: hashedPassword,
-            role
+            role: userRole
         });
 
         if (!user) {
@@ -71,7 +98,7 @@ export async function POST(request: NextRequest) {
         // Generate JWT token
         const token = jwt.sign(
             { id: user.id, email: user.email },
-            getJwtSecret(process.env.ADMIN_JWT_SECRET as string),
+            getJwtSecret(secretValue),
             { expiresIn: "7d" }
         );
 

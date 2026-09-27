@@ -1,17 +1,18 @@
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeUserId } from "../../../shared/jwt";
 import { CartModel } from "../../../shared/models/cart";
 
 export const PATCH = async (req: NextRequest) => {
   try {
-    const body = await req.json();
+    const body = await readJsonObject(req);
     const { id, qty } = body;
 
-    if (!id) {
+    if (typeof id !== "string" || !id.trim()) {
       return NextResponse.json({ success: false, message: "Cart ID is required" }, { status: 400 });
     }
 
-    if (!Number.isInteger(qty) || qty < 1 || qty > 99) {
+    if (typeof qty !== "number" || !Number.isInteger(qty) || qty < 1 || qty > 99) {
       return NextResponse.json({ success: false, data: "Quantity must be between 1 and 99" }, { status: 400 });
     }
 
@@ -20,15 +21,15 @@ export const PATCH = async (req: NextRequest) => {
       return NextResponse.json({ success: false, data: "Authentication required" }, { status: 401 });
     }
 
-    const decoded = jwt.decode(cookie.value);
-    if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
+    const user_id = decodeUserId(cookie.value);
+    if (!user_id) {
       return NextResponse.json({ success: false, data: "Invalid authentication token" }, { status: 401 });
     }
 
     const response = await CartModel.updateCartDoc({
-      cart_id: String(id),
+      cart_id: id.trim(),
       qty,
-      user_id: String(decoded.id),
+      user_id,
     });
 
     if (!response) {

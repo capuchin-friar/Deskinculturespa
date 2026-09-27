@@ -1,13 +1,14 @@
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeUserId } from "../../../shared/jwt";
 import { CartModel } from "../../../shared/models/cart";
 
 export const DELETE = async (req: NextRequest) => {
   try {
-    const body = await req.json();
+    const body = await readJsonObject(req);
     const { id } = body;
 
-    if (!id) {
+    if (typeof id !== "string" || !id.trim()) {
       return NextResponse.json({ success: false, message: "Cart ID is required" }, { status: 400 });
     }
 
@@ -16,14 +17,14 @@ export const DELETE = async (req: NextRequest) => {
       return NextResponse.json({ success: false, data: "Authentication required" }, { status: 401 });
     }
 
-    const decoded = jwt.decode(cookie.value);
-    if (!decoded || typeof decoded !== "object" || !("id" in decoded)) {
+    const user_id = decodeUserId(cookie.value);
+    if (!user_id) {
       return NextResponse.json({ success: false, data: "Invalid authentication token" }, { status: 401 });
     }
 
     const deleted = await CartModel.deleteCartDoc({
-      id: String(id),
-      user_id: String(decoded.id),
+      id: id.trim(),
+      user_id,
     });
 
     if (!deleted) {

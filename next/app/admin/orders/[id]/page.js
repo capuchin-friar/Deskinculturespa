@@ -5,8 +5,8 @@ import dynamic from "next/dynamic"
 import Link from "next/link"
 import { useParams, useRouter } from "next/navigation"
 import { useDispatch, useSelector } from "react-redux"
-import { getOrdersByShop, getShopsByOwner, patchShopOrderStatus } from "../../../../lib/productApi"
-import { set_entrepreneur_shop_details } from "../../../../redux/entrepreneur/entrepreneur_shop"
+// import { getOrdersByShop, getShopsByOwner, patchShopOrderStatus } from "../../../../lib/productApi"
+// import { set_entrepreneur_shop_details } from "../../../../redux/entrepreneur/entrepreneur_shop"
 import "./styles/s.css"
 import "./styles/xxl.css"
 import "./styles/mobile.css";
@@ -536,12 +536,6 @@ export default function VendorOrderDetailPage() {
     if (!order?.order_id || !selectedShopId) return
     persistWorkspace({ progressStep, tags, timeline })
   }, [order?.order_id, persistWorkspace, progressStep, tags, timeline])
-
-  const onShopSelect = (e) => {
-    const id = e.target.value
-    const shop = shops.find((s) => String(shopRowId(s)) === String(id))
-    if (shop) dispatch(set_entrepreneur_shop_details(shop))
-  }
 
   const paymentSettled = paymentLooksSettled(order?.payment)
   const vendorStagesComplete = progressStep >= VENDOR_PROGRESS_STEPS.length

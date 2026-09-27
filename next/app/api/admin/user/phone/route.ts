@@ -4,15 +4,16 @@
  * @module app/api/admin/user/phone/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { UserModel } from "../../../shared/models/user";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             phone
         } = body;
@@ -44,7 +45,7 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -59,7 +60,7 @@ export const PATCH = async (req: NextRequest) => {
             {
                 success: true,
                 message: "Phone updated successfully",
-                blog_id: response.id,
+                blog_id: response[0]?.id,
             },
             { status: 201 }
         );

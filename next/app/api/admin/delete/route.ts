@@ -1,11 +1,13 @@
 // Admin Cloudinary asset deletion API route
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import type { NextRequest } from "next/server";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { v2 as cloudinary } from "cloudinary";
 import { getJwtSecret } from "../../shared/jwt";
 
-export async function DELETE(request) {
+export async function DELETE(request: NextRequest) {
     try {
         // Extract the admin id from the JWT
         const getCookie = request.cookies.get("admin_token");
@@ -17,7 +19,7 @@ export async function DELETE(request) {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -44,18 +46,18 @@ export async function DELETE(request) {
             api_secret: apiSecret
         });
 
-        const body = await request.json();
+        const body = await readJsonObject(request);
 
         const { publicId } = body;
 
-        if (!publicId) {
+        if (typeof publicId !== "string" || !publicId.trim()) {
             return NextResponse.json(
                 { error: "publicId is required." },
                 { status: 400 }
             );
         }
 
-        const result = await cloudinary.uploader.destroy(publicId);
+        const result = await cloudinary.uploader.destroy(publicId.trim());
 
         if (result.result !== "ok") {
             return NextResponse.json(

@@ -32,7 +32,7 @@ export class ProductModel {
     );
 
     static deleteProductDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;
@@ -47,7 +47,7 @@ export class ProductModel {
     )
 
     static updateProductDoc = withErrorHandling(
-        async (payload: Omit<NewProductDoc, "admin_id"> & { product_id: string }) => {
+        async (payload: Omit<NewProductDoc, "admin_id" | "stock"> & { product_id: string }) => {
             const {
                 product_id, name, price, description,
                 category, subcategory, brand, images, thumbnail_url, specifications,
@@ -58,12 +58,12 @@ export class ProductModel {
                 [name, price, description, category, subcategory, brand, images, thumbnail_url, specifications, product_id]
             );
 
-            return rows;
+            return rows[0];
         }
     );
 
     static getProductDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;
@@ -77,7 +77,7 @@ export class ProductModel {
     )
 
     static getAllProducttDoc = withErrorHandling(
-        async (payload: { id: string }) => {
+        async (payload: { id: string | number }) => {
             const {
                 id
             } = payload;

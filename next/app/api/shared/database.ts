@@ -1,4 +1,22 @@
-import { Pool, PoolClient } from "pg";
+import { Pool, type PoolClient, type QueryResult, type QueryResultRow } from "pg";
+
+export type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
+
+export type SqlParameter =
+  | string
+  | number
+  | boolean
+  | Date
+  | Buffer
+  | null
+  | undefined
+  | JsonValue;
 
 let pool: Pool | null = null;
 
@@ -29,9 +47,11 @@ export async function db(): Promise<PoolClient> {
   return client;
 }
 
-export async function query(text: string, params?: any[]) {
-  return getPool().query(text, params);
+export async function query<Row extends QueryResultRow = Record<string, unknown>>(
+  text: string,
+  params?: SqlParameter[],
+): Promise<QueryResult<Row>> {
+  return getPool().query<Row>(text, params);
 }
 
 export { getPool };
-

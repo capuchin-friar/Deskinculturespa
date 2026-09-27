@@ -26,7 +26,7 @@ export class UsersModel {
         const count = Number(rows[0].count);
 
         if (count > 0) {
-            const { rows: users } = await query(
+        const { rows: users } = await query<User>(
                 `SELECT * FROM users`
             );
 

@@ -4,13 +4,14 @@
  * @module app/api/admin/blogs/add/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { BlogModel } from "@/app/api/shared/models/blog";
 
 export const POST = async (req: NextRequest) => {
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
 
         const {
             title,
@@ -107,7 +108,7 @@ export const POST = async (req: NextRequest) => {
         }
 
         // Decode JWT
-        const decoded = jwt.decode(getCookie.value);
+        const decoded = decodeAdminPayload(getCookie.value);
 
         if (
             !decoded ||

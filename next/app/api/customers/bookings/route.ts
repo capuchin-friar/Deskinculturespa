@@ -1,15 +1,13 @@
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeUserId } from "../../shared/jwt";
 import { BookingModel } from "../../shared/models/booking";
 
 function getUserId(req: NextRequest): string | null {
   const cookie = req.cookies.get("user_token");
   if (!cookie?.value) return null;
 
-  const decoded = jwt.decode(cookie.value);
-  if (!decoded || typeof decoded !== "object" || !("id" in decoded)) return null;
-
-  return String(decoded.id);
+  return decodeUserId(cookie.value);
 }
 
 export const GET = async (req: NextRequest) => {
@@ -33,10 +31,10 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ success: false, message: "Authentication required" }, { status: 401 });
     }
 
-    const body = await req.json();
+    const body = await readJsonObject(req);
     const { service_id, scheduled_at, notes } = body;
 
-    if (!service_id || !scheduled_at) {
+    if (typeof service_id !== "string" || !service_id.trim() || typeof scheduled_at !== "string" || !scheduled_at.trim()) {
       return NextResponse.json({ success: false, message: "Service and booking time are required" }, { status: 400 });
     }
 
@@ -47,9 +45,9 @@ export const POST = async (req: NextRequest) => {
 
     const booking = await BookingModel.createBookingDoc({
       user_id,
-      service_id: String(service_id),
+      service_id: service_id.trim(),
       scheduled_at: scheduledDate.toISOString(),
-      notes: notes ?? null,
+      notes: typeof notes === "string" ? notes : null,
     });
 
     if (!booking) {

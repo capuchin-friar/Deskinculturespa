@@ -4,21 +4,22 @@
  * @module app/api/admin/appointments/add/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
 
 
 export const DELETE = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             appointment_id
         } = body;
 
         // Validate all fields
-        if (!appointment_id) {
+        if (typeof appointment_id !== "string" || !appointment_id.trim()) {
             return NextResponse.json(
                 { message: "Appointment ID is required" },
                 { status: 400 }
@@ -35,16 +36,16 @@ export const DELETE = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
 
         // Final validation 
-        if (appointment_id && admin_id) {
+        if (admin_id) {
             // Create appointment
             await AppointmentModel.deleteAppointmentDoc({
-                id: appointment_id
+                id: appointment_id.trim()
             });
 
             return NextResponse.json({

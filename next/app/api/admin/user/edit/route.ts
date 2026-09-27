@@ -4,15 +4,16 @@
  * @module app/api/admin/user/edit/route
  */
 
+import { isRecord, readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { UserModel } from "../../../shared/models/user";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             fname,
             lname,
@@ -30,13 +31,11 @@ export const PATCH = async (req: NextRequest) => {
         const userGender =
             typeof gender === "string" ? gender.trim() : false;
 
-        const userLocation =
-            location &&
-                typeof location === "object" &&
-                location.state &&
-                location.city
-                ? location
-                : false;
+        const userLocation = isRecord(location) &&
+            typeof location.state === "string" &&
+            typeof location.city === "string"
+            ? location
+            : false;
 
 
 
@@ -63,7 +62,7 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 

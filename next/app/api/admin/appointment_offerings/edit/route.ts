@@ -4,15 +4,16 @@
  * @module app/api/admin/appointments/edit/route
  */
 
+import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
 
 
 export const PATCH = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             mode,
             duration_minutes,
@@ -20,7 +21,7 @@ export const PATCH = async (req: NextRequest) => {
             appointment_id
         } = body;
 
-        if (!appointment_id) {
+        if (typeof appointment_id !== "string" || !appointment_id.trim()) {
             return NextResponse.json(
                 { message: "Appointment ID is required" },
                 { status: 400 }
@@ -61,7 +62,7 @@ export const PATCH = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -73,7 +74,7 @@ export const PATCH = async (req: NextRequest) => {
                 mode: appointmentMode,
                 duration_minutes: appointmentDurationMins,
                 price: appointmentPrice,
-                appointment_id: appointment_id
+                appointment_id: appointment_id.trim()
             });
 
             return NextResponse.json({

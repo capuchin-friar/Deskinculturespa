@@ -4,15 +4,16 @@
  * @module app/api/admin/services/add/route
  */
 
+import { isJsonRecord, readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ServiceModel } from "@/app/api/shared/models/service";
 
 
 export const POST = async (req: NextRequest) => {
 
     try {
-        const body = await req.json();
+        const body = await readJsonObject(req);
         const {
             specifications,
             description,
@@ -35,7 +36,9 @@ export const POST = async (req: NextRequest) => {
             typeof duration_minutes === "number" ? duration_minutes : false;
 
         const servicePrice =
-            typeof price === "number" ? price : "";
+            typeof price === "number" ? price : false;
+
+        const serviceSpecifications = isJsonRecord(specifications) ? specifications : {};
 
         const serviceService =
             typeof service === "string" ? service.trim() : false;
@@ -85,7 +88,7 @@ export const POST = async (req: NextRequest) => {
         }
         const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-        const decoded = jwt.decode(token);
+        const decoded = decodeAdminPayload(token);
 
         const admin_id = decoded.id;
 
@@ -94,7 +97,7 @@ export const POST = async (req: NextRequest) => {
         if (serviceService && serviceSubService && serviceDescription && serviceDuration && servicePrice && serviceImageUrl) {
             // Create product
             const response = await ServiceModel.createServiceDoc({
-                specifications: specifications,
+                specifications: serviceSpecifications,
                 description: serviceDescription,
                 price: servicePrice,
                 duration_minutes: serviceDuration,

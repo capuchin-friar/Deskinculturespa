@@ -10,7 +10,6 @@
  */
 
 import { query } from "../database";
-import { NewBlogDoc } from "../types/admin";
 import type { NewUserDocument, User } from "../types/user";
 import { withErrorHandling } from "../utils/errHandler";
 
@@ -29,14 +28,14 @@ export class UserModel {
 
       const sql = `INSERT INTO users (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;
 
-      const { rows } = await query(sql, values);
+      const { rows } = await query<User>(sql, values);
 
       return rows[0];
     }
   );
 
   static findUserByEmail = withErrorHandling(async (email: string): Promise<User[]> => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `SELECT * FROM users WHERE email = $1`,
       [email]
     );
@@ -45,7 +44,7 @@ export class UserModel {
 
   /** Case-insensitive match (avoids 401 when DB email casing differs from login input). */
   static findUserByEmailNormalized = withErrorHandling(async (email: string): Promise<User[]> => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `SELECT * FROM users WHERE LOWER(TRIM(email)) = LOWER(TRIM($1))`,
       [email]
     );
@@ -53,23 +52,23 @@ export class UserModel {
   });
 
   static countEmail = withErrorHandling(async (email: string): Promise<number> => {
-    const { rows } = await query(
+    const { rows } = await query<{ count: string }>(
       `SELECT COUNT(*) as count FROM users WHERE email = $1`,
       [email]
     );
-    return parseInt(rows[0].count);
+    return Number.parseInt(rows[0].count, 10);
   });
 
   static countPhone = withErrorHandling(async (phone: string): Promise<number> => {
-    const { rows } = await query(
+    const { rows } = await query<{ count: string }>(
       `SELECT COUNT(*) as count FROM users WHERE phone = $1`,
       [phone]
     );
-    return parseInt(rows[0].count);
+    return Number.parseInt(rows[0].count, 10);
   });
 
   static findUserById = withErrorHandling(async (id: number): Promise<User[]> => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `SELECT * FROM users WHERE id = $1`,
       [id]
     );
@@ -77,7 +76,7 @@ export class UserModel {
   });
 
   static updateUserPhoneById = withErrorHandling(async (id: number, phone: string) => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `UPDATE users SET phone = $1 WHERE id = $2 RETURNING *`,
       [phone, id]
     );
@@ -85,7 +84,7 @@ export class UserModel {
   });
 
   static updateUserRoleById = withErrorHandling(async (id: number, role: string) => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `UPDATE users SET role = $1 WHERE id = $2 RETURNING *`,
       [role, id]
     );
@@ -93,7 +92,7 @@ export class UserModel {
   });
 
   static updateUserEmailById = withErrorHandling(async (id: number, email: string) => {
-    const { rows } = await query(
+    const { rows } = await query<User>(
       `UPDATE users SET email = $1 WHERE id = $2 RETURNING *`,
       [email, id]
     );
@@ -109,7 +108,7 @@ export class UserModel {
         [ fname, lname, location, gender, id]
       );
 
-      return rows;
+      return rows[0];
     }
   );
 

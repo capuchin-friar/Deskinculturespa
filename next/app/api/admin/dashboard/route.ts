@@ -10,7 +10,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { DashboardModel } from "../../shared/models/dashboard";
 
 
@@ -30,7 +30,7 @@ export const GET = async (request: NextRequest) => {
         }
 
         // Decode JWT
-        const decoded = jwt.decode(getCookie.value);
+        const decoded = decodeAdminPayload(getCookie.value);
 
         if (
             !decoded ||

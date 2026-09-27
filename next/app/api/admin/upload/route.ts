@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { v2 as cloudinary } from "cloudinary";
 
 const MAX_BYTES = 8 * 1024 * 1024;
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     }
     const token = typeof (getCookie.value) === "string" ? getCookie.value : "";
 
-    const decoded = jwt.decode(token);
+    const decoded = decodeAdminPayload(token);
 
     const admin_id = decoded.id;
 

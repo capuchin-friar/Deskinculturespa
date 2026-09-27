@@ -6,6 +6,8 @@
  * @module app/api/shared/types/admin
  */
 
+import type { JsonValue } from "../database";
+
 export interface NewProductDoc {
     name: string,
     description: string,
@@ -21,7 +23,7 @@ export interface NewProductDoc {
 }
 
 export interface NewServiceDoc {
-    specifications: any,
+    specifications: Record<string, JsonValue>,
     description: string,
     price: number,
     duration_minutes: number,
@@ -40,10 +42,10 @@ export interface NewAppointmentDoc {
 
 export interface NewBlogDoc {
     title: string,
-    summary: string,
+    summary: string | null,
     content: string,
     image_urls: string[],
-    thumbnail_url: string,
+    thumbnail_url: string | null,
     category: string,
     admin_id: string | number
 }
