@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { baseApi } from "../../app/api/config";
+import { baseApi } from "../../app/api/shared/config";
 
 export default function useServiceHandler() {
 
@@ -14,7 +14,7 @@ export default function useServiceHandler() {
             try {
 
 
-                const { data } = await baseApi.get("services");
+                const { data } = await baseApi.get("customers/services");
 
                 if (!data?.success) {
                     throw new Error(

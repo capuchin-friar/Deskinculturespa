@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { DashboardModel } from "../../lib/models/dashboard";
+import { DashboardModel } from "../../shared/models/dashboard";
 
 
 export const GET = async (request: NextRequest) => {

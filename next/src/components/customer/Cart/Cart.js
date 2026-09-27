@@ -119,7 +119,7 @@ const CartComp = () => {
           <button
             className="checkout-btn"
             onClick={(e) => {
-              window.location.href = "/store/checkout";
+              window.location.href = "/customer/store/checkout";
             }}
           >
             Checkout Now

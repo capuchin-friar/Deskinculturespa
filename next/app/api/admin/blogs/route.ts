@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { BlogModel } from "../../lib/models/blog";
+import { BlogModel } from "../../shared/models/blog";
 
 
 export const GET = async (request: NextRequest) => {

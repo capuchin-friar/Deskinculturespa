@@ -5,7 +5,7 @@ const Btn = ({subTotal,url}) => {
 
     return ( 
         <>
-            <button className="shadow-sm" onClick={e => window.location.href = (`/store/checkout/`)}>
+            <button className="shadow-sm" onClick={e => window.location.href = (`/customer/store/checkout/`)}>
                 <span>Proceed with Checkout</span>
                 <br />
             </button>

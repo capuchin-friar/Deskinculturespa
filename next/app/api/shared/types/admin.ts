@@ -1,0 +1,49 @@
+/**
+ * Admin Types
+ * 
+ * Type definitions for admin-related operations.
+ * 
+ * @module app/api/shared/types/admin
+ */
+
+export interface NewProductDoc {
+    name: string,
+    description: string,
+    price: number,
+    stock: number,
+    category: string,
+    subcategory: string,
+    brand: string,
+    images: string[],
+    thumbnail_url: string,
+    specifications: Record<string, string>,
+    admin_id: string | number
+}
+
+export interface NewServiceDoc {
+    specifications: any,
+    description: string,
+    price: number,
+    duration_minutes: number,
+    image_url: string,
+    service: string,
+    sub_service: string,
+    admin_id: string | number
+}
+
+export interface NewAppointmentDoc {
+    mode: string,
+    duration_minutes: number,
+    price: number,
+    admin_id: string | number
+}
+
+export interface NewBlogDoc {
+    title: string,
+    summary: string,
+    content: string,
+    image_urls: string[],
+    thumbnail_url: string,
+    category: string,
+    admin_id: string | number
+}

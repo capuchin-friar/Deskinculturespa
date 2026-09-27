@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux"
 // import { set_admin_shop_details } from "../../../redux/admin/admin_shop"
 import "./styles/xxl.css"
 import "./styles/s.css"
-import { api, baseApi } from "../../api/config"
+import { api } from "../../api/shared/config"
 import {
   IoVideocamOutline,
   IoLocationOutline
@@ -256,7 +256,7 @@ export default function ProductListPage() {
         return
       }
       try {
-        baseApi.delete("delete/folder-delete", {
+        api.delete("delete/folder-delete", {
           data: {
             product_id: hash
           }

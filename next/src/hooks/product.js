@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { baseApi } from "../../app/api/config";
+import { baseApi } from "../../app/api/shared/config";
 
 export default function useProductHandler() {
 
@@ -13,7 +13,7 @@ export default function useProductHandler() {
 
             try {
 
-                const { data } = await baseApi.get("products");
+                const { data } = await baseApi.get("customers/products");
 
                 if (!data?.success) {
                     throw new Error(

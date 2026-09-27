@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 
-import { baseApi } from "../../app/api/config";
+import { baseApi } from "../../app/api/shared/config";
 import { set_cart } from "../../redux/customer/cart";
 
 export default function useToggler() {
@@ -8,7 +8,7 @@ export default function useToggler() {
   const { cart } = useSelector((state) => state.cart);
 
   const refreshCart = async () => {
-    const { data } = await baseApi.get("cart");
+    const { data } = await baseApi.get("customers/cart");
 
     if (!data.success) {
       console.log("Error:", data.message);
@@ -21,7 +21,7 @@ export default function useToggler() {
 
   const addToCart = async ({ item, qty = 1 }) => {
     try {
-      const { data } = await baseApi.post("cart/add", {
+      const { data } = await baseApi.post("customers/cart/add", {
         product_id: item.id,
         qty,
       });
@@ -48,7 +48,7 @@ export default function useToggler() {
         return false;
       }
 
-      const { data } = await baseApi.delete("cart/delete", {
+      const { data } = await baseApi.delete("customers/cart/delete", {
         data: { id: cartItem.id },
       });
 

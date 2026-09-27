@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { ProductModel } from "@/app/api/lib/models/product";
+import { ProductModel } from "@/app/api/shared/models/product";
 
 
 export const PATCH = async (req: NextRequest) => {

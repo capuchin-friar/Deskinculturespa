@@ -106,7 +106,7 @@ export default function SimilarProducts() {
                         {/* IMAGE */}
 
                         <div className="similar-product-image" onClick={(e) => {
-                            router.push(`/store/${product.id}`)
+                            router.push(`/customer/store/${product.id}`)
                         }}>
 
                             <img
@@ -122,7 +122,7 @@ export default function SimilarProducts() {
                         <div className="similar-product-content" >
 
                             <h3 title={product.name} style={{ padding: "unset" }} onClick={(e) => {
-                                router.push(`/store/${product.id}`)
+                            router.push(`/customer/store/${product.id}`)
                             }}>
                                 {product.name}
                             </h3>
@@ -130,7 +130,7 @@ export default function SimilarProducts() {
                             <div className="similar-product-bottom">
 
                                 <span className="similar-product-price" onClick={(e) => {
-                                    router.push(`/store/${product.id}`)
+                                    router.push(`/customer/store/${product.id}`)
                                 }}>
                                     ₦
                                     {new Intl.NumberFormat("en-NG").format(

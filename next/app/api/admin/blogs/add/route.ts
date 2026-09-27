@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { BlogModel } from "@/app/api/lib/models/blog";
+import { BlogModel } from "@/app/api/shared/models/blog";
 
 export const POST = async (req: NextRequest) => {
     try {

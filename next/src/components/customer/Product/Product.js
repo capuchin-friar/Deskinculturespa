@@ -25,7 +25,7 @@ import QuantityCounter from '../QuantityCounter'
 import { data } from 'react-router-dom'
 import useProductHandler from "../../../hooks/product";
 import useToggler from "../../../hooks/toggler"
-import { baseApi } from '../../../../app/api/config'
+import { baseApi } from '../../../../app/api/shared/config'
 let BtnStyles = {
     height: '35px',
     width: '100%',
@@ -114,7 +114,7 @@ const Product = ({ item }) => {
         const {
             data,
             status
-        } = await baseApi.patch("/cart/edit", { id, qty: cartQty });
+        } = await baseApi.patch("/customers/cart/edit", { id, qty: cartQty });
 
         if (!data.success) {
             throw new Error("Error: ", data.message);

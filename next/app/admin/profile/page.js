@@ -61,7 +61,7 @@ export default function UserProfile() {
     set_profileLoading(true)
     set_profileError("")
     try {
-      const { data: res } = await api.get("/user");
+      const { data: res } = await api.get("/admin/user");
       let user = res.data[0];
       if (user) {
         const normalized = normalizeUserRow(user);
@@ -230,7 +230,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_detailErr("")
     set_detailOk(false)
     try {
-      await api.patch(`/user/edit`, {
+      await api.patch(`/admin/user/edit`, {
         fname: fname.trim(),
         lname: lname.trim(),
         location: ({ state: state, city: city, zipcode: "" }),
@@ -254,7 +254,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_emailErr("")
     set_emailOk(false)
     try {
-      await api.patch(`/user/email/`, { email: email.trim() })
+      await api.patch(`/admin/user/email/`, { email: email.trim() })
       await onProfileRefresh?.()
       set_emailOk(true)
       window.setTimeout(() => set_emailOk(false), 2800)
@@ -273,7 +273,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_phoneErr("")
     set_phoneOk(false)
     try {
-      await api.patch(`/user/phone`, { phone: phone.trim() })
+      await api.patch(`/admin/user/phone`, { phone: phone.trim() })
       await onProfileRefresh?.()
       set_phoneOk(true)
       window.setTimeout(() => set_phoneOk(false), 2800)

@@ -171,7 +171,7 @@ export default function Home() {
         <button
           className="customer-service-view-btn"
           onClick={(e) => {
-            window.location.href = `/services`;
+            window.location.href = `/customer/services`;
           }}
         >
           View All
@@ -205,7 +205,7 @@ export default function Home() {
             <button
               className="customer-appointment-btn"
               onClick={(e) => {
-                window.location.href = "/consultation";
+                window.location.href = "/customer/consultation";
               }}
             >
               Book A Consultation Now
@@ -279,7 +279,7 @@ export default function Home() {
 
               <div
                 className="customer-product-body"
-                onClick={() => router.push(`/store/${p.id}`)}
+                onClick={() => router.push(`/customer/store/${p.id}`)}
               >
                 <p className="customer-product-title">
                   {p.name ?? "Product title"}
@@ -294,7 +294,7 @@ export default function Home() {
 
         <button className="customer-product-view-btn">
           <Link
-            href={`/store`}
+            href={`/customer/store`}
             style={{
               height: "100%",
               width: "100%",
@@ -338,7 +338,7 @@ export default function Home() {
         </div>
 
         <button className="customer-package-view-btn" onClick={e => {
-          window.location.href = "/packages"
+          window.location.href = "/customer/packages"
         }}>View All</button>
       </div>
 

@@ -53,11 +53,11 @@ export function Header() {
             resource: [
                 {
                     name: "About Us",
-                    href: "/about"
+                    href: "/customer/about"
                 },
                 {
                     name: "Blogs",
-                    href: "/blogs"
+                    href: "/customer/blogs"
                 },
                 // {
                 //     name: "FAQ",
@@ -65,11 +65,11 @@ export function Header() {
                 // },
                 {
                     name: "Contact Us",
-                    href: "/contact"
+                    href: "/customer/contact"
                 },
                 {
                     name: "Newsletter",
-                    href: "/newsletter"
+                    href: "/customer/newsletter"
                 },
                 // {
                 //     name: "Referral Program",
@@ -77,7 +77,7 @@ export function Header() {
                 // },
                 {
                     name: "Shipping & Returns",
-                    href: "/shipping-returns"
+                    href: "/customer/shipping-returns"
                 }
             ]
         }
@@ -168,7 +168,7 @@ export function Header() {
                                                         key={item.id}
                                                     >
 
-                                                        <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? `/services/${item.id}` : type === "appointments" ? `consultation/${item.id}` : "#"}>
+                                                        <Link href={type === "products" ? `/customer/store/${item.id}` : type === "services" ? `/customer/services/${item.id}` : type === "appointments" ? `/customer/consultation/${item.id}` : "#"}>
                                                             {
                                                                 type === "products" ? 
                                                                 item.name 
@@ -186,7 +186,7 @@ export function Header() {
                                             </ul>
 
                                             <Link
-                                                href={type === "products" ? `/store` : type === "services" ? `/services` : type === "appointments" ? `consultation` : "#"}
+                                                href={type === "products" ? `/customer/store` : type === "services" ? `/customer/services` : type === "appointments" ? `/customer/consultation` : "#"}
                                                 className="mega-menu-view-all"
                                             >
                                                 View all
@@ -299,7 +299,7 @@ export function Header() {
                 <div className="nav-item">
 
                     <span className="nav-item-label" >
-                        <Link href={"gallery"} style={{
+                        <Link href={"/customer/gallery"} style={{
                             textDecoration: "none"
                         }}>
                             Gallery
@@ -420,7 +420,7 @@ export function Header() {
                     type="button"
                     aria-label="Shopping cart"
                     onClick={() => {
-                        window.location.href = "/store/cart";
+                        window.location.href = "/customer/store/cart";
                     }}
                     style={{
                         position: "relative"
@@ -447,7 +447,7 @@ export function Header() {
                     type="button"
                     aria-label="Search"
                     onClick={() => {
-                        window.location.href = "/store/search";
+                        window.location.href = "/customer/store/search";
                     }}
                 >
                     <IoSearchOutline

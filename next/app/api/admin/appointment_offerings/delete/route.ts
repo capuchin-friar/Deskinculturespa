@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { AppointmentModel } from "@/app/api/lib/models/appointment";
+import { AppointmentModel } from "@/app/api/shared/models/appointment";
 
 
 export const DELETE = async (req: NextRequest) => {

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { PaystackButton } from "react-paystack"
 import { useDispatch, useSelector } from "react-redux";
-import { baseApi } from "../../../app/api/config";
+import { baseApi } from "../../../app/api/shared/config";
 import { set_cart } from "../../../redux/customer/cart";
 
 export default function CartSummary() {
@@ -24,7 +24,7 @@ export default function CartSummary() {
             const {
                 data,
                 status
-            } = await baseApi.delete("/cart/delete", {
+            } = await baseApi.delete("/customers/cart/delete", {
                 data: {
                     id: cartId
                 }
@@ -58,7 +58,7 @@ export default function CartSummary() {
         const {
             data,
             status
-        } = await baseApi.patch("/cart/edit", { id, qty: cartQty });
+        } = await baseApi.patch("/customers/cart/edit", { id, qty: cartQty });
 
         if (!data.success) {
             throw new Error("Error: ", data.message);
@@ -121,7 +121,7 @@ export default function CartSummary() {
                     buyer_locale: `${buyer_info.campus} in ${buyer_info.state}`
                 }),
             });
-            window.location.href = `/store/orders/${order_list?.product?.product_id}/tracker`;
+            window.location.href = `/customer/store/orders/${order_list?.product?.product_id}/tracker`;
 
         },
         onClose: () => {

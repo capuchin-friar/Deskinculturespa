@@ -20,7 +20,7 @@ import "./styles/customer/mega-header.css"
 import { Aside } from "@/src/components/customer/Aside";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { baseApi } from "@/app/api/config";
+import { baseApi } from "@/app/api/shared/config";
 import { useDispatch } from "react-redux";
 import { set_cart } from "@/redux/customer/cart";
 
@@ -38,14 +38,14 @@ export default function Customer({ children }) {
                 const {
                     data,
                     status
-                } = await baseApi.get("/cart");
+                } = await baseApi.get("/customers/cart");
 
                 if (!data.success) {
                     throw new Error("Error: ", data.message);
                 }
                 dispatch(set_cart(data.data));
                 console.log(pathname)
-                let path = pathname.length == 2 && pathname[1] === "store";
+                let path = pathname.length == 3 && pathname[2] === "store";
                 setPath(path);
             } catch (error) {
                 console.log(error);

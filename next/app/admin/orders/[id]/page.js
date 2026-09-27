@@ -688,7 +688,7 @@ export default function VendorOrderDetailPage() {
 
         {!loading && order ? (
           <>
-            <Link href="/entrepreneur/orders" className="vendor-order-back">
+            <Link href="/admin/orders" className="vendor-order-back">
               <span aria-hidden>←</span> Orders
             </Link>
 

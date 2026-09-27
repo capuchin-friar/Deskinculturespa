@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { set_cart } from "../../../../redux/customer/cart";
 import Thumbnail from "../../Thumbnail";
 import axios from "axios";
-import { baseApi } from "../../../../app/api/config";
+import { baseApi } from "../../../../app/api/shared/config";
 import useToggler from "../../../hooks/toggler";
 
 const Card = ({ item, index, getTotalPrice }) => {
@@ -37,7 +37,7 @@ const Card = ({ item, index, getTotalPrice }) => {
   async function updateHandler(type, qty, id) {
     setLoading(true);
     let cartQty = type === "add" ? qty + 1 : qty - 1;
-    const { data, status } = await baseApi.patch("/cart/edit", {
+    const { data, status } = await baseApi.patch("/customers/cart/edit", {
       id,
       qty: cartQty,
     });

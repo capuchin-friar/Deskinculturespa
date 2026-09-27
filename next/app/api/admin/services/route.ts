@@ -7,7 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { ServiceModel } from "../../lib/models/service";
+import { ServiceModel } from "../../shared/models/service";
 
 
 export const GET = async (request: NextRequest) => {

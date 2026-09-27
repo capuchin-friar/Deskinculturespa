@@ -7,9 +7,8 @@ import {
 } from "react-icons/io5";
 import "./styles/xxl.css";
 import {
-    api,
-    baseApi
-} from "../../../api/config";
+    api
+} from "../../../api/shared/config";
 import Select from "react-select";
 import uuidV4 from "uuid-v4";
 
@@ -450,7 +449,7 @@ export default function CreateProductPage() {
                 const {
                     data,
                     status
-                } = await baseApi.post(
+                } = await api.post(
                     "upload",
                     formData,
                     {
@@ -624,7 +623,7 @@ export default function CreateProductPage() {
         const {
             data,
             status
-        } = await baseApi.delete(
+                } = await api.delete(
             "delete",
             {
                 data: {

@@ -12,7 +12,7 @@ import Select from "react-select";
 import "./styles/xxl.css";
 import _SERVICES from "../../../../src/json/services.json";
 import uuidV4 from "uuid-v4";
-import { api, baseApi } from "../../../api/config";
+import { api } from "../../../api/shared/config";
 
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -187,7 +187,7 @@ export default function AddServicePage() {
                 const {
                     data,
                     status,
-                } = await baseApi.post(
+                } = await api.post(
                     "upload",
                     formData,
                     {
@@ -325,7 +325,7 @@ export default function AddServicePage() {
         const {
             data,
             status,
-        } = await baseApi.delete(
+        } = await api.delete(
             "delete",
             {
                 data: {
