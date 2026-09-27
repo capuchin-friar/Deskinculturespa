@@ -2,6 +2,9 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import './styles/s.css'
 import './styles/xxl.css'
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import location from "../../../src/json/location.json"

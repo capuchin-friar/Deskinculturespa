@@ -9,6 +9,9 @@ import { getOrdersByShop, getShopsByOwner, patchShopOrderStatus } from "../../..
 import { set_entrepreneur_shop_details } from "../../../../redux/entrepreneur/entrepreneur_shop"
 import "./styles/s.css"
 import "./styles/xxl.css"
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 
 const VendorOrderLocationMap = dynamic(() => import("./VendorOrderLocationMap"), { ssr: false })
 

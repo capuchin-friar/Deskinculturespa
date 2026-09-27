@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import useServiceHandler from "../../../../src/hooks/service";
 import Formatter from "../../../../src/utils/formatter";
 import useToggler from "../../../../src/hooks/toggler";

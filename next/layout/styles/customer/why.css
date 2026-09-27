@@ -100,37 +100,7 @@
 }
 
 /* Mobile */
-@media (max-width: 600px) {
+/* @media (max-width: 600px) {
 
-    .why-choose-us {
-        padding: 60px 20px;
-    }
 
-    .why-choose-header {
-        margin-bottom: 35px;
-    }
-
-    .why-choose-header h2 {
-        font-size: 27px;
-    }
-
-    .why-choose-list {
-        grid-template-columns: 1fr;
-        gap: 28px;
-    }
-
-    .why-choose-item {
-        gap: 15px;
-    }
-
-    .why-choose-icon {
-        width: 65px;
-        height: 65px;
-        flex-basis: 65px;
-    }
-
-    .why-choose-content h3 {
-        font-size: 16px;
-    }
-
-}
+} */

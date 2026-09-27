@@ -1,5 +1,6 @@
 import {
     IoCartOutline,
+    IoMenu,
     IoPersonOutline,
     IoSearchOutline
 } from "react-icons/io5";
@@ -14,7 +15,12 @@ import { useSelector } from "react-redux";
 export function Header() {
     const [products, setProducts] = useState([]);
     const [services, setServices] = useState([]);
+    const [screenWidth, setScreenWidth] = useState(0);
     const [appointments, setAppointments] = useState([]);
+
+    useEffect(() => {
+        setScreenWidth(window.screen.width);
+    }, []);
 
     let {
         cart
@@ -111,6 +117,10 @@ export function Header() {
                 {/* =========================
                     SHOP
                 ========================== */}
+
+                {
+                    screenWidth <= 480 ? <IoMenu size={30} /> : ''
+                }
 
                 <div className="nav-item">
 
@@ -395,11 +405,18 @@ export function Header() {
                 <span className="customer-logo">
 
                     <img
-                        src=""
+                        src="logo.jpeg"
                         alt="De Skin Culture"
+                        style={{
+                            height: "35px",
+                            width: "35px"
+                        }}
                     />
 
                 </span>
+
+                &nbsp;
+                &nbsp;
 
                 <span className="customer-brand-name">
                     <b>

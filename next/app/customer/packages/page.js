@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import { useEffect, useMemo, useState } from "react";
 import Formatter from "../../../src/utils/formatter";
 import useToggler from "../../../src/hooks/toggler";

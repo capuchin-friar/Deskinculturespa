@@ -13,6 +13,9 @@ import {
   IoLocationOutline
 } from "react-icons/io5";
 import "./appointment.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 function shopRowId(s) {
   return s?.id ?? s?.shop_id
 }

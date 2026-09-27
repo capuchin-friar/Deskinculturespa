@@ -4,6 +4,9 @@ import React, { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import "./styles/xxl.css"
 import "./styles/s.css"
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import { api } from "../../api/shared/config"
 
 
@@ -136,5 +139,3 @@ export default function InventoryPage() {
         </div>
     )
 }
-
-

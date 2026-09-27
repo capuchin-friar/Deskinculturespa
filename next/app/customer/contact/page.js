@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import "./style/xxl.css";
+import "./style/mobile.css";
+import "./style/tablet.css";
+import "./style/ipad.css";
 
 
 export default function ContactPage() {

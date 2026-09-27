@@ -1,4 +1,7 @@
 "use client"
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 
 import { useCallback } from "react";
 import {

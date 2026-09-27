@@ -7,6 +7,9 @@ import { useDispatch, useSelector } from "react-redux"
 // import { set_admin_shop_details } from "../../../redux/admin/admin_shop"
 import "./styles/xxl.css"
 import "./styles/s.css"
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 
 function shopRowId(s) {
   return s?.id ?? s?.shop_id

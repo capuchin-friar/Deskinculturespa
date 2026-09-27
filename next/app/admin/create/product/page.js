@@ -6,6 +6,9 @@ import {
     IoTrashBin
 } from "react-icons/io5";
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import {
     api
 } from "../../../api/shared/config";

@@ -10,6 +10,9 @@ import {
 } from "react-icons/io5";
 import Select from "react-select";
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import _SERVICES from "../../../../src/json/services.json";
 import uuidV4 from "uuid-v4";
 import { api } from "../../../api/shared/config";

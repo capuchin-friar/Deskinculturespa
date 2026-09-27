@@ -1,5 +1,8 @@
 import Link from "next/link";
 import "./style/xxl.css";
+import "./style/mobile.css";
+import "./style/tablet.css";
+import "./style/ipad.css";
 
 export default function AboutPage() {
     return (

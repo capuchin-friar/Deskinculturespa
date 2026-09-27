@@ -13,6 +13,9 @@ import {
 } from "react-icons/io5";
 
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;

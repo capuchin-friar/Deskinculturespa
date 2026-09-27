@@ -6,6 +6,9 @@ import '@/app/customer/store/[id]/styles/large.css'
 import '@/app/customer/store/[id]/styles/semi-medium.css'
 import '@/app/customer/store/[id]/styles/medium.css'
 import '@/app/customer/store/[id]/styles/g.css'
+import '@/app/customer/store/[id]/styles/mobile.css'
+import '@/app/customer/store/[id]/styles/tablet.css'
+import '@/app/customer/store/[id]/styles/ipad.css'
 import Product from "@/src/components/customer/Product/Product";
 import { useEffect, useRef, useState } from "react";
 import Description from "@/src/components/customer/Product/Description";

@@ -188,7 +188,7 @@ Ifite-Awka, Green House`}
 
             {/* Copyright */}
             <div className="dsc-footer-copyright">
-                © {new Date().getFullYear()} De Skin Culture.
+                © {new Date().getFullYear()} <i>DeSkinCulture</i>.
                 All rights reserved.
             </div>
 

@@ -1,6 +1,9 @@
 "use client"
 
 import "./styles/xxl.css";
+import "./styles/mobile.css";
+import "./styles/tablet.css";
+import "./styles/ipad.css";
 import "./styles/g.css";
 import locations from "../../../../src/json/location.json";
 import { useEffect, useState } from "react";
