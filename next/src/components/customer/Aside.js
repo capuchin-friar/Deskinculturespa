@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux";
 import uuid from "uuid-v4";
 import { set_filters } from "@/redux/customer/filter";
 
-export function Aside() {
+export function Aside({ isMobileFilterOpen = false }) {
 
     let dispatch = useDispatch();
     const MAX_PRICE = 100000000;
@@ -37,7 +37,10 @@ export function Aside() {
 
     return (
         <>
-            <aside className="customer-aside">
+            <aside
+                id="customer-store-filter"
+                className={`customer-aside${isMobileFilterOpen ? " customer-aside--mobile-open" : ""}`}
+            >
                 <section className="filter-headline">
                     <span>
                         <IoFilterOutline size={25} fontWeight={"bold"} />

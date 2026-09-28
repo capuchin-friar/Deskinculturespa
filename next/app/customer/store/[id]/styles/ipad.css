@@ -1,3 +1,18 @@
 @media (min-width: 761px) and (max-width: 1199px) {
-
+  .dsc-pdp-page { padding: 26px clamp(28px, 5vw, 58px) 64px; }
+  .dsc-pdp-breadcrumbs { margin-bottom: 24px; }
+  .dsc-pdp__hero {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.96fr);
+    gap: clamp(26px, 4vw, 48px);
+  }
+  .dsc-pdp__image-stage { aspect-ratio: 1 / 1; }
+  .dsc-pdp__main-image { width: 88%; height: 88%; }
+  .dsc-pdp__thumbnail { flex-basis: 68px; width: 68px; height: 68px; }
+  .dsc-pdp__summary { padding-top: 16px; }
+  .dsc-pdp__title { font-size: clamp(31px, 3.6vw, 40px); letter-spacing: -1.1px; }
+  .dsc-pdp__intro { font-size: 14px; line-height: 1.7; }
+  .dsc-pdp__purchase { grid-template-columns: 108px minmax(0, 1fr); gap: 10px; }
+  .dsc-pdp__cart-button { padding-inline: 12px; font-size: 13px; }
+  .dsc-pdp__product-meta { gap: 12px 18px; }
+  .dsc-pdp__details { margin-top: 60px; }
 }

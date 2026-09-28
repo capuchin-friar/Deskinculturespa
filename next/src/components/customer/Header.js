@@ -3,6 +3,7 @@ import {
     IoChevronForward,
     IoClose,
     IoCartOutline,
+    IoFilterOutline,
     IoMenu,
     IoPersonOutline
 } from "react-icons/io5";
@@ -14,7 +15,12 @@ import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
 
-export function Header() {
+export function Header({
+    storeFilterEnabled = false,
+    storeFilterOpen = false,
+    onToggleStoreFilter,
+    onCloseStoreFilter,
+}) {
     const [products, setProducts] = useState([]);
     const [services, setServices] = useState([]);
     const [appointments, setAppointments] = useState([]);
@@ -222,18 +228,35 @@ export function Header() {
     return (
         <header className="customer-header">
 
-            <button
-                type="button"
-                className="customer-mobile-menu-trigger"
-                aria-label="Open navigation menu"
-                aria-expanded={mobileMenuOpen}
-                onClick={() => {
-                    setMobileMenuStack([]);
-                    setMobileMenuOpen(true);
-                }}
-            >
-                <IoMenu size={25} aria-hidden="true" />
-            </button>
+            <div className="customer-header-mobile-controls">
+                <button
+                    type="button"
+                    className="customer-mobile-menu-trigger"
+                    aria-label="Open navigation menu"
+                    aria-expanded={mobileMenuOpen}
+                    disabled={storeFilterOpen}
+                    onClick={() => {
+                        onCloseStoreFilter?.();
+                        setMobileMenuStack([]);
+                        setMobileMenuOpen(true);
+                    }}
+                >
+                    <IoMenu size={25} aria-hidden="true" />
+                </button>
+                {storeFilterEnabled && (
+                    <button
+                        type="button"
+                        className="customer-store-filter-toggle"
+                        aria-label={storeFilterOpen ? "Close store filters" : "Open store filters"}
+                        aria-controls="customer-store-filter"
+                        aria-expanded={storeFilterOpen}
+                        onClick={onToggleStoreFilter}
+                    >
+                        <IoFilterOutline size={19} aria-hidden="true" />
+                        {/* <span>Filter</span> */}
+                    </button>
+                )}
+            </div>
 
             {/* =========================
                 LEFT NAVIGATION

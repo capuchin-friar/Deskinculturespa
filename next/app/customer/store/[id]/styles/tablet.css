@@ -1,3 +1,14 @@
 @media (min-width: 481px) and (max-width: 760px) {
-
+  .dsc-pdp-page { padding: 24px 28px 56px; }
+  .dsc-pdp-breadcrumbs { margin-bottom: 22px; }
+  .dsc-pdp__hero { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .dsc-pdp__image-stage { max-height: 560px; aspect-ratio: 1 / 0.88; }
+  .dsc-pdp__main-image { width: 82%; height: 82%; }
+  .dsc-pdp__thumbnails { gap: 10px; }
+  .dsc-pdp__thumbnail { flex-basis: 70px; width: 70px; height: 70px; }
+  .dsc-pdp__summary { padding: 0 0 8px; }
+  .dsc-pdp__title { max-width: 640px; font-size: clamp(34px, 6vw, 42px); }
+  .dsc-pdp__intro { max-width: 620px; }
+  .dsc-pdp__purchase { max-width: 520px; }
+  .dsc-pdp__details { margin-top: 54px; }
 }

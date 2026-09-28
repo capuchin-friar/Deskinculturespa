@@ -17,6 +17,9 @@ import "./styles/customer/xxl.css";
 import "./styles/customer/why.css";
 import "./styles/customer/footer.css"
 import "./styles/customer/mega-header.css"
+import "./styles/customer/mobile.css"
+import "./styles/customer/tablet.css"
+import "./styles/customer/ipad.css"
 import "./styles/customer/mobile-menu.css"
 import { Aside } from "@/src/components/customer/Aside";
 import { usePathname } from "next/navigation";
@@ -29,8 +32,10 @@ import { set_cart } from "@/redux/customer/cart";
 
 export default function Customer({ children }) {
 
-    let pathname = usePathname().split("/");
-    let [path, setPath] = useState(false);
+    let pathname = usePathname();
+    let path = ["/customer/store", "/store"].includes(pathname);
+    let [storeFilterOpen, setStoreFilterOpen] = useState(false);
+    let isStoreFilterOpen = path && storeFilterOpen;
 
     let dispatch = useDispatch();
     useEffect(() => {
@@ -45,15 +50,52 @@ export default function Customer({ children }) {
                     throw new Error("Error: ", data.message);
                 }
                 dispatch(set_cart(data.data));
-                console.log(pathname)
-                let path = pathname.length == 3 && pathname[2] === "store";
-                setPath(path);
             } catch (error) {
                 console.log(error);
             }
         })();
 
-    }, [pathname]);
+    }, [pathname, dispatch]);
+
+    useEffect(() => {
+        if (!isStoreFilterOpen) return undefined;
+
+        const bodyStyle = {
+            position: document.body.style.position,
+            top: document.body.style.top,
+            left: document.body.style.left,
+            right: document.body.style.right,
+            width: document.body.style.width,
+            overflow: document.body.style.overflow,
+        };
+        const htmlOverflow = document.documentElement.style.overflow;
+        const scrollY = window.scrollY;
+        const closeFilter = () => setStoreFilterOpen(false);
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") closeFilter();
+        };
+        const handleResize = () => {
+            if (window.innerWidth > 480) closeFilter();
+        };
+
+        document.body.style.position = "fixed";
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = "0";
+        document.body.style.right = "0";
+        document.body.style.width = "100%";
+        document.body.style.overflow = "hidden";
+        document.documentElement.style.overflow = "hidden";
+        document.addEventListener("keydown", handleKeyDown);
+        window.addEventListener("resize", handleResize);
+
+        return () => {
+            Object.assign(document.body.style, bodyStyle);
+            document.documentElement.style.overflow = htmlOverflow;
+            document.removeEventListener("keydown", handleKeyDown);
+            window.removeEventListener("resize", handleResize);
+            window.scrollTo(0, scrollY);
+        };
+    }, [isStoreFilterOpen]);
 
 
     return (
@@ -62,10 +104,27 @@ export default function Customer({ children }) {
 
 
                 <div className="customer-content">
-                    <Header />
+                    <Header
+                        storeFilterEnabled={path}
+                        storeFilterOpen={isStoreFilterOpen}
+                        onToggleStoreFilter={() => setStoreFilterOpen((open) => !open)}
+                        onCloseStoreFilter={() => setStoreFilterOpen(false)}
+                    />
                     <div className="customer-body" style={{marginTop: "60px"}}>
                         {
-                            path && <Aside />
+                            path && (
+                                <>
+                                    <button
+                                        type="button"
+                                        className={`customer-store-filter-backdrop${isStoreFilterOpen ? " is-open" : ""}`}
+                                        aria-label="Close store filters"
+                                        aria-hidden={!isStoreFilterOpen}
+                                        tabIndex={isStoreFilterOpen ? 0 : -1}
+                                        onClick={() => setStoreFilterOpen(false)}
+                                    />
+                                    <Aside isMobileFilterOpen={isStoreFilterOpen} />
+                                </>
+                            )
                         }
                         <Main children={children} />
                     </div>

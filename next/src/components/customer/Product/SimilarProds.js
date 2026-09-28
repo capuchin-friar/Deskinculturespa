@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+import Image from "next/image";
 import {
     IoChevronBack,
     IoChevronForward,
@@ -12,7 +13,7 @@ import useToggler from "../../../hooks/toggler";
 import { useRouter } from "next/navigation";
 import useProductHandler from "../../../hooks/product";
 
-export default function SimilarProducts() {
+export default function SimilarProducts({ productId, category }) {
     const carouselRef = useRef(null);
     const router = useRouter();
 
@@ -29,8 +30,6 @@ export default function SimilarProducts() {
         });
     };
 
-    const [products, setProducts] = useState([]);
-
     const {
         addToCart,
         rmFromCart,
@@ -38,13 +37,14 @@ export default function SimilarProducts() {
     } = useToggler();
 
 
-    const {
-        products: prods
-    } = useProductHandler();
+    const { products } = useProductHandler();
 
-    useEffect(() => {
-        setProducts(prods)
-    }, [prods]);
+    const relatedProducts = products.filter((product) =>
+        String(product.id) !== String(productId) &&
+        (!category || product.category?.toLowerCase() === category.toLowerCase())
+    );
+
+    if (!relatedProducts.length) return null;
 
     return (
         <section className="similar-products">
@@ -96,7 +96,7 @@ export default function SimilarProducts() {
                 ref={carouselRef}
             >
 
-                {products.map((product) => (
+                {relatedProducts.map((product) => (
 
                     <article
                         className="similar-product-card"
@@ -105,13 +105,16 @@ export default function SimilarProducts() {
 
                         {/* IMAGE */}
 
-                        <div className="similar-product-image" onClick={(e) => {
+                        <div className="similar-product-image" onClick={() => {
                             router.push(`/customer/store/${product.id}`)
                         }}>
 
-                            <img
+                            <Image
                                 src={product.thumbnail_url}
                                 alt={product.name}
+                                width={600}
+                                height={600}
+                                unoptimized
                             />
 
                         </div>
@@ -121,7 +124,7 @@ export default function SimilarProducts() {
 
                         <div className="similar-product-content" >
 
-                            <h3 title={product.name} style={{ padding: "unset" }} onClick={(e) => {
+                            <h3 title={product.name} style={{ padding: "unset" }} onClick={() => {
                             router.push(`/customer/store/${product.id}`)
                             }}>
                                 {product.name}
@@ -129,7 +132,7 @@ export default function SimilarProducts() {
 
                             <div className="similar-product-bottom">
 
-                                <span className="similar-product-price" onClick={(e) => {
+                                <span className="similar-product-price" onClick={() => {
                                     router.push(`/customer/store/${product.id}`)
                                 }}>
                                     ₦

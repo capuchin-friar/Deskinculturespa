@@ -1,275 +1,216 @@
-// import cartSvg from '../../../assets/add-to-the-cart-svgrepo-com.svg'
-// import ytcartSvg from '../../../assets/add-to-cart-yt.svg'
-import {
-    useEffect,
-    useState
-} from 'react'
+"use client";
 
-import {
-    useDispatch,
-    useSelector
-} from 'react-redux'
-import ItemImgs from './ItemImgs'
-import Share from './Share'
-// import SaveButton from '../dashboard/SaveButton'
-// import { UnSaveItem } from '@/app/api/buyer/delete'
-// import { setSaveTo } from '@/redux/buyer_store/Save'
-// import { SaveItem } from '@/app/api/buyer/post'
-import Contact from './Contact'
-import Link from 'next/link'
-import axios from 'axios'
-import { IoCart, IoCartOutline, IoCubeOutline, IoImageOutline } from 'react-icons/io5'
-import StarRating from '../../../utils/star'
-import { set_cart } from '../../../../redux/customer/cart'
-import QuantityCounter from '../QuantityCounter'
-import { data } from 'react-router-dom'
-import useProductHandler from "../../../hooks/product";
-import useToggler from "../../../hooks/toggler"
-import { baseApi } from '../../../../app/api/shared/config'
-let BtnStyles = {
-    height: '35px',
-    width: '100%',
-    borderRadius: '5px',
-    outline: 'none',
-    // padding: '0',
-    border: 'none',
-    float: 'left',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#fff',
-    fontSize: 'small',
-    fontWeight: '500',
-    backgroundColor: '#278A3D',
-    margin: '0'
-}
+import { useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import Image from "next/image";
+import { IoChevronBack, IoChevronForward, IoCubeOutline, IoImageOutline } from "react-icons/io5";
+import { baseApi } from "@/app/api/shared/config";
+import useToggler from "@/src/hooks/toggler";
 
-const Product = ({ item }) => {
-    let dispatch = useDispatch()
+const getImageUrl = (image) => {
+  if (typeof image === "string") return image.trim();
+  if (image && typeof image === "object") {
+    return String(image.secure_url || image.url || image.src || "").trim();
+  }
+  return "";
+};
 
-    let { cart } = useSelector(s => s.cart);
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-NG", { maximumFractionDigits: 0 }).format(Number(price) || 0);
 
+export default function Product({ item }) {
+  const { cart } = useSelector((state) => state.cart);
+  const { addToCart, rmFromCart, refreshCart } = useToggler();
+  const [activeImage, setActiveImage] = useState(0);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const [busy, setBusy] = useState(false);
+  const [cartMessage, setCartMessage] = useState("");
+  const touchStartX = useRef(null);
 
-    let user_id = {};
-    let ItemImages = [];
-    let ActiveImg = {};
+  const candidates = [item?.thumbnail_url, ...(Array.isArray(item?.images) ? item.images : [])]
+    .map(getImageUrl)
+    .filter(Boolean);
+  const images = [...new Set(candidates)];
 
-    const {
-        addToCart,
-        rmFromCart,
-        isCarted
-    } = useToggler();
+  const cartItem = cart.find((entry) => String(entry.product_id) === String(item?.id));
+  const stock = Number(item?.stock);
+  const hasStockValue = item?.stock !== null && item?.stock !== undefined && Number.isFinite(stock);
+  const outOfStock = hasStockValue && stock <= 0;
+  const maxQuantity = hasStockValue && stock > 0 ? Math.min(99, stock) : 99;
+  const currentQuantity = cartItem
+    ? Math.max(1, Math.min(Number(cartItem.quantity) || 1, maxQuantity))
+    : quantity;
+  const currentImage = images[activeImage] || "";
 
-    // let {
-    //     user_id
-    // } = useSelector(s => s.user_id);
-    // let { 
-    //     savedItem
-    // } = useSelector(s => s.savedItem)
-    // let {
-    //     buyer_info
-    // } = useSelector(s => s.buyer_info);
-    let [saved, setSaved] = useState(false)
-    let [btnMode, setBtnMode] = useState(true)
-    let [searchParams, setsearchParams] = useState({})
-    // let {ItemImages} = useSelector(s => s.itemImages)
-    // let {ActiveImg} = useSelector(s => s.ActiveImg)
+  const showImage = (index) => {
+    if (!images.length) return;
+    setActiveImage((index + images.length) % images.length);
+    setImageFailed(false);
+  };
 
-    let [metaImg, setMetaImg] = useState('')
-    let [screenWidth, setScreenWidth] = useState(0)
-    let [loading, setLoading] = useState(false);
-    let [qty, setQty] = useState(1);
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null || images.length < 2) return;
+    const delta = event.changedTouches[0].clientX - touchStartX.current;
+    if (Math.abs(delta) > 45) showImage(activeImage + (delta < 0 ? 1 : -1));
+    touchStartX.current = null;
+  };
 
-
-
-    // useEffect(() => { setMetaImg(ItemImages[0]) }, [])
-    // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)}, [ItemImages])
-    // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)},[])
-    // useEffect(() => {setActiveImg(ItemImages?.length > 0 ? ItemImages[ActiveImg].secure_url : imgSvg)},[ActiveImg])
-
-    useEffect(() => {
-        const searchParams = new URLSearchParams(window.location.search);
-        if (searchParams?.get('id')) {
-            setActiveImg('')
-        }
-    }, [searchParams])
-    useEffect(() => { let width = window.innerWidth; setScreenWidth(width) }, [])
-
-
-    const handleRatingChange = (newRating) => setRating(newRating);
-    const buyNow = () => "";
-
-    useEffect(() => {
-        let cartedProd = cart.find(c => c.product_id === item.id);
-        if (cartedProd) {
-            setQty(cartedProd.quantity);
-        }
-    }, [cart]);
-
-
-
-    async function updateHandler(type, qty, id) {
-        setLoading(true);
-        let cartQty = type === "add" ? qty + 1 : qty - 1;
-        const {
-            data,
-            status
-        } = await baseApi.patch("/customers/cart/edit", { id, qty: cartQty });
-
-        if (!data.success) {
-            throw new Error("Error: ", data.message);
-            setLoading(false)
-        }
-        if (data.success) {
-            dispatch(
-                set_cart(
-                    cart.map(c =>
-                        c?.id == id
-                            ? { ...c, quantity: cartQty }
-                            : c
-                    )
-                )
-            );
-            setLoading(false)
-        }
+  const changeQuantity = async (nextQuantity) => {
+    const next = Math.max(1, Math.min(maxQuantity, nextQuantity));
+    setCartMessage("");
+    if (!cartItem) {
+      setQuantity(next);
+      return;
     }
 
-
-    async function toggleCart() {
-        let isProductCarted = isCarted(item.id);
-
-        if (isProductCarted) {
-            await rmFromCart(item.id);
-            setQty(1);
-        } else {
-            await addToCart({item, qty})
-        }
-
+    setBusy(true);
+    try {
+      const { data } = await baseApi.patch("/customers/cart/edit", {
+        id: String(cartItem.id),
+        qty: next,
+      });
+      if (!data?.success) throw new Error(data?.message || "Could not update quantity.");
+      await refreshCart();
+    } catch (error) {
+      setCartMessage(error?.message || "Could not update quantity. Please try again.");
+    } finally {
+      setBusy(false);
     }
+  };
 
-    let [activeImg, setActiveImg] = useState(0);
-
-    function handleActiveImage(data) {
-        setActiveImg(data)
+  const handleCartAction = async () => {
+    setBusy(true);
+    setCartMessage("");
+    try {
+      const succeeded = cartItem
+        ? await rmFromCart(cartItem.product_id)
+        : await addToCart({ item: { ...item, id: String(item.id) }, qty: currentQuantity });
+      if (!succeeded) throw new Error(cartItem ? "Could not remove this product from your bag." : "Could not add this product to your bag.");
+      setCartMessage(cartItem ? "Removed from your bag." : "Added to your bag.");
+      if (cartItem) setQuantity(1);
+    } catch (error) {
+      setCartMessage(error?.message || "Something went wrong. Please try again.");
+    } finally {
+      setBusy(false);
     }
+  };
 
-    return (
-        <>
+  const productName = item?.name || item?.title || "Product";
 
-            <div className="overlay">
-                <div className="loader">
-                </div>
+  return (
+    <section className="dsc-pdp" aria-labelledby="dsc-pdp-title">
+      <div className="dsc-pdp__hero">
+        <div className="dsc-pdp__gallery" aria-label="Product images">
+          <div
+            className="dsc-pdp__image-stage"
+            onTouchStart={(event) => { touchStartX.current = event.touches[0].clientX; }}
+            onTouchEnd={handleTouchEnd}
+          >
+            {currentImage && !imageFailed ? (
+              <Image
+                className="dsc-pdp__main-image"
+                src={currentImage}
+                alt={productName}
+                width={1000}
+                height={1000}
+                unoptimized
+                onError={() => setImageFailed(true)}
+              />
+            ) : (
+              <div className="dsc-pdp__image-placeholder" role="img" aria-label={`${productName} image unavailable`}>
+                <IoImageOutline aria-hidden="true" />
+                <span>Product image unavailable</span>
+              </div>
+            )}
+
+            {images.length > 1 && (
+              <>
+                <button className="dsc-pdp__gallery-arrow dsc-pdp__gallery-arrow--previous" type="button" onClick={() => showImage(activeImage - 1)} aria-label="Previous product image">
+                  <IoChevronBack aria-hidden="true" />
+                </button>
+                <button className="dsc-pdp__gallery-arrow dsc-pdp__gallery-arrow--next" type="button" onClick={() => showImage(activeImage + 1)} aria-label="Next product image">
+                  <IoChevronForward aria-hidden="true" />
+                </button>
+                <span className="dsc-pdp__image-count">{activeImage + 1} / {images.length}</span>
+              </>
+            )}
+          </div>
+
+          {images.length > 1 && (
+            <div className="dsc-pdp__thumbnails" aria-label="Choose a product image">
+              {images.map((image, index) => (
+                <button
+                  className={`dsc-pdp__thumbnail${index === activeImage ? " is-active" : ""}`}
+                  type="button"
+                  key={`${image}-${index}`}
+                  onClick={() => showImage(index)}
+                  aria-label={`Show product image ${index + 1}`}
+                  aria-pressed={index === activeImage}
+                >
+                  <Image src={image} alt="" width={120} height={120} unoptimized loading="lazy" />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="dsc-pdp__summary">
+          {(item?.brand || item?.category) && (
+            <div className="dsc-pdp__eyebrow">
+              {item?.brand && <span>{item.brand}</span>}
+              {item?.brand && item?.category && <span aria-hidden="true">·</span>}
+              {item?.category && <span>{item.category}</span>}
+            </div>
+          )}
+
+          <h1 className="dsc-pdp__title" id="dsc-pdp-title">{productName}</h1>
+
+          <p className="dsc-pdp__price">₦{formatPrice(item?.price)}</p>
+
+          {item?.description && <p className="dsc-pdp__intro">{item.description}</p>}
+
+          {hasStockValue && (
+            <div className={`dsc-pdp__availability${outOfStock ? " is-out-of-stock" : ""}`}>
+              <IoCubeOutline aria-hidden="true" />
+              <span>{outOfStock ? "Currently unavailable" : `${stock} ${stock === 1 ? "unit" : "units"} available`}</span>
+            </div>
+          )}
+
+          <div className="dsc-pdp__purchase">
+            <div className="dsc-pdp__quantity-field">
+              <span className="dsc-pdp__field-label">Quantity</span>
+              <div className="dsc-pdp__quantity" aria-label="Product quantity">
+                <button type="button" onClick={() => changeQuantity(currentQuantity - 1)} disabled={busy || currentQuantity <= 1 || outOfStock} aria-label="Decrease quantity">−</button>
+                <output aria-live="polite">{currentQuantity}</output>
+                <button type="button" onClick={() => changeQuantity(currentQuantity + 1)} disabled={busy || currentQuantity >= maxQuantity || outOfStock} aria-label="Increase quantity">+</button>
+              </div>
             </div>
 
-            <div className="buyer-product-data">
-                <div id="left">
-                    {
+            <button className="dsc-pdp__cart-button" type="button" onClick={handleCartAction} disabled={busy || outOfStock}>
+              {busy ? "Updating…" : cartItem ? "Remove from bag" : "Add to bag"}
+            </button>
+          </div>
 
-                        <div className="img-cnt" style={{ backgroundImage: `url(${item.images[activeImg]})`, borderRadius: '5px', backgroundRepeat: 'no-repeat', backgroundSize: '350px 350px', backgroundPosition: 'center' }}>
-                            <img src={item.images[activeImg]} style={{ height: '100%', width: '100%', borderRadius: '5px' }} alt="" loading="lazy" />
-                        </div>
-                    }
-                    {
-                        item
-                            ?
-                            <ItemImgs
-                                imgList={item?.images}
-                                activeImg={activeImg}
-                                handleActiveImage={handleActiveImage}
-                            />
-                            :
-                            ''
-                    }
-                </div>
+          <p className="dsc-pdp__cart-message" role="status" aria-live="polite">{cartMessage}</p>
 
-                <div id="right" style={{ position: 'relative' }}>
+          <div className="dsc-pdp__product-meta">
+            {item?.brand && <div><span>Brand</span><strong>{item.brand}</strong></div>}
+            {item?.category && <div><span>Category</span><strong>{item.category}</strong></div>}
+            {item?.subcategory && <div><span>Collection</span><strong>{item.subcategory}</strong></div>}
+          </div>
+        </div>
+      </div>
 
-                    <div style={{ borderBottom: '1px solid #696969' }}>
-                        <div style={{ fontSize: '3vh', marginBottom: '10px' }}>{item?.name ?? item?.title}</div>
-                        <div style={{ fontSize: '13px', marginBottom: '10px' }}>
-                            Category: <span style={{ color: 'blue' }}>{item?.category}</span> | <span style={{ color: 'blue' }}>Similar products from {item?.category}</span>
-                        </div>
-                    </div>
-
-                    {
-
-                        <div style={{ background: '#fff', padding: '10px', color: '#278A3D', fontWeight: '500', position: 'relative', borderRadius: '5px', height: 'fit-content' }}>
-
-                            <p style={{ fontWeight: '700', margin: '0', padding: '10px 0', fontSize: '3.5vh', color: '#000' }}>
-                                <small>&#8358;</small>{new Intl.NumberFormat('en-us').format(item?.price)}
-                            </p>
-
-
-                            <h3 style={{ fontSize: 'small', fontWeight: 'bold', textDecoration: 'underline', padding: '0px', textTransform: 'capitalize', color: '#278A3D', marginBottom: '10px', display: "flex", alignItems: 'center', justifyContent: 'flex-start' }}>
-                                <IoCubeOutline size={25} /> &nbsp; {item?.stock} units available
-                            </h3>
-                            <br />
-
-                            <div className="buyer-items-stock" data-price={item.price} style={{
-                                opacity: cart.some(c => c.product_id === item.id) ? 1 : .5,
-                                pointerEvents: cart.some(c => c.product_id === item.id)
-                            }}>
-                                <button onClick={(e) => updateHandler('reduce', Number(qty), cart.find(c => c.product_id === item.id).id)} data-id={item.product_id} disabled={loading || qty < 2 || !cart.some(c => c.product_id === item.id)}>-</button>
-
-                                <div id={`ce${item.product_id}`}>
-                                    {qty}
-                                </div>
-
-                                <button onClick={(e) => updateHandler('add', Number(qty), cart.find(c => c.product_id === item.id).id)} disabled={loading || Number(qty) === Number(item.stock) || !cart.some(c => c.product_id === item.id)}>+</button>
-                            </div>
-                        </div>
-
-                    }
-
-
-                    {/* <SaveButton data={item} Saver={Saver} isItemSaved={saved} /> */}
-
-                    <br />
-
-
-
-                    {
-                        screenWidth > 481
-                            ?
-                            <>
-                                {/* <Contact phone={item.phone} item={item} /> */}
-
-                                <div style={{
-                                    display: "flex",
-                                    justifyContent: "space-between",
-                                    padding: "0px 10px",
-
-                                }}>
-                                    {/* <button style={{ borderRadius: '2.5px', border: 'none', outline: 'none', width: '46%' }} className='shadow' onClick={e => handleOrder(item.product_id)}>
-                                        Buy Now
-                                    </button> */}
-                                    <button style={{ borderRadius: '2.5px', border: 'none', outline: 'none', width: '100%' }} className='shadow' onClick={e => toggleCart()}>
-                                        {
-                                            isCarted(item.id) ? "Remove From Cart" : "Add To Cart"
-                                        }
-                                    </button>
-                                </div>
-
-                                <br />
-
-
-
-
-                            </>
-                            :
-                            ''
-
-                    }
-
-
-
-                    <Share activeImg={activeImg} item={item} url={`https://www.deskinculture.com/store/${item?.id}`} metaImg={metaImg} />
-
-                </div>
-            </div>
-
-        </>
-    );
+      {item?.description && (
+        <section className="dsc-pdp__details" aria-labelledby="dsc-pdp-description">
+          <div className="dsc-pdp__section-heading">
+            <span>GET TO KNOW IT</span>
+            <h2 id="dsc-pdp-description">Product details</h2>
+          </div>
+          <p>{item.description}</p>
+        </section>
+      )}
+    </section>
+  );
 }
-
-export default Product;

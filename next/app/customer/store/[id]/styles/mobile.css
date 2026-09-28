@@ -1,3 +1,116 @@
 @media (max-width: 480px) {
+  .dsc-pdp-page {
+    padding: 18px 16px 44px;
+  }
 
+  .dsc-pdp-breadcrumbs {
+    gap: 7px;
+    margin-bottom: 17px;
+    font-size: 11px;
+  }
+
+  .dsc-pdp__hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+  }
+
+  .dsc-pdp__image-stage {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+  }
+
+  .dsc-pdp__main-image {
+    width: 90%;
+    height: 90%;
+  }
+
+  .dsc-pdp__gallery-arrow {
+    width: 36px;
+    height: 36px;
+  }
+
+  .dsc-pdp__gallery-arrow--previous { left: 9px; }
+  .dsc-pdp__gallery-arrow--next { right: 9px; }
+
+  .dsc-pdp__image-count {
+    right: 10px;
+    bottom: 10px;
+    padding: 5px 8px;
+  }
+
+  .dsc-pdp__thumbnails {
+    gap: 9px;
+    margin-top: 10px;
+  }
+
+  .dsc-pdp__thumbnail {
+    flex-basis: 64px;
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+  }
+
+  .dsc-pdp__summary { padding: 0; }
+
+  .dsc-pdp__eyebrow {
+    gap: 7px;
+    margin-bottom: 10px;
+    font-size: 10px;
+    letter-spacing: 1px;
+  }
+
+  .dsc-pdp__title {
+    font-size: clamp(27px, 8vw, 36px);
+    letter-spacing: -0.9px;
+    line-height: 1.12;
+  }
+
+  .dsc-pdp__price {
+    margin-top: 13px;
+    font-size: 25px;
+  }
+
+  .dsc-pdp__intro {
+    margin-top: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+    -webkit-line-clamp: 3;
+  }
+
+  .dsc-pdp__availability {
+    margin-top: 15px;
+    font-size: 12px;
+  }
+
+  .dsc-pdp__purchase {
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 10px;
+    margin-top: 18px;
+    padding: 16px 0;
+  }
+
+  .dsc-pdp__quantity {
+    grid-template-columns: 32px minmax(28px, 1fr) 32px;
+    height: 46px;
+  }
+
+  .dsc-pdp__cart-button {
+    min-height: 46px;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+
+  .dsc-pdp__product-meta {
+    gap: 12px 20px;
+    padding-top: 11px;
+  }
+
+  .dsc-pdp__details {
+    margin-top: 42px;
+    padding: 22px 0;
+  }
+
+  .dsc-pdp__section-heading h2 { font-size: 22px; }
+  .dsc-pdp__details > p { font-size: 14px; line-height: 1.7; }
+  .dsc-pdp-related { margin-top: 8px; }
 }
