@@ -6,7 +6,9 @@ import { CartModel } from "../../../shared/models/cart";
 export const DELETE = async (req: NextRequest) => {
   try {
     const body = await readJsonObject(req);
-    const { id } = body;
+    const { id: cart_id } = body;
+
+    let id = String(cart_id);
 
     if (typeof id !== "string" || !id.trim()) {
       return NextResponse.json({ success: false, message: "Cart ID is required" }, { status: 400 });
