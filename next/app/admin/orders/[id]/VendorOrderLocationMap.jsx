@@ -1,43 +1,43 @@
 "use client"
 
 import { useEffect } from "react"
-import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet"
+// import { MapContainer, TileLayer, Marker, Tooltip, useMap } from "react-leaflet"
 import L from "leaflet"
-import "leaflet/dist/leaflet.css"
+// import "leaflet/dist/leaflet.css"
 
 const NIGERIA_CENTER = [9.08, 8.67]
 const DEFAULT_ZOOM = 5
 const PIN_ZOOM = 14
 
-function fixLeafletIcons() {
-  delete L.Icon.Default.prototype._getIconUrl
-  L.Icon.Default.mergeOptions({
-    iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-    iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-    shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
-  })
-}
+// function fixLeafletIcons() {
+//   delete L.Icon.Default.prototype._getIconUrl
+//   L.Icon.Default.mergeOptions({
+//     iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+//     iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+//     shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+//   })
+// }
 
 function MapFocus({ lat, lng, hasPin }) {
-  const map = useMap()
-  useEffect(() => {
-    map.invalidateSize()
-    if (hasPin && Number.isFinite(lat) && Number.isFinite(lng)) {
-      map.flyTo([lat, lng], PIN_ZOOM, { duration: 0.85 })
-    } else {
-      map.setView(NIGERIA_CENTER, DEFAULT_ZOOM, { animate: false })
-    }
-  }, [lat, lng, hasPin, map])
-  return null
+  // const map = useMap()
+  // useEffect(() => {
+  //   map.invalidateSize()
+  //   if (hasPin && Number.isFinite(lat) && Number.isFinite(lng)) {
+  //     map.flyTo([lat, lng], PIN_ZOOM, { duration: 0.85 })
+  //   } else {
+  //     map.setView(NIGERIA_CENTER, DEFAULT_ZOOM, { animate: false })
+  //   }
+  // }, [lat, lng, hasPin, map])
+  // return null
 }
 
 /**
  * @param {{ lat: number, lng: number, label?: string, hasPin?: boolean }} props
  */
 export default function VendorOrderLocationMap({ lat, lng, label, hasPin = true }) {
-  useEffect(() => {
-    fixLeafletIcons()
-  }, [])
+  // useEffect(() => {
+  //   fixLeafletIcons()
+  // }, [])
 
   const centerLat = hasPin && Number.isFinite(lat) ? lat : NIGERIA_CENTER[0]
   const centerLng = hasPin && Number.isFinite(lng) ? lng : NIGERIA_CENTER[1]
@@ -45,7 +45,7 @@ export default function VendorOrderLocationMap({ lat, lng, label, hasPin = true 
 
   return (
     <div className="vendor-order-map-root">
-      <MapContainer
+      {/* <MapContainer
         key={`${centerLat},${centerLng},${hasPin ? 1 : 0}`}
         center={[centerLat, centerLng]}
         zoom={zoom}
@@ -67,7 +67,7 @@ export default function VendorOrderLocationMap({ lat, lng, label, hasPin = true 
             ) : null}
           </Marker>
         ) : null}
-      </MapContainer>
+      </MapContainer> */}
     </div>
   )
 }
