@@ -1,3 +1,14 @@
 @media (min-width: 761px) and (max-width: 1199px) {
+  .dsc-checkout {
+    padding: 32px clamp(24px, 4vw, 54px) 60px;
+  }
 
+  .dsc-checkout-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 330px);
+    gap: clamp(24px, 3vw, 40px);
+  }
+
+  .dsc-checkout-summary-content {
+    padding: 20px 16px 16px;
+  }
 }

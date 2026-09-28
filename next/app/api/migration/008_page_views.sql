@@ -5,7 +5,7 @@ CREATE TABLE page_views (
 
     visitor_id BIGINT,
 
-    user_id UUID
+    user_id INTEGER
         REFERENCES users(id)
         ON DELETE SET NULL,
 

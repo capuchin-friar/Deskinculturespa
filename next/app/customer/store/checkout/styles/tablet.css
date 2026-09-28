@@ -1,3 +1,66 @@
 @media (min-width: 481px) and (max-width: 760px) {
+  .dsc-checkout {
+    padding: 28px 28px 54px;
+  }
 
+  .dsc-checkout-heading {
+    margin: 26px 0 22px;
+  }
+
+  .dsc-checkout-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .dsc-checkout-form-column, .dsc-checkout-summary {
+    width: 100%;
+  }
+
+  .dsc-checkout-summary {
+    position: static;
+    width: 100%;
+    height: fit-content;
+  }
+
+  .dsc-checkout-summary-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 61px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 17px;
+    border: 0;
+    background: #f8fbf7;
+    color: var(--checkout-dark);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .dsc-checkout-summary-toggle>span {
+    display: grid;
+    gap: 3px;
+  }
+
+  .dsc-checkout-summary-toggle strong {
+    font-size: 14px;
+  }
+
+  .dsc-checkout-count {
+    color: var(--checkout-muted);
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .dsc-checkout-summary-content {
+    display: none;
+    padding: 19px 18px 17px;
+  }
+
+  .dsc-checkout-summary-content.is-open {
+    display: block;
+  }
 }

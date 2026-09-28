@@ -22,7 +22,7 @@ export default function useToggler() {
   const addToCart = async ({ item, qty = 1 }) => {
     try {
       const { data } = await baseApi.post("customers/cart/add", {
-        product_id: item.id,
+        product_id: (item.id),
         qty,
       });
 

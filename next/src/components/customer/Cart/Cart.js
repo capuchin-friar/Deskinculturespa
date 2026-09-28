@@ -39,8 +39,8 @@ export const Cart = () => {
     <section className="dsc-cart-page" aria-labelledby="dsc-cart-title">
       <header className="dsc-cart-heading">
         <div>
-          <span className="dsc-cart-heading__eyebrow">YOUR BAG</span>
-          <h1 id="dsc-cart-title">Shopping bag</h1>
+          {/* <span className="dsc-cart-heading__eyebrow">YOUR BAG</span>
+          <h1 id="dsc-cart-title">Shopping bag</h1> */}
           <p>{cart.length} {cart.length === 1 ? "product" : "products"} · {itemCount} {itemCount === 1 ? "item" : "items"}</p>
         </div>
         <Link className="dsc-cart-continue" href="/store">Continue shopping <IoArrowForward aria-hidden="true" /></Link>

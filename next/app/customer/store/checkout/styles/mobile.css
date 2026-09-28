@@ -1,3 +1,38 @@
 @media (max-width: 480px) {
-
+  .dsc-checkout { min-height: 65vh; padding: 21px 17px 40px; }
+  .dsc-checkout-breadcrumb { font-size: 11px; }
+  .dsc-checkout-heading { margin: 24px 0 19px; }
+  .dsc-checkout-heading h1 { margin-top: 7px; font-size: 32px; }
+  .dsc-checkout-heading > p:last-child { max-width: 280px; font-size: 12px; line-height: 1.5; }
+  .dsc-checkout-layout { display: flex; flex-direction: column; gap: 22px; }
+  .dsc-checkout-form-column, .dsc-checkout-summary { width: 100%; }
+  .dsc-checkout-section { padding: 21px 0 23px; }
+  .dsc-checkout-section:first-child { padding-top: 0; }
+  .dsc-checkout-section-heading { gap: 11px; margin-bottom: 17px; }
+  .dsc-checkout-step { flex-basis: 29px; width: 29px; height: 29px; }
+  .dsc-checkout-section-heading h2 { font-size: 16px; }
+  .dsc-checkout-section-heading p { font-size: 11px; }
+  .dsc-checkout-fields { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .dsc-checkout-field--full { grid-column: auto; }
+  .dsc-checkout-field { gap: 6px; font-size: 11px; }
+  .dsc-checkout-field input, .dsc-checkout-field select { height: 48px; font-size: 16px; }
+  .dsc-checkout-delivery-note { font-size: 10px; }
+  .dsc-checkout-payment-method { gap: 9px; padding: 10px; }
+  .dsc-checkout-payment-method small { font-size: 9px; }
+  .dsc-checkout-payment-total { font-size: 12px; }
+  .dsc-checkout-pay-button { min-height: 52px; font-size: 13px; }
+  .dsc-checkout-summary { position: static; border-radius: 7px; }
+  .dsc-checkout-summary-toggle { display: flex; width: 100%; min-height: 60px; align-items: center; justify-content: space-between; padding: 12px 14px; border: 0; background: #f8fbf7; color: var(--checkout-dark); font: inherit; font-size: 12px; font-weight: 650; text-align: left; cursor: pointer; }
+  .dsc-checkout-summary-toggle > span { display: grid; gap: 3px; }
+  .dsc-checkout-summary-toggle strong { font-size: 13px; }
+  .dsc-checkout-count { color: var(--checkout-muted); font-size: 9px; font-weight: 500; }
+  .dsc-checkout-summary-content { display: none; padding: 17px 13px 14px; }
+  .dsc-checkout-summary-content.is-open { display: block; }
+  .dsc-checkout-summary-content h2 { font-size: 14px; }
+  .dsc-checkout-item { grid-template-columns: 48px minmax(0, 1fr) auto; gap: 9px; }
+  .dsc-checkout-item-image { width: 48px; height: 50px; }
+  .dsc-checkout-item-info strong { font-size: 10px; }
+  .dsc-checkout-item-price { font-size: 9px; }
+  .dsc-checkout-alert { font-size: 11px; }
+  .dsc-checkout-alert--success strong { font-size: 12px; }
 }

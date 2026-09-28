@@ -7,7 +7,11 @@ import { query } from "../../../shared/database";
 export const POST = async (req: NextRequest) => {
   try {
     const body = await readJsonObject(req);
-    const { product_id, qty } = body;
+    const { product_id: id, qty } = body;
+
+    let product_id = String(id);
+
+    console.log("product_id: ", typeof product_id, product_id)
 
     if (typeof product_id !== "string" || !product_id.trim()) {
       return NextResponse.json({ success: false, data: "Product ID is required" }, { status: 400 });
