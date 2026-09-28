@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel's Next.js adapter manages deployment output; standalone output is
+  // reserved for self-hosted builds.
+  output: process.env.VERCEL ? undefined : "standalone",
 
   async redirects() {
     const customerRoutes = [
