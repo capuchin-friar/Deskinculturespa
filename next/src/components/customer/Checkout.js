@@ -123,7 +123,7 @@ export default function CartSummary() {
 
         },
         onClose: () => {
-            alert("Wait! You need this oil, don't go!!!!");
+            alert("Wait! You need this oil, don't go!!!!"); 
         },
     }
 
