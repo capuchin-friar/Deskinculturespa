@@ -1,3 +1,54 @@
 @media (max-width: 480px) {
-
+  .dsc-about-hero { grid-template-columns: 1fr; padding: 44px 22px 52px; gap: 30px; }
+  .dsc-about-hero h1 { font-size: clamp(42px, 13vw, 58px); }
+  .dsc-about-hero-content > p { font-size: 14px; }
+  .dsc-about-hero-image { height: 330px; }
+  .dsc-about-philosophy { padding: 48px 22px; }
+  .dsc-about-philosophy-content { grid-template-columns: 1fr; gap: 12px; margin-top: 26px; }
+  .dsc-about-philosophy-content p { font-size: 14px; }
+  .dsc-about-values { grid-template-columns: 1fr; padding: 52px 22px; gap: 20px; }
+  .dsc-about-values-grid { grid-template-columns: 1fr; gap: 20px; }
+  .dsc-about-values-grid h3 { margin: 18px 0 8px; }
+  .dsc-about-cta { align-items: flex-start; flex-direction: column; padding: 42px 22px; gap: 10px; }
+  .dsc-blogs-header { padding: 54px 22px 48px; }
+  .dsc-blogs-empty { grid-template-columns: 1fr; margin: 26px 18px 54px; padding: 26px 22px; gap: 24px; }
+  .dsc-blogs-empty-mark { width: 110px; }
+  .booking-page { padding: 38px 16px 56px; }
+  .booking-intro { margin-bottom: 28px; }
+  .booking-intro h1 { font-size: 39px; }
+  .booking-intro p { font-size: 13px; }
+  .booking-layout { grid-template-columns: 1fr; gap: 16px; }
+  .booking-main { padding: 22px 16px; }
+  .appointment-header { align-items: flex-start; }
+  .appointment-header h2 { font-size: 24px; }
+  .booking-duration { white-space: nowrap; }
+  .date-list { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; margin: 20px 0 30px; }
+  .date-item { min-height: 82px; }
+  .date-number { font-size: 22px; }
+  .time-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .booking-summary { position: static; }
+  .dsc-contact-hero { padding: 54px 22px 44px; }
+  .dsc-contact-hero h1 { font-size: clamp(46px, 13vw, 60px); }
+  .dsc-contact-main { grid-template-columns: 1fr; gap: 26px; padding: 46px 18px 58px; }
+  .dsc-contact-information h2 { margin-bottom: 26px; }
+  .dsc-contact-form { padding: 24px 18px; }
+  .dsc-gallery-hero { grid-template-columns: 1fr; }
+  .dsc-gallery-hero-content { padding: 48px 22px 32px; }
+  .dsc-gallery-hero h1 { font-size: 48px; }
+  .dsc-gallery-hero-image { min-height: 280px; height: 280px; }
+  .dsc-gallery-filter-section { align-items: flex-start; flex-direction: column; padding: 40px 18px 0; gap: 18px; }
+  .dsc-gallery-filter { width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 5px; }
+  .dsc-gallery-filter button { flex: 0 0 auto; }
+  .dsc-gallery-empty { min-height: 260px; margin: 22px 18px 48px; padding: 28px 18px; }
+  .dsc-gallery-cta { align-items: flex-start; flex-direction: column; padding: 42px 22px; gap: 22px; }
+  .dsc-newsletter-hero { grid-template-columns: 1fr; }
+  .dsc-newsletter-content { padding: 50px 22px; }
+  .dsc-newsletter-content h1 { font-size: 48px; }
+  .dsc-newsletter-visual { min-height: 300px; }
+  .dsc-newsletter-circle { width: 190px; }
+  .dsc-newsletter-note { align-items: flex-start; flex-direction: column; padding: 22px; gap: 10px; }
+}@media (max-width: 480px) {
+  .dsc-newsletter-hero { grid-template-columns: minmax(0, 1fr); }
+  .dsc-newsletter-content { width: 100%; min-width: 0; }
+  .dsc-newsletter-form,.dsc-newsletter-input-group { width: 100%; min-width: 0; }
 }

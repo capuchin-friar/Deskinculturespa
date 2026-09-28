@@ -1,3 +1,29 @@
 @media (min-width: 481px) and (max-width: 760px) {
-
+  .dsc-about-hero { grid-template-columns: 1fr .85fr; padding: 44px 28px 58px; gap: 26px; }
+  .dsc-about-hero h1 { font-size: clamp(40px, 7vw, 56px); }
+  .dsc-about-hero-image { height: 390px; }
+  .dsc-about-philosophy,.dsc-about-values { padding: 58px 30px; }
+  .dsc-about-philosophy-content { gap: 26px; }
+  .dsc-about-values { grid-template-columns: 1fr; gap: 22px; }
+  .dsc-about-values-grid { gap: 16px; }
+  .dsc-about-cta,.dsc-gallery-cta { padding: 44px 30px; }
+  .dsc-blogs-header { padding: 64px 28px 54px; }
+  .dsc-blogs-empty { grid-template-columns: 130px 1fr; margin: 34px 24px 60px; padding: 30px; gap: 26px; }
+  .booking-page { padding: 44px 24px 60px; }
+  .booking-layout { grid-template-columns: 1fr; }
+  .booking-main { padding: 30px; }
+  .booking-summary { position: static; }
+  .date-list { grid-template-columns: repeat(6, 1fr); }
+  .dsc-contact-hero { padding: 64px 34px 50px; }
+  .dsc-contact-main { grid-template-columns: 1fr 1.2fr; gap: 26px; padding: 50px 28px 64px; }
+  .dsc-contact-form { padding: 26px; }
+  .dsc-gallery-hero { grid-template-columns: 1fr .8fr; }
+  .dsc-gallery-hero-content { padding: 52px 28px; }
+  .dsc-gallery-hero-image { min-height: 360px; }
+  .dsc-gallery-filter-section { align-items: flex-start; flex-direction: column; padding: 44px 28px 0; gap: 18px; }
+  .dsc-gallery-empty { margin: 26px 28px 58px; }
+  .dsc-newsletter-hero { grid-template-columns: 1fr .8fr; }
+  .dsc-newsletter-content { padding: 52px 30px; }
+  .dsc-newsletter-content h1 { font-size: 48px; }
+  .dsc-newsletter-visual { min-height: 360px; }
 }

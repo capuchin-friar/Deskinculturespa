@@ -1,3 +1,19 @@
 @media (min-width: 761px) and (max-width: 1199px) {
-
+  .dsc-about-hero { padding: 56px 5vw 68px; gap: 5vw; }
+  .dsc-about-hero-image { height: 460px; }
+  .dsc-about-philosophy,.dsc-about-values { padding-left: 6vw; padding-right: 6vw; }
+  .dsc-about-values { grid-template-columns: .7fr 1.3fr; gap: 5vw; }
+  .dsc-about-values-grid { gap: 16px; }
+  .dsc-about-cta,.dsc-gallery-cta { padding-left: 6vw; padding-right: 6vw; }
+  .dsc-blogs-empty { margin-left: 5vw; margin-right: 5vw; }
+  .booking-page { padding-left: 4vw; padding-right: 4vw; }
+  .booking-layout { grid-template-columns: minmax(0, 1.35fr) minmax(280px, .8fr); gap: 18px; }
+  .booking-main { padding: 30px 24px; }
+  .date-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .dsc-contact-main { padding-left: 6vw; padding-right: 6vw; gap: 5vw; }
+  .dsc-contact-hero { padding-left: 6vw; }
+  .dsc-gallery-hero-content { padding-left: 6vw; padding-right: 4vw; }
+  .dsc-gallery-filter-section { padding-left: 5vw; padding-right: 5vw; }
+  .dsc-gallery-empty { margin-left: 5vw; margin-right: 5vw; }
+  .dsc-newsletter-content { padding: 62px 5vw; }
 }

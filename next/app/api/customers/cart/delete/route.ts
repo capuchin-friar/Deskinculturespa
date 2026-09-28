@@ -38,3 +38,5 @@ export const DELETE = async (req: NextRequest) => {
     return NextResponse.json({ success: false, data: "Something went wrong. Please try again in a moment." }, { status: 500 });
   }
 };
+
+
