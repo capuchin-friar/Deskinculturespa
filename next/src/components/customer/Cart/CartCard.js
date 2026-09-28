@@ -1,138 +1,136 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect, useState } from "react";
-import { IoArrowForward, IoTrashBinOutline } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
-import { set_cart } from "../../../../redux/customer/cart";
-import Thumbnail from "../../Thumbnail";
-import axios from "axios";
-import { baseApi } from "../../../../app/api/shared/config";
-import useToggler from "../../../hooks/toggler";
+import { IoTrashOutline, IoImageOutline } from "react-icons/io5";
+import { baseApi } from "@/app/api/shared/config";
+import { set_cart } from "@/redux/customer/cart";
 
-const Card = ({ item, index, getTotalPrice }) => {
-  let dispatch = useDispatch();
-  let { cart: Cart } = useSelector((s) => s.cart);
-  let [loading, setLoading] = useState(false);
-  const {
-    rmFromCart
-  } = useToggler()
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(price) || 0);
 
-  async function RmFromCart(cartId) {
-    setLoading(true);
+const CartCard = ({ item }) => {
+  const dispatch = useDispatch();
+  const cart = useSelector((state) => state.cart?.cart || []);
+  const [busy, setBusy] = useState(false);
+  const [imageFailed, setImageFailed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const quantity = Number(item.quantity) || 1;
+  const stock = item.stock == null ? null : Number(item.stock);
+  const maxQuantity = stock !== null && Number.isFinite(stock) && stock > 0
+    ? Math.min(stock, 99)
+    : 99;
+  const itemTotal = Number(item.price || 0) * quantity;
+  const imageUrl = typeof item.thumbnail_url === "string" ? item.thumbnail_url.trim() : "";
+
+  const updateQuantity = async (nextQuantity) => {
+    const next = Math.max(1, Math.min(maxQuantity, nextQuantity));
+    if (next === quantity) return;
+
+    setBusy(true);
+    setErrorMessage("");
     try {
-      const response = await rmFromCart(cartId);
-
-      if (!response) {
-        setLoading(false);
-        throw new Error("Error: ", );
+      const { data } = await baseApi.patch("/customers/cart/edit", {
+        id: String(item.id),
+        qty: next,
+      });
+      if (!data?.success) {
+        throw new Error(data?.message || data?.data || "Could not update this quantity.");
       }
-    //   if (data.success) {
-    //     dispatch(set_cart(Cart.filter((c) => c?.id != cartId)));
-    //     setLoading(false);
-    //   }
+      dispatch(set_cart(cart.map((cartItem) =>
+        String(cartItem.id) === String(item.id)
+          ? { ...cartItem, quantity: next }
+          : cartItem,
+      )));
     } catch (error) {
-      console.log(error);
+      setErrorMessage(error?.response?.data?.message || error?.response?.data?.data || error?.message || "Could not update this quantity. Please try again.");
+    } finally {
+      setBusy(false);
     }
-  }
+  };
 
-  async function updateHandler(type, qty, id) {
-    setLoading(true);
-    let cartQty = type === "add" ? qty + 1 : qty - 1;
-    const { data, status } = await baseApi.patch("/customers/cart/edit", {
-      id,
-      qty: cartQty,
-    });
-
-    if (!data.success) {
-      throw new Error("Error: ", data.message);
-      setLoading(false);
+  const removeItem = async () => {
+    setBusy(true);
+    setErrorMessage("");
+    try {
+      const { data } = await baseApi.delete("/customers/cart/delete", {
+        data: { id: String(item.id) },
+      });
+      if (!data?.success) {
+        throw new Error(data?.message || data?.data || "Could not remove this product.");
+      }
+      dispatch(set_cart(cart.filter((cartItem) => String(cartItem.id) !== String(item.id))));
+    } catch (error) {
+      setErrorMessage(error?.response?.data?.message || error?.response?.data?.data || error?.message || "Could not remove this product. Please try again.");
+    } finally {
+      setBusy(false);
     }
-    if (data.success) {
-      dispatch(
-        set_cart(
-          Cart.map((c) => (c?.id == id ? { ...c, quantity: cartQty } : c)),
-        ),
-      );
-      setLoading(false);
-    }
-  }
-
-  useEffect(() => {
-    getTotalPrice();
-  }, [Cart]);
+  };
 
   return (
-    <>
-      <div
-        key={index}
-        className="buyer-cart-card shadow-sm"
-        style={{ height: "190px" }}
-      >
-        <div className="thumbnail-cnt">
-          <Thumbnail thumbnail_id={item?.thumbnail_url} height={"100%"} />
+    <article className={`dsc-cart-item${busy ? " is-busy" : ""}`}>
+      <Link className="dsc-cart-item__image" href={`/customer/store/${item.product_id}`} aria-label={`View ${item.name}`}>
+        {imageUrl && !imageFailed ? (
+          <Image
+            src={imageUrl}
+            alt={item.name || "Product"}
+            width={320}
+            height={320}
+            unoptimized
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <span className="dsc-cart-item__placeholder" aria-hidden="true"><IoImageOutline /></span>
+        )}
+      </Link>
+
+      <div className="dsc-cart-item__content">
+        <div className="dsc-cart-item__topline">
+          <div className="dsc-cart-item__identity">
+            <Link className="dsc-cart-item__name" href={`/customer/store/${item.product_id}`}>
+              {item.name || "Product"}
+            </Link>
+            {stock !== null && Number.isFinite(stock) && (
+              <span className={`dsc-cart-item__stock${stock <= 0 ? " is-unavailable" : ""}`}>
+                {stock <= 0 ? "Currently unavailable" : `${stock} ${stock === 1 ? "unit" : "units"} available`}
+              </span>
+            )}
+          </div>
+          <span className="dsc-cart-item__unit-price">₦{formatPrice(item.price)}</span>
         </div>
 
-        <div
-          className="buyer-cart-body"
-          style={{ justifyContent: "space-between" }}
-        >
-          <div
-            className="buyer-item-title"
-            style={{ fontWeight: "500", fontSize: "medium" }}
-          >
-            <p>{item.name}</p>
-          </div>
-
-          <div className="buyer-item-price">
-            <span style={{ fontWeight: "bold" }}>
-              &#8358;{new Intl.NumberFormat("en-us").format(item.price)}{" "}
-            </span>
-          </div>
-
-          <div className="buyer-item-units">
-            <span>{item.stock} units Available</span>
-          </div>
-
-          <div className="buyer-items-stock" data-price={item.price}>
+        <div className="dsc-cart-item__controls">
+          <div className="dsc-cart-quantity" aria-label={`Quantity for ${item.name}`}>
+            <button type="button" onClick={() => updateQuantity(quantity - 1)} disabled={busy || quantity <= 1} aria-label={`Decrease quantity of ${item.name}`}>−</button>
+            <output aria-live="polite">{quantity}</output>
             <button
-              onClick={(e) =>
-                updateHandler("reduce", Number(item.quantity), item.id)
-              }
-              data-id={item.product_id}
-              disabled={loading || item.quantity < 2}
-            >
-              -
-            </button>
+              type="button"
+              onClick={() => updateQuantity(quantity + 1)}
+              disabled={busy || quantity >= maxQuantity || stock === 0}
+              aria-label={`Increase quantity of ${item.name}`}
+            >+</button>
+          </div>
 
-            <div id={`ce${item.product_id}`}>{item.quantity}</div>
+          <button className="dsc-cart-item__remove" type="button" onClick={removeItem} disabled={busy}>
+            <IoTrashOutline aria-hidden="true" />
+            <span>{busy ? "Updating…" : "Remove"}</span>
+          </button>
 
-            <button
-              onClick={(e) =>
-                updateHandler("add", Number(item.quantity), item.id)
-              }
-              disabled={loading || Number(item.quantity) === Number(item.stock)}
-            >
-              +
-            </button>
+          <div className="dsc-cart-item__subtotal">
+            <span>Item total</span>
+            <strong>₦{formatPrice(itemTotal)}</strong>
           </div>
         </div>
-        <button
-          className="buyer-cart-remove-btn"
-          style={{
-            background: "#efefef",
-            position: "absolute",
-            top: "15px",
-            right: "15px",
-            left: "unset",
-            width: "fit-content",
-          }}
-          onClick={(e) => RmFromCart(item.product_id)}
-          disabled={loading}
-        >
-          <IoTrashBinOutline color="#000" />
-        </button>
       </div>
-    </>
+
+      {errorMessage && <p className="dsc-cart-item__error" role="status">{errorMessage}</p>}
+    </article>
   );
 };
 
-export default Card;
+export default CartCard;

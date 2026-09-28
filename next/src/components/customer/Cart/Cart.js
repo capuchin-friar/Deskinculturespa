@@ -1,147 +1,78 @@
-// import img from '../../../assets/download (3).jpeg'
-// import deleteSvg from '../../../assets/delete-svgrepo-com (1).svg'
-import { useEffect, useState } from "react";
-import jsAgo from "js-ago";
-// import imgSvg from '../../../assets/image-svgrepo-com (4).svg';
-import { useDispatch, useSelector } from "react-redux";
-// import {
-//     setCartTo
-// } from '../../../redux/buyer_store/Cart';
-// import {
-//     useNavigate
-// } from 'react-router-dom';
+"use client";
+
+import Link from "next/link";
+import { useSelector } from "react-redux";
+import { IoBagHandleOutline, IoArrowForward } from "react-icons/io5";
 import Card from "./CartCard";
-import Btn from "./Btn";
-import axios from "axios";
-// import { GetCartItems } from '@/app/api/buyer/get';
 
-const CartComp = () => {
-  let [Items, setItems] = useState([]);
-  let [url, setUrl] = useState("");
-  let [subTotal, setSubTotal] = useState("0.00");
+const formatPrice = (price) =>
+  new Intl.NumberFormat("en-NG", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(price) || 0);
 
-  let { cart: Cart } = useSelector((s) => s.cart);
+export const Cart = () => {
+  const cart = useSelector((state) => state.cart?.cart || []);
+  const itemCount = cart.reduce((count, item) => count + (Number(item.quantity) || 0), 0);
+  const subtotal = cart.reduce(
+    (total, item) => total + Number(item.price || 0) * Number(item.quantity || 0),
+    0,
+  );
 
-  function getTotalPrice() {
-    let list = [...document.querySelectorAll(".buyer-items-stock")];
-    let values = [];
-    list.map((item) =>
-      values.push(
-        parseInt(item.children[1].innerHTML ?? 0) *
-          parseInt(item.dataset.price),
-      ),
+  if (cart.length === 0) {
+    return (
+      <section className="dsc-cart-page dsc-cart-page--empty" aria-labelledby="dsc-cart-empty-title">
+        <div className="dsc-cart-empty">
+          <span className="dsc-cart-empty__icon" aria-hidden="true"><IoBagHandleOutline /></span>
+          <span className="dsc-cart-empty__eyebrow">YOUR BAG</span>
+          <h1 id="dsc-cart-empty-title">Your bag is empty</h1>
+          <p>Take a moment for yourself. Discover products for your next self-care ritual.</p>
+          <Link className="dsc-cart-empty__button" href="/store">
+            Explore the store <IoArrowForward aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
     );
-    let total = sum(values, values.length);
-    setSubTotal(total);
   }
-  function sum(arr, n) {
-    // base or terminating condition
-    if (n <= 0) {
-      return 0;
-    }
-
-    // Calling method recursively
-    return sum(arr, n - 1) + arr[n - 1];
-  }
-
-  useEffect(() => {
-    if (Cart) {
-      setItems(Cart);
-      let prices = [];
-
-      Cart.map((item) =>
-        prices.push(
-          parseInt(
-            Number(item.price) * Number(item.quantity) +
-              (item?.shipping_fee ?? 0),
-          ),
-        ),
-      );
-      let s = sum(prices, prices.length);
-      setSubTotal(s);
-    }
-  }, [Cart]);
-
-  let [screenWidth, setScreenWidth] = useState(0);
-
-  useEffect(() => {
-    let width = window.innerWidth;
-    setScreenWidth(width);
-  }, []);
 
   return (
-    <>
-      <div className="buyer-cart">
-        {Items?.map((item, index) => {
-          return (
-            <Card
-              product_id={item.product_id}
-              getTotalPrice={getTotalPrice}
-              item={item}
-              index={index}
-            />
-          );
-        })}
+    <section className="dsc-cart-page" aria-labelledby="dsc-cart-title">
+      <header className="dsc-cart-heading">
+        <div>
+          <span className="dsc-cart-heading__eyebrow">YOUR BAG</span>
+          <h1 id="dsc-cart-title">Shopping bag</h1>
+          <p>{cart.length} {cart.length === 1 ? "product" : "products"} · {itemCount} {itemCount === 1 ? "item" : "items"}</p>
+        </div>
+        <Link className="dsc-cart-continue" href="/store">Continue shopping <IoArrowForward aria-hidden="true" /></Link>
+      </header>
+
+      <div className="dsc-cart-layout">
+        <section className="dsc-cart-items" aria-label="Items in your bag">
+          {cart.map((item) => <Card item={item} key={item.id} />)}
+        </section>
+
+        <aside className="dsc-cart-summary" aria-labelledby="dsc-cart-summary-title">
+          <h2 id="dsc-cart-summary-title">Order summary</h2>
+          <div className="dsc-cart-summary__row">
+            <span>Subtotal</span>
+            <span>₦{formatPrice(subtotal)}</span>
+          </div>
+          <div className="dsc-cart-summary__row">
+            <span>Delivery</span>
+            <span>Free</span>
+          </div>
+          <div className="dsc-cart-summary__total">
+            <span>Total</span>
+            <strong>₦{formatPrice(subtotal)}</strong>
+          </div>
+          <Link className="dsc-cart-summary__checkout" href="/customer/store/checkout">
+            Proceed to checkout <IoArrowForward aria-hidden="true" />
+          </Link>
+          <p className="dsc-cart-summary__note">Your order details will be confirmed at checkout.</p>
+        </aside>
       </div>
 
-      {screenWidth > 659 ? (
-        <div className="buyer-cart-checkout">
-          <h4 className="cart-title">Cart Summary</h4>
-          <div className="cart-summary">
-            <div className="summary-row">
-              <span>Subtotal</span>
-              <span>
-                ₦
-                {new Intl.NumberFormat("en-NG", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(Number(subTotal))}
-              </span>
-            </div>
-
-            <div className="summary-row">
-              <span>Delivery fee</span>
-              <span>Free</span>
-            </div>
-
-            <div className="summary-row total-row">
-              <span>Total (Incl. VAT)</span>
-              <span>
-                ₦
-                {new Intl.NumberFormat("en-NG", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(Number(subTotal))}
-              </span>
-            </div>
-          </div>
-
-          <button
-            className="checkout-btn"
-            onClick={(e) => {
-              window.location.href = "/customer/store/checkout";
-            }}
-          >
-            Checkout Now
-          </button>
-        </div>
-      ) : (
-        <>
-          <div
-            style={{
-              position: "fixed",
-              bottom: "0",
-              padding: "20px",
-              left: "0",
-              width: "100%",
-            }}
-          >
-            <Btn url={url} subTotal={subTotal} />
-          </div>
-        </>
-      )}
-    </>
+      <Link className="dsc-cart-continue dsc-cart-continue--bottom" href="/store">Continue shopping <IoArrowForward aria-hidden="true" /></Link>
+    </section>
   );
 };
-
-export { CartComp as Cart };
