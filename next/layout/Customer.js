@@ -33,18 +33,17 @@ import { set_cart } from "@/redux/customer/cart";
 export default function Customer({ children }) {
 
     let pathname = usePathname();
+    let isAuthPage = pathname === "/login" || pathname === "/register";
     let path = ["/customer/store", "/store"].includes(pathname);
     let [storeFilterOpen, setStoreFilterOpen] = useState(false);
     let isStoreFilterOpen = path && storeFilterOpen;
 
     let dispatch = useDispatch();
     useEffect(() => {
+        if (isAuthPage) return;
         (async () => {
             try {
-                const {
-                    data,
-                    status
-                } = await baseApi.get("/customers/cart");
+                const { data } = await baseApi.get("/customers/cart");
 
                 if (!data.success) {
                     throw new Error("Error: ", data.message);
@@ -55,7 +54,7 @@ export default function Customer({ children }) {
             }
         })();
 
-    }, [pathname, dispatch]);
+    }, [pathname, dispatch, isAuthPage]);
 
     useEffect(() => {
         if (!isStoreFilterOpen) return undefined;
@@ -98,6 +97,10 @@ export default function Customer({ children }) {
     }, [isStoreFilterOpen]);
 
 
+    if (isAuthPage) {
+        return <main className="customer-auth-shell">{children}</main>;
+    }
+
     return (
         <>
             <div className="customer-cnt">
@@ -126,7 +129,7 @@ export default function Customer({ children }) {
                                 </>
                             )
                         }
-                        <Main children={children} />
+                        <Main>{children}</Main>
                     </div>
                     <Footer />
                 </div>
