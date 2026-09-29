@@ -13,7 +13,7 @@ export default function Reviews() {
           <div className="pdp-reviews__summary-panel">
             <p className="pdp-reviews__score">4.5/5.0</p>
             <div className="pdp-reviews__stars">
-              <StarRating rating={4.5} starRatedColor="#00926E" />
+              <StarRating rating={4.5} starRatedColor="#278a3d" />
             </div>
             <p className="pdp-reviews__count">19 verified reviews</p>
           </div>
@@ -25,7 +25,7 @@ export default function Reviews() {
           </h3>
           <div className="pdp-reviews__comment-card">
             <div className="pdp-reviews__comment-stars">
-              <StarRating rating={4.5} starRatedColor="#00926E" />
+              <StarRating rating={4.5} starRatedColor="#278a3d" />
             </div>
             <p className="pdp-reviews__comment-title">Original and effective</p>
             <p className="pdp-reviews__comment-body">All smells great</p>

@@ -27,8 +27,8 @@
   .vendor-order-page {
     display: block;
     width: 100%;
-    height: calc(100vh - 120px);
-    overflow: auto;
+    height: auto;
+    overflow: visible;
     margin: 0 auto;
     padding: 0px;
     box-sizing: border-box;

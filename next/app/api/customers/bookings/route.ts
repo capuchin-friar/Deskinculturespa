@@ -34,19 +34,17 @@ export const POST = async (req: NextRequest) => {
     const body = await readJsonObject(req);
     const { service_id, scheduled_at, notes } = body;
 
-    if (typeof service_id !== "string" || !service_id.trim() || typeof scheduled_at !== "string" || !scheduled_at.trim()) {
-      return NextResponse.json({ success: false, message: "Service and booking time are required" }, { status: 400 });
+    if (typeof service_id !== "string" || !/^\d+$/.test(service_id.trim())) {
+      return NextResponse.json({ success: false, message: "A valid service is required" }, { status: 400 });
     }
 
-    const scheduledDate = new Date(scheduled_at);
-    if (Number.isNaN(scheduledDate.getTime()) || scheduledDate <= new Date()) {
-      return NextResponse.json({ success: false, message: "A valid future booking time is required" }, { status: 400 });
+    if (scheduled_at !== undefined && scheduled_at !== null) {
+      return NextResponse.json({ success: false, message: "Add the service first, then schedule all services together from the booking page." }, { status: 400 });
     }
 
     const booking = await BookingModel.createBookingDoc({
       user_id,
       service_id: service_id.trim(),
-      scheduled_at: scheduledDate.toISOString(),
       notes: typeof notes === "string" ? notes : null,
     });
 
@@ -54,7 +52,7 @@ export const POST = async (req: NextRequest) => {
       return NextResponse.json({ success: false, message: "Service not found or unavailable" }, { status: 404 });
     }
 
-    return NextResponse.json({ success: true, data: booking, message: "Service booked successfully" }, { status: 201 });
+    return NextResponse.json({ success: true, data: booking, message: "Service added to your bookings" }, { status: 201 });
   } catch {
     return NextResponse.json({ success: false, message: "Something went wrong. Please try again in a moment." }, { status: 500 });
   }

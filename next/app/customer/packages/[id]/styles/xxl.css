@@ -9,12 +9,12 @@ LARGE SCREEN ONLY
 @media (min-width: 1200px) {
 
     :root {
-        --package-green: #278a3d;
-        --package-dark: #0b3b1a;
-        --package-soft: #eef7ef;
-        --package-border: #e1e8e2;
-        --package-text: #172019;
-        --package-muted: #66736a;
+        --package-green: var(--brand-green);
+        --package-dark: var(--brand-dark);
+        --package-soft: var(--soft-green);
+        --package-border: var(--border);
+        --package-text: var(--text-dark);
+        --package-muted: var(--text-muted);
     }
 
 
@@ -65,12 +65,7 @@ LARGE SCREEN ONLY
         padding:
             25px 0 30px;
 
-        font-family:
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 12px;
 
@@ -242,9 +237,7 @@ LARGE SCREEN ONLY
         color:
             #ffffff;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 11px;
 
@@ -275,9 +268,7 @@ LARGE SCREEN ONLY
 
         margin-bottom: 17px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 11px;
 
@@ -297,10 +288,7 @@ LARGE SCREEN ONLY
 
         margin: 0;
 
-        font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+        font-family: var(--font-body);
 
         font-size: 48px;
 
@@ -324,9 +312,7 @@ LARGE SCREEN ONLY
     .package-detail-price {
         margin-top: 22px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 25px;
 
@@ -410,9 +396,7 @@ LARGE SCREEN ONLY
 
 
     .package-detail-duration span {
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 10px;
 
@@ -422,9 +406,7 @@ LARGE SCREEN ONLY
 
 
     .package-detail-duration strong {
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 13px;
 
@@ -447,9 +429,7 @@ LARGE SCREEN ONLY
         margin:
             28px 0 0;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 14px;
 
@@ -498,9 +478,7 @@ LARGE SCREEN ONLY
 
         gap: 9px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 12px;
 
@@ -580,9 +558,7 @@ LARGE SCREEN ONLY
         color:
             #ffffff;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 13px;
 
@@ -626,9 +602,7 @@ LARGE SCREEN ONLY
         color:
             var(--package-green);
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 12px;
 
@@ -672,9 +646,7 @@ LARGE SCREEN ONLY
 
         margin-bottom: 15px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 10px;
 
@@ -690,10 +662,7 @@ LARGE SCREEN ONLY
     .package-section-heading h2 {
         margin: 0;
 
-        font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+        font-family: var(--font-body);
 
         font-size: 38px;
 
@@ -717,9 +686,7 @@ LARGE SCREEN ONLY
         margin:
             0 0 20px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 14px;
 
@@ -799,9 +766,7 @@ LARGE SCREEN ONLY
 
 
     .include-number {
-        font-family:
-            Georgia,
-            serif;
+        font-family: var(--font-body);
 
         font-size: 11px;
 
@@ -849,9 +814,7 @@ LARGE SCREEN ONLY
     .package-include-card p {
         margin: 2px 0 0;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 13px;
 
@@ -894,9 +857,7 @@ LARGE SCREEN ONLY
 
         margin-bottom: 15px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 10px;
 
@@ -912,10 +873,7 @@ LARGE SCREEN ONLY
     .package-detail-cta h2 {
         margin: 0;
 
-        font-family:
-            Georgia,
-            "Times New Roman",
-            serif;
+        font-family: var(--font-body);
 
         font-size: 40px;
 
@@ -956,9 +914,7 @@ LARGE SCREEN ONLY
         color:
             #ffffff;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
 
         font-size: 13px;
 
@@ -1002,16 +958,12 @@ LARGE SCREEN ONLY
 
         gap: 20px;
 
-        font-family:
-            system-ui,
-            sans-serif;
+        font-family: var(--font-body);
     }
 
 
     .package-detail-not-found h1 {
-        font-family:
-            Georgia,
-            serif;
+        font-family: var(--font-body);
 
         font-size: 35px;
 

@@ -97,6 +97,7 @@
 
   .customer-body {
     margin-top: 64px !important;
+    min-height: calc(100vh - 64px);
   }
 
   .customer-mobile-menu-overlay {
@@ -156,7 +157,7 @@
     grid-column: 2;
     margin: 0;
     color: #0b3b1a;
-    font-family: Georgia, "Times New Roman", serif;
+    font-family: var(--font-body);
     font-size: 23px;
     font-weight: 500;
     letter-spacing: -0.35px;

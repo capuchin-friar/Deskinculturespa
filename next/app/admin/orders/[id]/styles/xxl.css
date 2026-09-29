@@ -24,8 +24,8 @@
     display: block;
     width: 100%;
     position: relative;
-    height: calc(100vh - 60px);
-    overflow: auto;
+    height: auto;
+    overflow: visible;
     margin: 0 auto;
     padding: 0 12px 96px;
     box-sizing: border-box;

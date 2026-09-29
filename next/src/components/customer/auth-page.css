@@ -6,7 +6,7 @@
   container-type: inline-size;
   background: #f7f8f5;
   color: #172019;
-  font-family: var(--family, var(--font-geist-sans), Arial, sans-serif);
+  font-family: var(--font-body);
 }
 
 .customer-auth-shell *,
@@ -120,7 +120,7 @@
 .dsc-auth-intro h2 {
   max-width: 310px;
   margin: 19px 0 15px;
-  font-family: Georgia, serif;
+  font-family: var(--font-body);
   font-size: clamp(37px, 4vw, 49px);
   font-weight: 400;
   letter-spacing: -1.4px;
@@ -160,7 +160,7 @@
 .dsc-auth-heading h1 {
   margin: 12px 0 8px;
   color: #183e2c;
-  font-family: Georgia, serif;
+  font-family: var(--font-body);
   font-size: clamp(30px, 3.2vw, 38px);
   font-weight: 400;
   letter-spacing: -.8px;

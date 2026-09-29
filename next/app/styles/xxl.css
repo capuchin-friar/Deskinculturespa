@@ -1,34 +1,11 @@
-:root {
-  /* Brand */
-  --brand-green: #278a3d;
-  --brand-dark: #0b3b1a;
-  --brand-light: #63d94f;
-  --brand-green-light: #278a3d80;
 
-  /* Neutrals */
-  --white: #ffffff;
-  --off-white: #f8faf7;
-  --text-dark: #172019;
-  --text-muted: #66736a;
-  --border: #e1e8e2;
-
-  /* Supporting */
-  --soft-green: #eef7ef;
-  --sage: #8ba98f;
-
-  /* Border Radius */
-  --radius: 5px;
-  --family:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-}
 
 .customer-hero-section {
   height: 120vh;
   width: 100%;
   display: flex;
   flex-direction: column;
-  font-family: var(--family);
+  font-family: var(--font-body);
 
   justify-content: space-between;
   background-image: url("/spa.png");
@@ -59,7 +36,7 @@
   align-items: center;
   flex-direction: column;
   justify-content: center;
-  font-family: var(--family);
+  font-family: var(--font-body);
   color: #fff;
   padding: 45px 65px;
   background-color: rgba(0, 0, 0, 0.2);
@@ -93,7 +70,7 @@
   width: 100%;
   padding: 20px;
   display: flex;
-  font-family: var(--family);
+  font-family: var(--font-body);
   flex-direction: column;
   justify-content: space-between;
   background-color: #fff;
@@ -104,7 +81,7 @@
 .customer-product-tag {
   font-size: 7vh;
   font-weight: lighter;
-  font-family: var(--family);
+  font-family: var(--font-body);
 }
 
 .customer-product-view-btn {
@@ -122,7 +99,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .customer-product-card {
@@ -152,7 +130,7 @@
   padding: 10px 10px;
   cursor: pointer;
   color: #fff;
-  font-family: var(--family);
+  font-family: var(--font-body);
   text-transform: uppercase;
   font-size: 15px;
 
@@ -187,12 +165,12 @@
   height: 50px;
   overflow: hidden;
   font-weight: lighter;
-  font-family: var(--family);
+  font-family: var(--font-body);
   margin-bottom: 5px;
 }
 
 .customer-product-price {
-  font-family: var(--family);
+  font-family: var(--font-body);
 }
 
 .customer-admin-section {
@@ -211,7 +189,7 @@
   width: 50%;
   height: 100%;
   display: flex;
-  font-family: var(--family);
+  font-family: var(--font-body);
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
@@ -234,13 +212,13 @@
 }
 
 .customer-admin-headline {
-  font-family: var(--family);
+  font-family: var(--font-body);
   color: #acacac;
   font-size: large;
 }
 
 .customer-admin-summary {
-  font-family: var(--family);
+  font-family: var(--font-body);
 }
 
 .left {
@@ -263,7 +241,7 @@
 
 .customer-testimonials-headline {
   font-size: 5vh;
-  font-family: var(--family);
+  font-family: var(--font-body);
   text-transform: uppercase;
   margin-bottom: 145px;
   font-weight: lighter;
@@ -274,7 +252,7 @@
   width: 100%;
   padding: 25px;
   display: flex;
-  font-family: var(--family);
+  font-family: var(--font-body);
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--brand-green);
@@ -286,7 +264,7 @@
   font-size: 7vh;
   font-weight: lighter;
   color: #fff;
-  font-family: var(--family);
+  font-family: var(--font-body);
 }
 
 .customer-service-view-btn {
@@ -305,7 +283,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .customer-service-card {
@@ -342,7 +321,7 @@
   padding: 10px 10px;
   cursor: pointer;
   color: #fff;
-  font-family: var(--family);
+  font-family: var(--font-body);
   text-transform: uppercase;
   font-size: 15px;
   border-radius: var(--radius);
@@ -397,7 +376,7 @@
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
-  font-family: var(--family);
+  font-family: var(--font-body);
   color: #000;
   padding: 45px 65px;
   /* background-color: rgba(0, 0, 0, 0.2); */
@@ -491,7 +470,7 @@
   font-size: 7vh;
   color: var(--brand-green);
   font-weight: bold;
-  font-family: 'Times New Roman', Times, serif;
+  font-family: var(--font-body);
 }
 
 .customer-appointment-summary {
@@ -521,7 +500,7 @@
   width: 100%;
   padding: 25px;
   display: flex;
-  font-family: var(--family);
+  font-family: var(--font-body);
   flex-direction: column;
   justify-content: space-between;
   background-color: var(--brand-green);
@@ -533,7 +512,7 @@
   font-size: 7vh;
   font-weight: lighter;
   color: #fff;
-  font-family: var(--family);
+  font-family: var(--font-body);
 }
 
 .customer-package-view-btn {
@@ -552,7 +531,8 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  overflow: auto;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 .customer-package-card {
@@ -584,7 +564,7 @@
   padding: 10px 10px;
   cursor: pointer;
   color: #fff;
-  font-family: var(--family);
+  font-family: var(--font-body);
   text-transform: uppercase;
   font-size: 15px;
   border-radius: var(--radius);

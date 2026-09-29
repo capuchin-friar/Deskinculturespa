@@ -1,30 +1,10 @@
 
-:root {
-  /* Brand */
-  --brand-green: #278A3D;
-  --brand-dark: #0B3B1A;
-  --brand-light: #63D94F;
 
-  /* Neutrals */
-  --white: #FFFFFF;
-  --off-white: #F8FAF7;
-  --text-dark: #172019;
-  --text-muted: #66736A;
-  --border: #E1E8E2;
-
-  /* Supporting */
-  --soft-green: #EEF7EF;
-  --sage: #8BA98F;
-
-  /* Border Radius */
-  --radius: 5px;
-  --family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
 
 
 .massage-page {
   width: 100%;
-  min-height: 100vh;
+  min-height: calc(100vh - 60px);
 
   padding: 30px 60px;
 
@@ -36,12 +16,12 @@
   ========================================= */
 
 .page-layout {
-  width: 1350px;
+  width: min(100%, 1350px);
 
   margin: 0 auto;
 
   display: grid;
-  grid-template-columns: 950px 435px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
 
   column-gap: 30px;
 
@@ -53,7 +33,8 @@
   ========================================= */
 
 .category-section {
-  width: 950px;
+  width: 100%;
+  min-width: 0;
 
   overflow: hidden;
 }
@@ -65,7 +46,7 @@
 .category-hero {
   position: relative;
 
-  width: 950px;
+  width: 100%;
   height: 387px;
 
   overflow: hidden;
@@ -225,18 +206,7 @@
 
   color: #10182b;
 
-  font-family:
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    Roboto,
-    Oxygen,
-    Ubuntu,
-    Cantarell,
-    "Open Sans",
-    "Helvetica Neue",
-    sans-serif;
+  font-family: var(--font-body);
 
   font-size: 18px;
 
@@ -430,7 +400,8 @@
   ========================================= */
 
 .booking-sidebar {
-  width: 435px;
+  width: 100%;
+  min-width: 0;
 }
 
 .booking-panel {
@@ -710,7 +681,7 @@
 
   border-radius: 999px;
 
-  background: #b82961;
+  background: var(--brand-green);
 
   color: #ffffff;
 
@@ -726,7 +697,7 @@
 }
 
 .select-time-button:hover {
-  background: #a91f56;
+  background: var(--brand-dark);
 
   transform: translateY(-1px);
 }
@@ -759,11 +730,12 @@
   ========================================= */
 
 .service-modal {
-  width: 620px;
+  width: min(620px, calc(100% - 32px));
 
   max-height: 90vh;
 
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   border-radius: 22px;
 
@@ -968,7 +940,7 @@
 
   border-radius: 999px;
 
-  background: #b82961;
+  background: var(--brand-green);
 
   color: #ffffff;
 
@@ -984,7 +956,56 @@
 }
 
 .modal-book-button:hover {
-  background: #a91f56;
+  background: var(--brand-dark);
 
   transform: translateY(-1px);
+}
+
+@media (max-width: 1199px) {
+  .massage-page { padding: 24px 16px; }
+  .page-layout { grid-template-columns: minmax(0, 1fr); }
+  .page-layout > * { width: 100%; max-width: 100%; min-width: 0; }
+  .category-hero { width: 100%; }
+}
+
+@media (max-width: 760px) {
+  .massage-page { min-height: calc(100vh - 64px); }
+}
+
+.modal-image-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #eef7ef, #dcebdd);
+}
+
+.booking-scheduled-at {
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.booking-scheduled-at {
+  margin: 8px 0 0;
+}
+
+.booking-feedback {
+  margin: 12px 0 0;
+  color: #a62b59;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.booking-status {
+  color: var(--brand-green);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.book-service-button:disabled,
+.remove-button:disabled,
+.modal-book-button:disabled,
+.select-time-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
 }

@@ -120,6 +120,9 @@ export default function UserProfile() {
       </header>
 
       <main className="up-main">
+        <div style={{ display: "flex", justifyContent: "flex-end", padding: "18px 24px 0" }}>
+          <Link href="/admin/availability" className="up-btn up-btn--small">Manage weekly availability</Link>
+        </div>
         <div className="up-nav-wrap">
           <nav className="up-nav" aria-label="Profile sections">
             <button

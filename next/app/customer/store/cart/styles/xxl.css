@@ -10,7 +10,7 @@
   padding: 42px clamp(24px, 5vw, 76px) 72px;
   background: #fff;
   color: var(--cart-text);
-  font-family: var(--family, system-ui, sans-serif);
+  font-family: var(--font-body);
   box-sizing: border-box;
 }
 

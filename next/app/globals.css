@@ -1,25 +1,28 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: light;
   --background: #ffffff;
-  --foreground: #171717;
-}
-:root {
-  /* Brand */
-  --brand-green: #278A3D;
-  --brand-dark: #0B3B1A;
-  --brand-light: #63D94F;
+  --foreground: #172019;
 
-  /* Neutrals */
-  --white: #FFFFFF;
-  --off-white: #F8FAF7;
+  /* Brand palette: keep the existing spa green as the single accent. */
+  --brand-green: #278a3d;
+  --brand-dark: #0b3b1a;
+  --brand-light: #63d94f;
+  --brand-green-light: #278a3d80;
+  --soft-green: #eef7ef;
+  --sage: #8ba98f;
+
+  /* Shared neutral and typography tokens. */
+  --white: #ffffff;
+  --off-white: #f8faf7;
   --text-dark: #172019;
-  --text-muted: #66736A;
-  --border: #E1E8E2;
-
-  /* Supporting */
-  --soft-green: #EEF7EF;
-  --sage: #8BA98F;
+  --text-muted: #66736a;
+  --border: #e1e8e2;
+  --radius: 5px;
+  --family: var(--font-geist-sans), Arial, sans-serif;
+  --font-body: var(--font-geist-sans), Arial, sans-serif;
+  --font-display: var(--font-geist-sans), Arial, sans-serif;
 }
 
 @theme inline {
@@ -29,17 +32,17 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
 }
 
 

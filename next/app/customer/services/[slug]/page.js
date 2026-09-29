@@ -1,28 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { useParams, useRouter } from "next/navigation";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import useServiceHandler from "../../../../src/hooks/service";
-import Formatter from "../../../../src/utils/formatter";
-import useToggler from "../../../../src/hooks/toggler";
-import { useDispatch, useSelector } from "react-redux";
-// const bookings = [
-//   {
-//     id: 1,
-//     title: "Organic Massage",
-//     duration: "60 minutes",
-//     price: "£50.00",
-//   },
-//   {
-//     id: 2,
-//     title: "Relaxing Massage",
-//     duration: "60 minutes",
-//     price: "£50.00",
-//   },
-// ];
+import useServiceToggler from "../../../../src/hooks/serviceToggler";
 
 function LocationIcon() {
   return (
@@ -39,26 +24,6 @@ function LocationIcon() {
         strokeWidth="1.7"
       />
       <circle cx="12" cy="10" r="2.5" stroke="currentColor" strokeWidth="1.7" />
-    </svg>
-  );
-}
-
-function EditIcon() {
-  return (
-    <svg
-      width="23"
-      height="23"
-      viewBox="0 0 24 24"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M4 20L4.8 16.2L16.9 4.1C17.5 3.5 18.5 3.5 19.1 4.1L19.9 4.9C20.5 5.5 20.5 6.5 19.9 7.1L7.8 19.2L4 20Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-      <path d="M14.8 6.2L17.8 9.2" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }
@@ -130,18 +95,16 @@ function CloseIcon() {
   );
 }
 
-export default function Page({ params }) {
-  const {
-    cart
-  } = useSelector(s => s.cart);
-  let bookings = Array.isArray(cart) ? cart.filter(b => b.type === "service") : [];
-  const { addToCart, rmFromCart } = useToggler();
-
+export default function Page() {
+  const { slug } = useParams();
+  const router = useRouter();
   const { services: s } = useServiceHandler();
-  const [services, setServices] = useState([]);
+  const { bookings, loading: bookingsLoading, loadError, getBooking, isBooked, isBusy, toggleService } = useServiceToggler();
   const [selectedService, setSelectedService] = useState(null);
+  const [bookingMessage, setBookingMessage] = useState("");
 
   const openServiceModal = (service) => {
+    setBookingMessage("");
     setSelectedService(service);
   };
 
@@ -149,32 +112,30 @@ export default function Page({ params }) {
     setSelectedService(null);
   };
 
-  useEffect(() => {
-    const r = window.location.pathname
-      .split("/")
-      .splice(-1)[0]
-      .replace("-", " ");
-    const filteredServices = s.filter((s) => s.category.toLowerCase() === r);
-    setServices(filteredServices);
-  }, [s]);
+  const categorySlug = String(slug ?? "").replaceAll("-", " ").toLowerCase();
+  const services = useMemo(
+    () => s.filter((service) => service.category?.toLowerCase() === categorySlug),
+    [s, categorySlug],
+  );
 
   const handleBookService = async (service) => {
- 
-    let checkIfExist = bookings.some((b) => b.id === service.id);
-    if (checkIfExist) {
-      await rmFromCart(service.product_id, "service");
-      return;
+    setBookingMessage("");
+    try {
+      const serviceId = service.service_id ?? service.id;
+      const existing = getBooking(serviceId);
+      const succeeded = await toggleService({ serviceId });
+      if (!succeeded) return;
+
+      setBookingMessage(existing ? "Service removed from your bookings." : "Service added to your bookings.");
+      closeServiceModal();
+    } catch (error) {
+      setBookingMessage(error.message || "Could not update this booking. Please try again.");
     }
-    let item = { id: service.product_id ?? service.id };
-    await addToCart({ item, qty: 1, type: "service" });
-    closeServiceModal();
   };
 
-  function getTotal() {
-    return bookings.reduce((a, c) => {
-      return a + Number(c.price);
-    }, 0);
-  }
+  const activeBookings = bookings.filter((booking) => ["pending", "confirmed"].includes(booking.status));
+  const getTotal = () => activeBookings.reduce((total, booking) => total + Number(booking.price || 0), 0);
+  const selectedBooking = selectedService ? getBooking(selectedService.id) : null;
 
   return (
     <main className="massage-page">
@@ -189,9 +150,9 @@ export default function Page({ params }) {
             <div className="hero-overlay" />
 
             <div className="hero-content">
-              <h1>Massage</h1>
+              <h1>{services[0]?.category || "Services"}</h1>
 
-              <p>24 treatment</p>
+              <p>{services.length} {services.length === 1 ? "treatment" : "treatments"}</p>
 
               <button
                 type="button"
@@ -241,14 +202,13 @@ export default function Page({ params }) {
                     <button
                       type="button"
                       className="book-service-button"
+                      disabled={bookingsLoading || isBusy(service.id) || (isBooked(service.id) && getBooking(service.id)?.status === "confirmed")}
                       onClick={(event) => {
                         event.stopPropagation();
                         handleBookService(service);
                       }}
                     >
-                      {bookings.some((b) => b.id === service.product_id ?? service.id)
-                        ? "Unbook Service"
-                        : "Book Service"}
+                      {isBusy(service.id) ? "Updating…" : getBooking(service.id)?.status === "confirmed" ? "Confirmed" : isBooked(service.id) ? "Remove Booking" : "Book Service"}
                     </button>
                   </div>
                 </article>
@@ -288,10 +248,13 @@ export default function Page({ params }) {
 
             {/* Booking Items */}
             <div className="booking-items">
-              {bookings.map((booking) => (
+              {loadError && <p className="booking-feedback" role="alert">{loadError}</p>}
+              {bookingsLoading && <p className="booking-empty">Loading your bookings…</p>}
+              {!bookingsLoading && activeBookings.length === 0 && <p className="booking-empty">No services in your bookings yet.</p>}
+              {activeBookings.map((booking) => (
                 <div className="booking-item" key={booking.id}>
                   <div className="booking-item-header">
-                    <strong>{booking.name ?? booking.subcategory}</strong>
+                    <strong>{booking.subcategory ?? booking.category ?? "Service"}</strong>
 
                     <strong>
                       ₦
@@ -303,34 +266,25 @@ export default function Page({ params }) {
 
                   <div className="booking-item-middle">
                     <span>
-                      {booking.duration ?? booking.duration_minutes} Mins
+                      {booking.duration_minutes ? `${booking.duration_minutes} Mins` : booking.status}
                     </span>
 
-                    <button
-                      type="button"
-                      className="remove-button"
-                      onClick={(e) => {
-                        handleBookService(booking);
-                      }}
-                    >
-                      Remove
-                    </button>
+                    {booking.status === "pending" ? (
+                      <button
+                        type="button"
+                        className="remove-button"
+                        disabled={isBusy(booking.service_id)}
+                        onClick={() => handleBookService(booking)}
+                      >
+                        {isBusy(booking.service_id) ? "Removing…" : "Remove"}
+                      </button>
+                    ) : <span className="booking-status">Confirmed</span>}
                   </div>
 
-                  <div className="professional-row">
-                    <span className="professional-label">Professional :</span>
+                  <p className="booking-scheduled-at">
+                    {booking.scheduled_at ? `Preferred time: ${new Date(booking.scheduled_at).toLocaleString()}` : "Appointment not arranged"}
+                  </p>
 
-                    <div className="professional">
-                      <div className="professional-avatar">
-                        <img
-                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&q=80"
-                          alt="Professional"
-                        />
-                      </div>
-
-                      <span>Chinelo Stella</span>
-                    </div>
-                  </div>
                 </div>
               ))}
             </div>
@@ -347,17 +301,16 @@ export default function Page({ params }) {
               </strong>
             </div>
 
+            {bookingMessage && <p className="booking-feedback" role="status" aria-live="polite">{bookingMessage}</p>}
+
             {/* Select Time */}
             <button
               type="button"
               className="select-time-button"
-              onClick={(e) => {
-                let r = window.location.pathname.split("/").splice(-1);
-                window.location.href = `/customer/booking?type=services&id=${r}`;
-                // router.push(`/${treatment.value.toLowerCase().replace(" ", "-")}`)
-              }}
+              disabled={activeBookings.length === 0}
+              onClick={() => router.push("/customer/booking")}
             >
-              Select time
+              Arrange appointment
             </button>
           </div>
         </aside>
@@ -378,12 +331,11 @@ export default function Page({ params }) {
           >
             {/* Modal Image */}
             <div className="modal-image-container">
-              <img
-                src={selectedService.image}
-                alt={selectedService.title}
+              {selectedService.image_url ? <img
+                src={selectedService.image_url}
+                alt={selectedService.subcategory || selectedService.category || "Service"}
                 className="modal-image"
-              />
-
+              /> : <div className="modal-image-placeholder" aria-hidden="true" />}
               <button
                 type="button"
                 className="modal-close-button"
@@ -396,7 +348,7 @@ export default function Page({ params }) {
 
             {/* Modal Content */}
             <div className="modal-content">
-              <h2 id="service-modal-title">{selectedService.title}</h2>
+              <h2 id="service-modal-title">{selectedService.subcategory || selectedService.category || "Service"}</h2>
 
               <p className="modal-description">{selectedService.description}</p>
 
@@ -406,7 +358,7 @@ export default function Page({ params }) {
                   <span className="modal-info-label">Price</span>
 
                   <strong className="modal-price">
-                    {selectedService.price}
+                    ₦{Number(selectedService.price || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
                   </strong>
                 </div>
 
@@ -418,18 +370,21 @@ export default function Page({ params }) {
                   <div className="duration-value">
                     <ClockIcon />
 
-                    <strong>{selectedService.duration}</strong>
+                    <strong>{selectedService.duration_minutes ? `${selectedService.duration_minutes} Mins` : "Duration arranged with the team"}</strong>
                   </div>
                 </div>
               </div>
+
+              {bookingMessage && <p className="booking-feedback" role="status" aria-live="polite">{bookingMessage}</p>}
 
               {/* Modal Action */}
               <button
                 type="button"
                 className="modal-book-button"
+                disabled={bookingsLoading || isBusy(selectedService.id) || selectedBooking?.status === "confirmed"}
                 onClick={() => handleBookService(selectedService)}
               >
-                Book Service
+                {isBusy(selectedService.id) ? "Updating…" : selectedBooking?.status === "confirmed" ? "Booking confirmed" : selectedBooking ? "Remove from bookings" : "Book Service"}
               </button>
             </div>
           </div>

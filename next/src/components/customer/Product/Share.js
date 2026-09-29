@@ -4,14 +4,14 @@ export default function Share({role,item,url,activeImg}) {
   return (
     <>
       <section style={{fontWeight: '500', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', padding: '10px', position: 'relative', width: '100%',}}>
-            <small style={{fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif"}}>Share With Your Friends</small>
+            <small>Share With Your Friends</small>
 
             <ul>
                 <li onClick={e => {
                     // const url = window.location.href;
                     window.open(`https://www.facebook.com/sharer/sharer.php?u=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
-                    <IoLogoFacebook color='#1877F2' size={25} />
+                    <IoLogoFacebook color='var(--brand-green)' size={25} />
                 </li>
 
                 <li onClick={e => {
@@ -19,7 +19,7 @@ export default function Share({role,item,url,activeImg}) {
                     const twitterUrl = `https://twitter.com/intent/tweet?&text=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`;
                     window.open(twitterUrl, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
-                    <IoLogoTwitter color='#1DA1F2' size={25} />
+                    <IoLogoTwitter color='var(--brand-green)' size={25} />
                 </li>
 
                 <li onClick={async e => {
@@ -27,7 +27,7 @@ export default function Share({role,item,url,activeImg}) {
                     window.open(whatsappUrl, '_blank');
 
                 }} style={{border: 'none', padding: '0', cursor: 'pointer'}}>
-                    <IoLogoWhatsapp color='#25D366' size={25} />
+                    <IoLogoWhatsapp color='var(--brand-green)' size={25} />
                 </li>
 
             </ul>

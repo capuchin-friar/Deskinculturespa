@@ -56,9 +56,9 @@ const CardCnt = ({items}) => {
                                     {
                                         screenWidth > 479
                                         ?
-                                        <small style={{fontSize: 'small', fontFamily: 'sans-serif', height: '35px', lineHeight: '18px', color: '#000'}} onClick={e => navigate(`/customer/store/${item.product_id}`)} >{item.title}</small>
+                                        <small style={{fontSize: 'small', height: '35px', lineHeight: '18px', color: '#000'}} onClick={e => navigate(`/customer/store/${item.product_id}`)} >{item.title}</small>
                                         : 
-                                        <small style={{fontSize: 'small', fontFamily: 'sans-serif', height: '35px', lineHeight: '18px', color: '#000'}} onClick={e => navigate(`/customer/store/${item.product_id}`)} >{item.title}</small>
+                                        <small style={{fontSize: 'small', height: '35px', lineHeight: '18px', color: '#000'}} onClick={e => navigate(`/customer/store/${item.product_id}`)} >{item.title}</small>
                                     }
 
                                     {/* <br /> */}
