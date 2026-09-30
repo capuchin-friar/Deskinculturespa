@@ -54,10 +54,13 @@ export default function ConsultationDetailPage() {
   if (!consultation) return <main className="consultation-detail"><div className="consultation-detail-inner"><h1>Consultation not found</h1><Link href="/customer/consultation">Browse consultations</Link></div></main>;
 
   const hasActiveConsultation = activeAppointments.length > 0;
+  const consultationTotal = activeAppointments.reduce((total, appointment) => total + Number(appointment.amount || 0), 0);
   return (
     <main className="consultation-detail">
       <div className="consultation-detail-inner">
         <Link className="consultation-back-link" href="/customer/consultation">← All consultations</Link>
+        <div className="consultation-detail-layout">
+          <div className="consultation-detail-main">
         <section className="consultation-detail-hero">
           <div className="consultation-detail-copy">
             <span className="consultation-detail-kicker">PERSONAL GUIDANCE, EXPERT CARE</span>
@@ -88,8 +91,33 @@ export default function ConsultationDetailPage() {
             })}
           </div>
           {feedback && <p className="consultation-feedback" role="status" aria-live="polite">{feedback}</p>}
-          {hasActiveConsultation && <Link className="consultation-schedule-link" href="/customer/booking">Choose an appointment time <span aria-hidden="true">↗</span></Link>}
         </section>
+          </div>
+
+          <aside className="consultation-booking-summary" aria-labelledby="consultation-summary-title">
+            <div className="consultation-summary-heading"><span>YOUR APPOINTMENT</span><h2 id="consultation-summary-title">Booking summary</h2></div>
+            <div className="consultation-summary-items">
+              {activeAppointments.length === 0 && <p className="consultation-summary-empty">No consultations selected yet.</p>}
+              {activeAppointments.map((appointment) => (
+                <article className="consultation-summary-item" key={appointment.id}>
+                  <div className="consultation-summary-item-heading">
+                    <strong>{appointment.consultation_name || consultation?.name || "Consultation"}</strong>
+                    <strong>₦{Number(appointment.amount || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong>
+                  </div>
+                  <p>{appointment.duration_minutes} min · {modeNames[appointment.mode] || appointment.mode}</p>
+                  <div className="consultation-summary-item-footer">
+                    <span>{appointment.scheduled_at ? `Scheduled · ${new Date(appointment.scheduled_at).toLocaleString()}` : "Appointment not arranged"}</span>
+                    {appointment.status === "pending" && <button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook({ id: appointment.offering_id })}>Remove</button>}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="consultation-summary-total"><span>Total</span><strong>₦{consultationTotal.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div>
+            {hasActiveConsultation
+              ? <Link className="consultation-summary-schedule" href="/customer/booking">Arrange appointment <span aria-hidden="true">→</span></Link>
+              : <span className="consultation-summary-schedule is-disabled" aria-disabled="true">Arrange appointment <span aria-hidden="true">→</span></span>}
+          </aside>
+        </div>
       </div>
     </main>
   );
