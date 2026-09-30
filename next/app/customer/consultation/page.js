@@ -15,9 +15,8 @@ export default function Consultation() {
 
         <div className="consultation-list" aria-label="Consultation services">
           {_CONSULTATIONS.map(({ id, name, subtitle, description, image }, index) => {
-            const slug = name.toLowerCase().trim().replace(/\s+/g, "-");
             return (
-            <Link className="consultation-card" href={`/customer/consultation/${slug}`} key={id}>
+            <Link className="consultation-card" href={`/customer/consultation/${id}`} key={id}>
               <span className="consultation-card-image">
                 <img src={image || "/consultation.png"} alt="" />
                 <span className="consultation-card-number">{String(index + 1).padStart(2, "0")}</span>

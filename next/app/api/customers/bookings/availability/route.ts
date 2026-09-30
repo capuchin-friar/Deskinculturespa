@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
   try {
     const data = await AvailabilityModel.getCustomerMonthAvailability(userId, month);
     if (data.error === "SERVICE_UNAVAILABLE") {
-      return NextResponse.json({ success: false, message: "One of these services is no longer available for booking." }, { status: 409 });
+      return NextResponse.json({ success: false, message: "One of these services or consultations is no longer available for booking." }, { status: 409 });
     }
     return NextResponse.json({ success: true, data });
   } catch {

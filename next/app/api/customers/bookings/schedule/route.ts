@@ -17,16 +17,20 @@ export async function POST(request: NextRequest) {
     }
     const result = await AvailabilityModel.scheduleCustomerBookings(userId, selected.toISOString());
     if (result.error === "BOOKING_NOT_FOUND") {
-      return NextResponse.json({ success: false, message: "No active service bookings were found." }, { status: 404 });
+      return NextResponse.json({ success: false, message: "No active service or consultation bookings were found." }, { status: 404 });
     }
     if (result.error === "SERVICE_UNAVAILABLE") {
-      return NextResponse.json({ success: false, message: "One of these services is no longer available for booking." }, { status: 409 });
+      return NextResponse.json({ success: false, message: "One of these services or consultations is no longer available for booking." }, { status: 409 });
     }
     if (result.error === "SLOT_UNAVAILABLE") {
-      return NextResponse.json({ success: false, message: "That time is no longer available for all your services. Choose another slot." }, { status: 409 });
+      return NextResponse.json({ success: false, message: "That time is no longer available for all your services and consultations. Choose another slot." }, { status: 409 });
     }
-    return NextResponse.json({ success: true, data: result.bookings, message: "All services were scheduled successfully." });
+    return NextResponse.json({
+      success: true,
+      data: { bookings: result.bookings, consultations: result.consultations },
+      message: "Your services and consultations were scheduled successfully.",
+    });
   } catch {
-    return NextResponse.json({ success: false, message: "Could not schedule your services." }, { status: 500 });
+    return NextResponse.json({ success: false, message: "Could not schedule your services and consultations." }, { status: 500 });
   }
 }
