@@ -1,73 +1,38 @@
-"use client";
-
-import "./styles/xxl.css";
+import Link from "next/link";
+import _CONSULTATIONS from "../../../src/json/consultations.json";
+import "../services/styles/xxl.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
-import _CONSULTATIONS from "../../../src/json/consultations.json";
-
 
 export default function Consultation() {
-  const appointmentList = _CONSULTATIONS.map(({ name }) => ({
-    label: name,
-    value: name,
-  }));
   return (
-    <div className="consultation-section">
-      <div className="consultation-container">
-        <div className="section-badge">
-          <svg
-            className="badge-icon"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              d="M7 12.5L9.5 15L17 7.5"
-              stroke="currentColor"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M5 5.5C5 4.672 5.672 4 6.5 4H9L10.5 2.5H13.5L15 4H17.5C18.328 4 19 4.672 19 5.5V18.5C19 19.328 18.328 20 17.5 20H6.5C5.672 20 5 19.328 5 18.5V5.5Z"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-          </svg>
+    <main className="consultation-catalog">
+      <section className="consultation-catalog-inner" aria-labelledby="consultations-title">
+        <div className="catalog-eyebrow"><span aria-hidden="true">✳</span> PERSONAL GUIDANCE, EXPERT CARE</div>
+        <h1 id="consultations-title">A little guidance can change everything.</h1>
+        <p className="catalog-intro">Talk through your goals with a specialist and find a routine or treatment plan that works for you.</p>
 
-          <span>Our Features</span>
+        <div className="consultation-list" aria-label="Consultation services">
+          {_CONSULTATIONS.map(({ id, name, subtitle, description, image }, index) => {
+            const slug = name.toLowerCase().trim().replace(/\s+/g, "-");
+            return (
+            <Link className="consultation-card" href={`/customer/consultation/${slug}`} key={id}>
+              <span className="consultation-card-image">
+                <img src={image || "/consultation.png"} alt="" />
+                <span className="consultation-card-number">{String(index + 1).padStart(2, "0")}</span>
+              </span>
+              <span className="consultation-card-copy">
+                <span className="consultation-card-subtitle">{subtitle}</span>
+                <span className="consultation-card-title">{name}</span>
+                <span className="consultation-card-description">{description}</span>
+                <span className="consultation-card-link">Explore consultation <span aria-hidden="true">↗</span></span>
+              </span>
+            </Link>
+            );
+          })}
         </div>
-
-        <h1 className="consultation-title">
-          Enjoy All Your Favorite Consultations
-          <br />
-          {/* At Home */}
-        </h1>
-
-        <div className="consultation-grid">
-          {appointmentList.map((treatment) => (
-            <div
-              key={treatment.name}
-              className={`treatment-card ${treatment.wide ? "treatment-card-wide" : ""
-                }`}
-              style={{
-                backgroundImage: `url("${treatment.image}")`,
-              }}
-              onClick={e => {
-                let r = treatment.value.toLowerCase().replace(" ", "-");
-                window.location.href = `/customer/consultation/${r}`;
-              }}
-            >
-              <div className="card-overlay" />
-              <span className="treatment-name">{treatment.value}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 }

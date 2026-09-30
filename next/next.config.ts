@@ -26,6 +26,12 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
 
+    const requestedCustomerRouteRedirects = ["services", "consultation"].map((route) => ({
+      source: `/customers/${route}/:path*`,
+      destination: `/customer/${route}/:path*`,
+      permanent: true,
+    }));
+
     const apiRouteRedirects = [
       ["/api/product/:path*", "/api/customers/product/:path*"],
       ["/api/products/:path*", "/api/customers/products/:path*"],
@@ -42,7 +48,7 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
 
-    return [...customerRouteRedirects, ...apiRouteRedirects];
+    return [...customerRouteRedirects, ...requestedCustomerRouteRedirects, ...apiRouteRedirects];
   },
 };
 
