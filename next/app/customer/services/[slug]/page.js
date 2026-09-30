@@ -208,7 +208,7 @@ export default function Page() {
                         handleBookService(service);
                       }}
                     >
-                      {isBusy(service.id) ? "Updating…" : getBooking(service.id)?.status === "confirmed" ? "Confirmed" : isBooked(service.id) ? "Remove Booking" : "Book Service"}
+                      {isBusy(service.id) ? "Updating…" : getBooking(service.id)?.status === "confirmed" ? "Confirmed" : isBooked(service.id) ? "UnBook" : "Book"}
                     </button>
                   </div>
                 </article>
@@ -384,7 +384,7 @@ export default function Page() {
                 disabled={bookingsLoading || isBusy(selectedService.id) || selectedBooking?.status === "confirmed"}
                 onClick={() => handleBookService(selectedService)}
               >
-                {isBusy(selectedService.id) ? "Updating…" : selectedBooking?.status === "confirmed" ? "Booking confirmed" : selectedBooking ? "Remove from bookings" : "Book Service"}
+                {isBusy(selectedService.id) ? "Updating…" : selectedBooking?.status === "confirmed" ? "Booking confirmed" : selectedBooking ? "Remove from bookings" : "Book"}
               </button>
             </div>
           </div>

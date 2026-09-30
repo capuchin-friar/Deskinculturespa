@@ -151,9 +151,9 @@
 .services-grid {
   width: 100%;
 
-  display: grid;
+  display: flex;
 
-  grid-template-columns: repeat(2, 1fr);
+  flex-wrap: wrap;
 
   gap: 18px;
 }
@@ -165,8 +165,10 @@
 .service-card {
   height: 250px;
 
-  padding: 24px 26px 20px;
+  width: 100%;
 
+  padding: 24px 26px 20px;
+  flex-shrink: 0;
   border-radius: 7px;
 
   background-color: #fff;
@@ -292,7 +294,7 @@
 }
 
 /* =========================================
-     BOOK SERVICE BUTTON
+     Book BUTTON
   ========================================= */
 
 .book-service-button {
@@ -311,6 +313,11 @@
 
   font-size: 14px;
   font-weight: 400;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+
+  font-size: small;
 
   cursor: pointer;
 
@@ -400,6 +407,7 @@
   ========================================= */
 
 .booking-sidebar {
+  height: fit-content;
   width: 100%;
   min-width: 0;
 }
