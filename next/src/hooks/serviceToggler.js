@@ -102,7 +102,6 @@ export default function useServiceToggler() {
 
   const scheduleBookings = useCallback(async ({ scheduledAt } = {}) => {
     const pendingBookings = bookings.filter((entry) => activeStatuses.has(entry.status));
-    if (!pendingBookings.length) throw new Error("No active service bookings were found.");
     const serviceIds = pendingBookings.map((entry) => String(entry.service_id));
     if (serviceIds.some((id) => pendingServiceIds.current.has(id))) return false;
     serviceIds.forEach((id) => pendingServiceIds.current.add(id));
@@ -113,13 +112,14 @@ export default function useServiceToggler() {
         throw new Error("Choose a valid future date and time.");
       }
       const { data } = await baseApi.post("customers/bookings/schedule", { scheduled_at: date.toISOString() });
-      if (!data?.success || !Array.isArray(data.data)) throw new Error(data?.message || "Could not schedule all services.");
-      const scheduledById = new Map(data.data.map((entry) => [String(entry.id), entry]));
+      if (!data?.success || !Array.isArray(data.data?.bookings) || !Array.isArray(data.data?.consultations)) throw new Error(data?.message || "Could not schedule your bookings.");
+      const updatedBookings = data.data.bookings;
+      const scheduledById = new Map(updatedBookings.map((entry) => [String(entry.id), entry]));
       setBookings((current) => {
         const currentIds = new Set(current.map((entry) => String(entry.id)));
         return [
           ...current.map((entry) => scheduledById.has(String(entry.id)) ? { ...entry, ...scheduledById.get(String(entry.id)) } : entry),
-          ...data.data.filter((entry) => !currentIds.has(String(entry.id))),
+          ...updatedBookings.filter((entry) => !currentIds.has(String(entry.id))),
         ];
       });
       return true;

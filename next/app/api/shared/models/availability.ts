@@ -25,6 +25,7 @@ type CustomerBookingForSlot = AvailabilityBookingContext & {
   subcategory: string | null;
   price: string | number;
   service_is_active: boolean;
+  kind?: "service" | "consultation";
 };
 type RawOccupiedBooking = OccupiedBooking & { user_id: string };
 
@@ -168,15 +169,29 @@ export class AvailabilityModel {
   }
 
   static async getCustomerMonthAvailability(userId: string, month: string) {
-    const { rows: bookings } = await query<CustomerBookingForSlot>(
+    const [{ rows: services }, { rows: consultations }] = await Promise.all([
+      query<CustomerBookingForSlot>(
       `SELECT b.id, b.user_id, b.service_id, b.scheduled_at, b.status, b.price,
               s.admin_id, s.duration_minutes, s.category, s.subcategory,
-              s.is_active AS service_is_active
+              s.is_active AS service_is_active, 'service' AS kind
        FROM bookings b JOIN services s ON s.id = b.service_id
        WHERE b.user_id = $1 AND b.status IN ('pending', 'confirmed')
        ORDER BY b.id`,
       [userId],
-    );
+      ),
+      query<CustomerBookingForSlot>(
+        `SELECT a.id, a.customer_id AS user_id, a.offering_id AS service_id,
+                a.scheduled_at, a.status, a.amount AS price, a.consultant_id AS admin_id,
+                c.duration_minutes, c.slug AS category,
+                COALESCE(a.consultation_name, c.slug) AS subcategory,
+                c.is_active AS service_is_active, 'consultation' AS kind
+         FROM appointments a JOIN consultations c ON c.id = a.offering_id
+         WHERE a.customer_id = $1 AND a.status IN ('pending', 'confirmed')
+         ORDER BY a.id`,
+        [userId],
+      ),
+    ]);
+    const bookings = [...services, ...consultations];
     if (bookings.some((booking) => !booking.service_is_active)) {
       return { bookings, timezone: "Africa/Lagos", dates: {}, error: "SERVICE_UNAVAILABLE" as const };
     }
@@ -197,16 +212,27 @@ export class AvailabilityModel {
     const lastDay = `${month}-${String(daysInMonth).padStart(2, "0")}`;
     const from = new Date(zonedDateTimeToUtc(firstDay, 0, timezone).getTime() - 2 * 86_400_000);
     const to = new Date(zonedDateTimeToUtc(addIsoDays(lastDay, 1), 0, timezone).getTime() + 2 * 86_400_000);
-    const targetIds = bookings.map((booking) => Number(booking.id));
+    const targetBookingIds = services.map((booking) => Number(booking.id));
+    const targetAppointmentIds = consultations.map((booking) => Number(booking.id));
     const occupiedByAdmin = new Map<number, OccupiedBooking[]>();
     await Promise.all([...grouped.keys()].map(async (adminId) => {
       const { rows } = await query<RawOccupiedBooking>(
-        `SELECT b.user_id, b.scheduled_at, s.duration_minutes
-         FROM bookings b JOIN services s ON s.id = b.service_id
-         WHERE s.admin_id = $1 AND b.status IN ('pending', 'confirmed')
-           AND b.scheduled_at IS NOT NULL AND b.scheduled_at >= $2 AND b.scheduled_at < $3
-           AND NOT (b.id = ANY($4::int[]))`,
-        [adminId, from, to, targetIds],
+        `SELECT user_id, scheduled_at, SUM(duration_minutes)::integer AS duration_minutes
+         FROM (
+           SELECT b.user_id, b.scheduled_at, s.duration_minutes, b.id, 'service' AS kind
+           FROM bookings b JOIN services s ON s.id = b.service_id
+           WHERE s.admin_id = $1 AND b.status IN ('pending', 'confirmed')
+             AND b.scheduled_at IS NOT NULL AND b.scheduled_at >= $2 AND b.scheduled_at < $3
+           UNION ALL
+           SELECT a.customer_id AS user_id, a.scheduled_at, c.duration_minutes, a.id, 'consultation' AS kind
+           FROM appointments a JOIN consultations c ON c.id = a.offering_id
+           WHERE a.consultant_id = $1 AND a.status IN ('pending', 'confirmed')
+             AND a.scheduled_at IS NOT NULL AND a.scheduled_at >= $2 AND a.scheduled_at < $3
+         ) occupied
+         WHERE (kind = 'service' AND NOT (id = ANY($4::int[])))
+            OR (kind = 'consultation' AND NOT (id = ANY($5::int[])))
+         GROUP BY user_id, scheduled_at`,
+        [adminId, from, to, targetBookingIds, targetAppointmentIds],
       );
       const rules = rulesByAdmin.get(adminId) || [];
       const adminTimezone = rules[0]?.timezone || timezone;
@@ -264,15 +290,27 @@ export class AvailabilityModel {
     try {
       await client.query("BEGIN");
       await client.query("SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", [userId, "customer-bookings"]);
-      const { rows: bookings } = await client.query<CustomerBookingForSlot>(
+      const { rows: services } = await client.query<CustomerBookingForSlot>(
         `SELECT b.id, b.user_id, b.service_id, b.scheduled_at, b.status, b.price,
                 s.admin_id, s.duration_minutes, s.category, s.subcategory,
-                s.is_active AS service_is_active
+                s.is_active AS service_is_active, 'service' AS kind
          FROM bookings b JOIN services s ON s.id = b.service_id
          WHERE b.user_id = $1 AND b.status IN ('pending', 'confirmed')
          ORDER BY b.id FOR UPDATE OF b`,
         [userId],
       );
+      const { rows: consultations } = await client.query<CustomerBookingForSlot>(
+        `SELECT a.id, a.customer_id AS user_id, a.offering_id AS service_id,
+                a.scheduled_at, a.status, a.amount AS price, a.consultant_id AS admin_id,
+                c.duration_minutes, c.slug AS category,
+                COALESCE(a.consultation_name, c.slug) AS subcategory,
+                c.is_active AS service_is_active, 'consultation' AS kind
+         FROM appointments a JOIN consultations c ON c.id = a.offering_id
+         WHERE a.customer_id = $1 AND a.status IN ('pending', 'confirmed')
+         ORDER BY a.id FOR UPDATE OF a`,
+        [userId],
+      );
+      const bookings = [...services, ...consultations];
       if (!bookings.length) {
         await client.query("ROLLBACK");
         return { error: "BOOKING_NOT_FOUND" as const };
@@ -307,7 +345,8 @@ export class AvailabilityModel {
         await client.query("SELECT pg_advisory_xact_lock(hashtext($1), hashtext($2))", [String(target.adminId), target.date]);
       }
 
-      const targetIds = bookings.map((booking) => Number(booking.id));
+      const targetBookingIds = services.map((booking) => Number(booking.id));
+      const targetAppointmentIds = consultations.map((booking) => Number(booking.id));
       for (const adminId of adminIds) {
         const rules = rulesByAdmin.get(adminId) || [];
         const timezone = rules[0]?.timezone || "Africa/Lagos";
@@ -326,17 +365,26 @@ export class AvailabilityModel {
         const endOfDay = zonedDateTimeToUtc(addIsoDays(localDate, 1), 0, timezone);
         const { rows: occupiedRows } = await client.query<RawOccupiedBooking>(
           `WITH booked_windows AS (
-             SELECT b.user_id, b.scheduled_at,
-                    SUM(COALESCE(s.duration_minutes, $3))::integer AS duration_minutes
-             FROM bookings b JOIN services s ON s.id = b.service_id
-             WHERE s.admin_id = $1 AND b.status IN ('pending', 'confirmed')
-               AND b.scheduled_at IS NOT NULL AND NOT (b.id = ANY($2::int[]))
-             GROUP BY b.user_id, b.scheduled_at
+             SELECT user_id, scheduled_at, SUM(duration_minutes)::integer AS duration_minutes
+             FROM (
+               SELECT b.user_id, b.scheduled_at, COALESCE(s.duration_minutes, $3) AS duration_minutes,
+                      b.id, 'service' AS kind
+               FROM bookings b JOIN services s ON s.id = b.service_id
+               WHERE s.admin_id = $1 AND b.status IN ('pending', 'confirmed') AND b.scheduled_at IS NOT NULL
+               UNION ALL
+               SELECT a.customer_id AS user_id, a.scheduled_at, c.duration_minutes,
+                      a.id, 'consultation' AS kind
+               FROM appointments a JOIN consultations c ON c.id = a.offering_id
+               WHERE a.consultant_id = $1 AND a.status IN ('pending', 'confirmed') AND a.scheduled_at IS NOT NULL
+             ) all_bookings
+             WHERE (kind = 'service' AND NOT (id = ANY($2::int[])))
+                OR (kind = 'consultation' AND NOT (id = ANY($6::int[])))
+             GROUP BY user_id, scheduled_at
            )
            SELECT user_id, scheduled_at, duration_minutes FROM booked_windows
            WHERE scheduled_at < $4
              AND scheduled_at + (duration_minutes * INTERVAL '1 minute') > $5`,
-          [adminId, targetIds, Number(rule.slot_interval_minutes), endOfDay, startOfDay],
+          [adminId, targetBookingIds, Number(rule.slot_interval_minutes), endOfDay, startOfDay, targetAppointmentIds],
         );
         const slots = makeSlots(localDate, duration, rule, occupiedRows);
         if (!slots.some((slot) => new Date(slot.scheduled_at).getTime() === selectedDate.getTime())) {
@@ -345,13 +393,30 @@ export class AvailabilityModel {
         }
       }
 
-      const { rowCount } = await client.query(
+      const scheduledAt = selectedDate.toISOString();
+      const { rowCount: bookingCount } = await client.query(
         `UPDATE bookings SET scheduled_at = $1, updated_at = NOW()
          WHERE user_id = $2 AND id = ANY($3::int[]) AND status IN ('pending', 'confirmed')
          RETURNING id`,
-        [selectedDate.toISOString(), userId, targetIds],
+        [scheduledAt, userId, targetBookingIds],
       );
-      if (rowCount !== targetIds.length) {
+      let appointmentCount = 0;
+      for (const appointment of consultations) {
+        const rules = rulesByAdmin.get(Number(appointment.admin_id)) || [];
+        const timezone = rules[0]?.timezone || "Africa/Lagos";
+        const startsInZone = partsInZone(selectedDate, timezone);
+        const endsInZone = partsInZone(new Date(selectedDate.getTime() + Number(appointment.duration_minutes || 0) * 60_000), timezone);
+        const { rowCount } = await client.query(
+          `UPDATE appointments
+           SET scheduled_at = $1, appointment_date = $2::date, start_time = $3::time,
+               end_time = $4::time, updated_at = NOW()
+           WHERE customer_id = $5 AND id = $6 AND status IN ('pending', 'confirmed')`,
+          [scheduledAt, `${startsInZone.year}-${startsInZone.month}-${startsInZone.day}`,
+            `${startsInZone.hour}:${startsInZone.minute}:00`, `${endsInZone.hour}:${endsInZone.minute}:00`, userId, appointment.id],
+        );
+        appointmentCount += Number(rowCount || 0);
+      }
+      if (bookingCount !== targetBookingIds.length || appointmentCount !== targetAppointmentIds.length) {
         await client.query("ROLLBACK");
         return { error: "BOOKING_NOT_FOUND" as const };
       }
@@ -359,10 +424,16 @@ export class AvailabilityModel {
         `SELECT b.*, s.category, s.subcategory, s.description, s.duration_minutes, s.image_url
          FROM bookings b JOIN services s ON s.id = b.service_id
          WHERE b.user_id = $1 AND b.id = ANY($2::int[]) ORDER BY b.id`,
-        [userId, targetIds],
+        [userId, targetBookingIds],
+      );
+      const { rows: updatedAppointments } = await client.query(
+        `SELECT a.*, c.slug, c.mode, c.duration_minutes
+         FROM appointments a JOIN consultations c ON c.id = a.offering_id
+         WHERE a.customer_id = $1 AND a.id = ANY($2::int[]) ORDER BY a.id`,
+        [userId, targetAppointmentIds],
       );
       await client.query("COMMIT");
-      return { bookings: updatedBookings };
+      return { bookings: updatedBookings, consultations: updatedAppointments };
     } catch (error) {
       await client.query("ROLLBACK");
       throw error;

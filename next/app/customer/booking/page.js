@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { baseApi } from "../../api/shared/config";
 import useServiceToggler from "../../../src/hooks/serviceToggler";
+import useConsultationToggler from "../../../src/hooks/consultationToggler";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";
@@ -25,9 +26,13 @@ const timezoneLabel = (timezone) => ({ "Africa/Lagos": "West Africa Time (GMT+1)
 
 export default function BookingPage() {
   const { bookings, loading, loadError, scheduleBookings } = useServiceToggler();
+  const { activeAppointments, loading: consultationsLoading, loadError: consultationsError, refreshAppointments } = useConsultationToggler();
   const activeBookings = useMemo(() => bookings.filter((booking) => ["pending", "confirmed"].includes(booking.status)), [bookings]);
-  const hasActiveBookings = activeBookings.length > 0;
-  const bookingSignature = activeBookings.map((booking) => `${booking.id}:${booking.service_id}:${booking.scheduled_at || ""}`).join(",");
+  const hasActiveBookings = activeBookings.length > 0 || activeAppointments.length > 0;
+  const bookingSignature = [
+    ...activeBookings.map((booking) => `service:${booking.id}:${booking.scheduled_at || ""}`),
+    ...activeAppointments.map((appointment) => `consultation:${appointment.id}:${appointment.scheduled_at || ""}`),
+  ].join(",");
   const [month, setMonth] = useState(currentMonth);
   const [availability, setAvailability] = useState(null);
   const [availabilityError, setAvailabilityError] = useState({ scope: "", message: "" });
@@ -43,7 +48,12 @@ export default function BookingPage() {
   const availabilityLoading = Boolean(hasActiveBookings && !shownAvailability && !availabilityErrorMessage);
   const dates = shownAvailability?.dates || {};
   const slots = selectedDate ? dates[selectedDate] || [] : [];
-  const total = activeBookings.reduce((sum, booking) => sum + Number(booking.price || 0), 0);
+  const total = activeBookings.reduce((sum, booking) => sum + Number(booking.price || 0), 0)
+    + activeAppointments.reduce((sum, appointment) => sum + Number(appointment.amount || 0), 0);
+  const bookingItems = [
+    ...activeBookings.map((booking) => ({ ...booking, itemName: booking.subcategory || booking.category || "Service", itemPrice: booking.price, itemKey: `service:${booking.id}` })),
+    ...activeAppointments.map((appointment) => ({ ...appointment, itemName: appointment.consultation_name || "Consultation", itemPrice: appointment.amount, itemKey: `consultation:${appointment.id}` })),
+  ];
   const firstMonth = currentMonth();
   const [year, monthNumber] = month.split("-").map(Number);
   const daysInMonth = new Date(Date.UTC(year, monthNumber, 0)).getUTCDate();
@@ -73,12 +83,13 @@ export default function BookingPage() {
   };
 
   const handleSchedule = async () => {
-    if (!activeBookings.length || !selectedSlot) return;
+    if (!hasActiveBookings || !selectedSlot) return;
     setSaving(true);
     setFeedback("");
     try {
       await scheduleBookings({ scheduledAt: selectedSlot });
-      setFeedback("The same appointment time was saved for all services.");
+      await refreshAppointments();
+      setFeedback("The same appointment time was saved for all services and consultations.");
     } catch (error) {
       setFeedback(error.message || "Could not schedule all services.");
       setAvailabilityRefresh((value) => value + 1);
@@ -99,15 +110,16 @@ export default function BookingPage() {
         <section className="booking-main" aria-label="Appointment calendar and available times">
           <div className="appointment-header">
             <div><span className="booking-step">APPOINTMENT SCHEDULE</span><h2>Choose a date and time</h2>
-              <p>One appointment time will be applied to every active service.</p></div>
-            <span className="booking-duration">{activeBookings.length} {activeBookings.length === 1 ? "service" : "services"}</span>
+              <p>One appointment time will be applied to all active services and consultations.</p></div>
+            <span className="booking-duration">{bookingItems.length} {bookingItems.length === 1 ? "booking" : "bookings"}</span>
           </div>
 
-          {loading && <p className="schedule-state">Loading your bookings…</p>}
+          {(loading || consultationsLoading) && <p className="schedule-state">Loading your bookings…</p>}
           {!loading && loadError && <p className="schedule-error" role="alert">{loadError}</p>}
-          {!loading && !loadError && activeBookings.length === 0 && <div className="booking-empty"><p>You have no services waiting to be scheduled.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link></div>}
+          {!consultationsLoading && consultationsError && <p className="schedule-error" role="alert">{consultationsError}</p>}
+          {!loading && !consultationsLoading && !loadError && !consultationsError && !hasActiveBookings && <div className="booking-empty"><p>You have no services or consultations waiting to be scheduled.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link> <Link href="/customer/consultation">Explore consultations <span aria-hidden="true">↗</span></Link></div>}
 
-          {!loading && activeBookings.length > 0 && <>
+          {!loading && !consultationsLoading && !loadError && !consultationsError && hasActiveBookings && <>
             <section className="calendar-section" aria-label="Choose appointment date">
               <div className="calendar-heading"><div><span className="booking-step">AVAILABLE DATES</span><h3>{formatDate(`${month}-01`, { month: "long", year: "numeric" })}</h3></div>
                 <div className="calendar-controls"><button type="button" aria-label="Previous month" disabled={month <= firstMonth || availabilityLoading} onClick={() => { setMonth((value) => shiftMonth(value, -1)); setSelection({ scope: "", date: "", slot: "" }); }}>‹</button><button type="button" aria-label="Next month" disabled={availabilityLoading} onClick={() => { setMonth((value) => shiftMonth(value, 1)); setSelection({ scope: "", date: "", slot: "" }); }}>›</button></div></div>
@@ -131,7 +143,7 @@ export default function BookingPage() {
                 {shownAvailability?.timezone && <p>Times shown in {timezoneLabel(shownAvailability.timezone)}.</p>}</div>
               {availabilityLoading ? <p className="schedule-state">Checking the team&apos;s availability…</p> : availabilityErrorMessage ? <p className="schedule-error" role="alert">{availabilityErrorMessage}</p> : selectedDate && slots.length === 0 ? <p className="no-slots">No available times remain on this date. Choose another date.</p> : null}
               {slots.length > 0 && <div className="time-list">{slots.map((slot) => <button type="button" key={slot.scheduled_at} className={`time-slot${selectedSlot === slot.scheduled_at ? " selected" : ""}`} aria-pressed={selectedSlot === slot.scheduled_at} onClick={() => { setSelection({ scope: selectionScope, date: selectedDate, slot: slot.scheduled_at }); setFeedback(""); }}>{formatTime(slot.scheduled_at, shownAvailability.timezone)}</button>)}</div>}
-              {activeBookings.length > 0 && <button type="button" className="appointment-save-button" disabled={!selectedSlot || saving} onClick={handleSchedule}>{saving ? "Saving…" : activeBookings.every((booking) => booking.scheduled_at) ? "Reschedule all services" : "Arrange all services"}</button>}
+              {hasActiveBookings && <button type="button" className="appointment-save-button" disabled={!selectedSlot || saving} onClick={handleSchedule}>{saving ? "Saving…" : bookingItems.every((booking) => booking.scheduled_at) ? "Reschedule all bookings" : "Arrange all bookings"}</button>}
               {feedback && <p className={`appointment-feedback${feedback.toLowerCase().includes("saved") ? "" : " is-error"}`} role="status" aria-live="polite">{feedback}</p>}
             </section>
           </>}
@@ -140,13 +152,13 @@ export default function BookingPage() {
 
         <aside className="booking-summary" aria-labelledby="booking-summary-title">
           <div className="summary-header"><span>YOUR APPOINTMENT</span><h2 id="booking-summary-title">Booking summary</h2></div>
-          <div className="summary-services"><h3>Services</h3><p className="summary-shared-slot-note">One appointment time applies to every service below.</p>
-            {activeBookings.length ? activeBookings.map((booking) => <div className="summary-service" key={booking.id}>
-              <span className="summary-service-top"><strong>{booking.subcategory || booking.category || "Service"}</strong><strong>₦{Number(booking.price || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></span>
+          <div className="summary-services"><h3>Services &amp; consultations</h3><p className="summary-shared-slot-note">One appointment time applies to every booking below.</p>
+            {bookingItems.length ? bookingItems.map((booking) => <div className="summary-service" key={booking.itemKey}>
+              <span className="summary-service-top"><strong>{booking.itemName}</strong><strong>₦{Number(booking.itemPrice || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></span>
               <span>{selectedSlot ? `Selected for all · ${formatTime(selectedSlot, shownAvailability?.timezone || "Africa/Lagos")}` : booking.scheduled_at ? `Scheduled · ${new Date(booking.scheduled_at).toLocaleString()}` : "Awaiting shared appointment time"}</span>
-            </div>) : <div className="booking-empty"><p>No services selected.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link></div>}
+            </div>) : <div className="booking-empty"><p>No services or consultations selected.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link></div>}
           </div>
-          <div className="summary-total"><div className="total-line"><span>Total</span><strong>₦{total.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div><p>Total shown for active service bookings.</p></div>
+          <div className="summary-total"><div className="total-line"><span>Total</span><strong>₦{total.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div><p>Total for active services and consultations.</p></div>
         </aside>
       </div>
     </main>
