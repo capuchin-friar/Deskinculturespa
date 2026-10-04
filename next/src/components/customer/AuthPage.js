@@ -99,7 +99,7 @@ export default function AuthPage({ mode }) {
       <section className="dsc-auth-card" aria-labelledby="auth-title">
         <aside className="dsc-auth-intro">
           <Link href="/" className="dsc-auth-brand" aria-label="Deskinculture Spa home">
-            <Image src="/logo.jpeg" alt="" width={42} height={42} />
+            <Image src="/deskinculture_logo.png" alt="" width={42} height={42} />
             <span>DESKIN<span>CULTURE</span></span>
           </Link>
           <div className="dsc-auth-intro-copy">

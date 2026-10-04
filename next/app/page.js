@@ -108,10 +108,10 @@ export default function Home() {
           <div className="customer-hero-content">
             <div className="customer-hero-logo">
               <img
-                src="/logo.jpeg"
+                src="/deskinculture_logo.png"
                 style={{
-                  height: "70px",
-                  width: "70px",
+                  height: "120px",
+                  width: "120px",
                 }}
                 alt="Logo"
               />
@@ -186,7 +186,7 @@ export default function Home() {
           <div className="appointment-left">
             <div className="customer-appointment-logo">
               <img
-                src="/logo.jpeg"
+                src="/deskinculture_logo.png"
                 style={{
                   height: "90px",
                   width: "90px",

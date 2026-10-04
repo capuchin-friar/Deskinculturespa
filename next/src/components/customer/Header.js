@@ -552,7 +552,7 @@ export function Header({
                 <span className="customer-logo">
 
                     <img
-                        src="logo.jpeg"
+                        src="deskinculture_logo.png"
                         alt="De Skin Culture"
                         style={{
                             height: "35px",
