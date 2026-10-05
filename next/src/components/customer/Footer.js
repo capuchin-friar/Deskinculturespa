@@ -68,9 +68,7 @@ export function Footer() {
 
                     <div className="dsc-footer-address">
 
-                        <Link href="#">
-                            Awka Store
-                        </Link>
+                        <p>Awka Store</p>
 
                         <p>
                             {`No 195 Ifite-Road,
@@ -92,25 +90,19 @@ Ifite-Awka, Green House`}
                     <ul>
 
                         <li>
-                            <Link href="#">
+                            <Link href="/about">
                                 About Us
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="#">
+                            <Link href="/blogs">
                                 Blogs
                             </Link>
                         </li>
 
                         <li>
-                            <Link href="#">
-                                FAQ's
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="#">
+                            <Link href="/shipping-returns">
                                 Shipping & Returns
                             </Link>
                         </li>
@@ -130,21 +122,15 @@ Ifite-Awka, Green House`}
                     <ul>
 
                         <li>
-                            <Link href="#">
-                                +234 000-000-0000
-                            </Link>
-                        </li>
-
-                        <li>
-                            <Link href="#">
+                            <a href="tel:+2348101321973">
                                 +234 810 132 1973
-                            </Link>
+                            </a>
                         </li>
 
                         <li>
-                            <Link href="#">
+                            <a href="mailto:chinelodavids@gmail.com">
                                 chinelodavids@gmail.com
-                            </Link>
+                            </a>
                         </li>
 
                     </ul>
@@ -162,21 +148,21 @@ Ifite-Awka, Green House`}
                     <ul>
 
                         <li>
-                            <Link href="#">
+                            <a href="https://www.instagram.com/deskinculture?stkn=b2p3OWkyNTJpdGs5&utm_source=qr" target="_blank" rel="noreferrer">
                                 Instagram
-                            </Link>
+                            </a>
                         </li>
 
                         <li>
-                            <Link href="#">
+                            <a href="https://www.facebook.com/dskinculture?mibextid=wwXIfr&rdid=VV6cQmYbB0wD7XWB&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F18Qf6He6kx%2F%3Fmibextid%3DwwXIfr#" target="_blank" rel="noreferrer">
                                 Facebook
-                            </Link>
+                            </a>
                         </li>
 
                         <li>
-                            <Link href="#">
+                            <a href="https://www.tiktok.com/@deskinculturespa12?_r=1&_t=ZS-9AHYvvOnyrZ" target="_blank" rel="noreferrer">
                                 TikTok
-                            </Link>
+                            </a>
                         </li>
 
                     </ul>

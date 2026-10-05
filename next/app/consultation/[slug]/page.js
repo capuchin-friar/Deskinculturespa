@@ -51,14 +51,14 @@ export default function ConsultationDetailPage() {
     } finally { setBusyOfferId(""); }
   };
 
-  if (!consultation) return <main className="consultation-detail"><div className="consultation-detail-inner"><h1>Consultation not found</h1><Link href="/customer/consultation">Browse consultations</Link></div></main>;
+  if (!consultation) return <main className="consultation-detail"><div className="consultation-detail-inner"><h1>Consultation not found</h1><Link href="/consultation">Browse consultations</Link></div></main>;
 
   const hasActiveConsultation = activeAppointments.length > 0;
   const consultationTotal = activeAppointments.reduce((total, appointment) => total + Number(appointment.amount || 0), 0);
   return (
     <main className="consultation-detail">
       <div className="consultation-detail-inner">
-        <Link className="consultation-back-link" href="/customer/consultation">← All consultations</Link>
+        <Link className="consultation-back-link" href="/consultation">← All consultations</Link>
         <div className="consultation-detail-layout">
           <div className="consultation-detail-main">
         <section className="consultation-detail-hero">
@@ -114,7 +114,7 @@ export default function ConsultationDetailPage() {
             </div>
             <div className="consultation-summary-total"><span>Total</span><strong>₦{consultationTotal.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div>
             {hasActiveConsultation
-              ? <Link className="consultation-summary-schedule" href="/customer/booking">Arrange appointment <span aria-hidden="true">→</span></Link>
+              ? <Link className="consultation-summary-schedule" href="/booking">Arrange appointment <span aria-hidden="true">→</span></Link>
               : <span className="consultation-summary-schedule is-disabled" aria-disabled="true">Arrange appointment <span aria-hidden="true">→</span></span>}
           </aside>
         </div>

@@ -35,7 +35,7 @@ const CartCard = ({ item }) => {
     setBusy(true);
     setErrorMessage("");
     try {
-      const { data } = await baseApi.patch("/customers/cart/edit", {
+      const { data } = await baseApi.patch("/cart/edit", {
         id: String(item.id),
         qty: next,
       });
@@ -58,7 +58,7 @@ const CartCard = ({ item }) => {
     setBusy(true);
     setErrorMessage("");
     try {
-      const { data } = await baseApi.delete("/customers/cart/delete", {
+      const { data } = await baseApi.delete("/cart/delete", {
         data: { id: String(item.id) },
       });
       if (!data?.success) {
@@ -74,7 +74,7 @@ const CartCard = ({ item }) => {
 
   return (
     <article className={`dsc-cart-item${busy ? " is-busy" : ""}`}>
-      <Link className="dsc-cart-item__image" href={`/customer/store/${item.product_id}`} aria-label={`View ${item.name}`}>
+      <Link className="dsc-cart-item__image" href={`/store/${item.product_id}`} aria-label={`View ${item.name}`}>
         {imageUrl && !imageFailed ? (
           <Image
             src={imageUrl}
@@ -92,7 +92,7 @@ const CartCard = ({ item }) => {
       <div className="dsc-cart-item__content">
         <div className="dsc-cart-item__topline">
           <div className="dsc-cart-item__identity">
-            <Link className="dsc-cart-item__name" href={`/customer/store/${item.product_id}`}>
+            <Link className="dsc-cart-item__name" href={`/store/${item.product_id}`}>
               {item.name || "Product"}
             </Link>
             {stock !== null && Number.isFinite(stock) && (

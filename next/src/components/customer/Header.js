@@ -9,11 +9,16 @@ import {
 } from "react-icons/io5";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import useProductHandler from "@/src/hooks/product";
 import useServiceHandler from "@/src/hooks/service";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 
+function serviceCategoryHref(service) {
+    const category = String(service?.category ?? "").trim().toLowerCase().replace(/\s+/g, "-");
+    return category ? `/services/${category}` : "/services";
+}
 
 export function Header({
     storeFilterEnabled = false,
@@ -21,12 +26,10 @@ export function Header({
     onToggleStoreFilter,
     onCloseStoreFilter,
 }) {
-    const [products, setProducts] = useState([]);
-    const [services, setServices] = useState([]);
-    const [appointments, setAppointments] = useState([]);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileMenuStack, setMobileMenuStack] = useState([]);
     const mobileMenuCloseRef = useRef(null);
+    const router = useRouter();
 
     let {
         cart
@@ -40,12 +43,8 @@ export function Header({
         services: servs
     } = useServiceHandler();
 
-    useEffect(() => {
-        setProducts(prods.splice(0, 4))
-    }, [prods]);
-    useEffect(() => {
-        setServices(servs.splice(0, 4))
-    }, [servs]);
+    const products = prods.slice(0, 4);
+    const services = servs.slice(0, 4);
 
     const offers = [
         {
@@ -53,9 +52,6 @@ export function Header({
         },
         {
             services: services
-        },
-        {
-            appointments: appointments
         }
     ];
 
@@ -65,11 +61,11 @@ export function Header({
             resource: [
                 {
                     name: "About Us",
-                    href: "/customer/about"
+                    href: "/about"
                 },
                 // {
                 //     name: "Blogs",
-                //     href: "/customer/blogs"
+                //     href: "/blogs"
                 // },
                 // {
                 //     name: "FAQ",
@@ -77,11 +73,11 @@ export function Header({
                 // },
                 {
                     name: "Contact Us",
-                    href: "/customer/contact"
+                    href: "/contact"
                 },
                 // {
                 //     name: "Newsletter",
-                //     href: "/customer/newsletter"
+                //     href: "/newsletter"
                 // },
                 // {
                 //     name: "Referral Program",
@@ -89,25 +85,12 @@ export function Header({
                 // },
                 {
                     name: "Shipping & Returns",
-                    href: "/customer/shipping-returns"
+                    href: "/shipping-returns"
                 }
             ]
         }
     ];
 
-
-    const gallery = [
-        {
-            gallery: [
-                "Treatment Gallery",
-                "Before & After",
-                "Spa Experience",
-                "Facial Treatments",
-                "Body Treatments",
-                "Massage Sessions"
-            ]
-        }
-    ];
 
     const mobileNavigation = [
         { name: "Home", href: "/" },
@@ -119,9 +102,9 @@ export function Header({
                     children: [
                         ...products.map((item) => ({
                             name: item.name,
-                            href: `/customer/store/${item.id}`,
+                            href: `/store/${item.id}`,
                         })),
-                        { name: "View all", href: "/customer/store" },
+                        { name: "View all", href: "/store" },
                     ],
                 },
                 {
@@ -129,19 +112,9 @@ export function Header({
                     children: [
                         ...services.map((item) => ({
                             name: item.subcategory ?? "service",
-                            href: `/customer/services/${item.id}`,
+                            href: serviceCategoryHref(item),
                         })),
-                        { name: "View all", href: "/customer/services" },
-                    ],
-                },
-                {
-                    name: "Appointments",
-                    children: [
-                        ...appointments.map((item) => ({
-                            name: item.name ?? item.title ?? "Appointment",
-                            href: `/customer/consultation/${item.id}`,
-                        })),
-                        { name: "View all", href: "/customer/consultation" },
+                        { name: "View all", href: "/services" },
                     ],
                 },
             ],
@@ -153,7 +126,7 @@ export function Header({
                 href: item.href,
             })),
         },
-        { name: "Gallery", href: "/customer/gallery" },
+        { name: "Gallery", href: "/gallery" },
     ];
 
     const closeMobileMenu = () => {
@@ -325,7 +298,7 @@ export function Header({
                                                         key={item.id}
                                                     >
 
-                                                        <Link href={type === "products" ? `/customer/store/${item.id}` : type === "services" ? `/customer/services/${item.id}` : type === "appointments" ? `/customer/consultation/${item.id}` : "#"}>
+                                                        <Link href={type === "products" ? `/store/${item.id}` : type === "services" ? serviceCategoryHref(item) : type === "appointments" ? `/consultation/${item.id}` : "/"}>
                                                             {
                                                                 type === "products" ? 
                                                                 item.name 
@@ -343,7 +316,7 @@ export function Header({
                                             </ul>
 
                                             <Link
-                                                href={type === "products" ? `/customer/store` : type === "services" ? `/customer/services` : type === "appointments" ? `/customer/consultation` : "#"}
+                                                href={type === "products" ? "/store" : type === "services" ? "/services" : type === "appointments" ? "/consultation" : "/"}
                                                 className="mega-menu-view-all"
                                             >
                                                 View all
@@ -401,8 +374,7 @@ export function Header({
 
                                 {resources.map((resource, index) => {
 
-                                    const [type, items] =
-                                        Object.entries(resource)[0];
+                                    const items = Object.values(resource)[0];
 
                                     return (
 
@@ -456,7 +428,7 @@ export function Header({
                 <div className="nav-item">
 
                     <span className="nav-item-label" >
-                        <Link href={"/customer/gallery"} style={{
+                        <Link href="/gallery" style={{
                             textDecoration: "none"
                         }}>
                             Gallery
@@ -512,7 +484,7 @@ export function Header({
                                                         key={itemIndex}
                                                     >
 
-                                                        <Link href="#">
+                                                        <Link href="/gallery">
                                                             {item}
                                                         </Link>
 
@@ -545,8 +517,8 @@ export function Header({
 
             <div style={{
                 cursor: "pointer"
-            }} className="customer-welcome-box" onClick={e => {
-                window.location.href = "/"
+            }} className="customer-welcome-box" onClick={() => {
+                router.push("/");
             }}>
 
                 <span className="customer-logo">
@@ -584,7 +556,7 @@ export function Header({
                     type="button"
                     aria-label="Shopping cart"
                     onClick={() => {
-                        window.location.href = "/customer/store/cart";
+                        router.push("/store/cart");
                     }}
                     style={{
                         position: "relative"
@@ -611,7 +583,7 @@ export function Header({
                     type="button"
                     aria-label="Search"
                     onClick={() => {
-                        window.location.href = "/customer/store/search";
+                        router.push("/store");
                     }}
                 >
                     <IoSearchOutline
@@ -624,7 +596,7 @@ export function Header({
                     type="button"
                     aria-label="Profile"
                     onClick={() => {
-                        window.open("/profile", "_blank");
+                        router.push("/login");
                     }}
                 >
                     <IoPersonOutline

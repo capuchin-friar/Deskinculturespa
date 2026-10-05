@@ -34,7 +34,7 @@ export default function Customer({ children }) {
 
     let pathname = usePathname();
     let isAuthPage = pathname === "/login" || pathname === "/register";
-    let path = ["/customer/store", "/store"].includes(pathname);
+    let path = pathname === "/store" || pathname.startsWith("/store/");
     let [storeFilterOpen, setStoreFilterOpen] = useState(false);
     let isStoreFilterOpen = path && storeFilterOpen;
 
@@ -43,7 +43,7 @@ export default function Customer({ children }) {
         if (isAuthPage) return;
         (async () => {
             try {
-                const { data } = await baseApi.get("/customers/cart");
+                const { data } = await baseApi.get("/cart");
 
                 if (!data.success) {
                     throw new Error("Error: ", data.message);

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import _SERVICES from "../../../src/json/services.json";
+import _SERVICES from "../../src/json/services.json";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";
@@ -25,7 +25,7 @@ export default function Services() {
             return (
               <Link
                 className="catalog-card service-catalog-card"
-                href={`/customer/services/${slug}`}
+                href={`/services/${slug}`}
                 key={category}
                 style={{ "--catalog-image": `url('${categoryImages[index % categoryImages.length]}')` }}
               >

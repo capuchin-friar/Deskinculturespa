@@ -16,7 +16,7 @@ export async function generateMetadata({ params }) {
 
   try {
     const res = await fetch(
-      `http://localhost:3000/api/customers/product?id=${encodeURIComponent(id)}`,
+      `http://localhost:3000/api/product?id=${encodeURIComponent(id)}`,
       {
         method: "GET",
         cache: "no-store",
@@ -117,7 +117,7 @@ export default async function ProductPage({ params }) {
   }
 
   const res = await fetch(
-    `http://localhost:3000/api/customers/product?id=${encodeURIComponent(id)}`,
+    `http://localhost:3000/api/product?id=${encodeURIComponent(id)}`,
     {
       method: "GET",
       cache: "no-store",

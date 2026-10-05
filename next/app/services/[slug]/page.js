@@ -308,7 +308,7 @@ export default function Page() {
               type="button"
               className="select-time-button"
               disabled={activeBookings.length === 0}
-              onClick={() => router.push("/customer/booking")}
+              onClick={() => router.push("/booking")}
             >
               Arrange appointment
             </button>

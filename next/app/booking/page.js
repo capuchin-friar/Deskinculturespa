@@ -117,7 +117,7 @@ export default function BookingPage() {
           {(loading || consultationsLoading) && <p className="schedule-state">Loading your bookings…</p>}
           {!loading && loadError && <p className="schedule-error" role="alert">{loadError}</p>}
           {!consultationsLoading && consultationsError && <p className="schedule-error" role="alert">{consultationsError}</p>}
-          {!loading && !consultationsLoading && !loadError && !consultationsError && !hasActiveBookings && <div className="booking-empty"><p>You have no services or consultations waiting to be scheduled.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link> <Link href="/customer/consultation">Explore consultations <span aria-hidden="true">↗</span></Link></div>}
+          {!loading && !consultationsLoading && !loadError && !consultationsError && !hasActiveBookings && <div className="booking-empty"><p>You have no services or consultations waiting to be scheduled.</p><Link href="/services">Explore services <span aria-hidden="true">↗</span></Link> <Link href="/consultation">Explore consultations <span aria-hidden="true">↗</span></Link></div>}
 
           {!loading && !consultationsLoading && !loadError && !consultationsError && hasActiveBookings && <>
             <section className="calendar-section" aria-label="Choose appointment date">
@@ -147,7 +147,7 @@ export default function BookingPage() {
               {feedback && <p className={`appointment-feedback${feedback.toLowerCase().includes("saved") ? "" : " is-error"}`} role="status" aria-live="polite">{feedback}</p>}
             </section>
           </>}
-          <p className="booking-contact-note">Appointment times remain requests until confirmed by the team. <Link href="/customer/contact">Contact us</Link> if you need help.</p>
+          <p className="booking-contact-note">Appointment times remain requests until confirmed by the team. <Link href="/contact">Contact us</Link> if you need help.</p>
         </section>
 
         <aside className="booking-summary" aria-labelledby="booking-summary-title">
@@ -156,7 +156,7 @@ export default function BookingPage() {
             {bookingItems.length ? bookingItems.map((booking) => <div className="summary-service" key={booking.itemKey}>
               <span className="summary-service-top"><strong>{booking.itemName}</strong><strong>₦{Number(booking.itemPrice || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></span>
               <span>{selectedSlot ? `Selected for all · ${formatTime(selectedSlot, shownAvailability?.timezone || "Africa/Lagos")}` : booking.scheduled_at ? `Scheduled · ${new Date(booking.scheduled_at).toLocaleString()}` : "Awaiting shared appointment time"}</span>
-            </div>) : <div className="booking-empty"><p>No services or consultations selected.</p><Link href="/customer/services">Explore services <span aria-hidden="true">↗</span></Link></div>}
+            </div>) : <div className="booking-empty"><p>No services or consultations selected.</p><Link href="/services">Explore services <span aria-hidden="true">↗</span></Link></div>}
           </div>
           <div className="summary-total"><div className="total-line"><span>Total</span><strong>₦{total.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div><p>Total for active services and consultations.</p></div>
         </aside>

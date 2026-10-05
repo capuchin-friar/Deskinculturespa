@@ -20,10 +20,10 @@ function getDestination() {
   if (next?.startsWith("/") && !next.startsWith("//")) return next;
 
   if (params.get("page") === "product" && params.get("data")) {
-    return `/customer/store/${encodeURIComponent(params.get("data"))}`;
+    return `/store/${encodeURIComponent(params.get("data"))}`;
   }
 
-  return "/customer/store";
+  return "/store";
 }
 
 export default function AuthPage({ mode }) {

@@ -95,8 +95,8 @@ export default async function RootLayout({ children }) {
     hasPart: [
       {
         "@type": "SiteNavigationElement",
-        name: "Sign Up",
-        url: "https://www.deskinculture.com/signup",
+        name: "Register",
+        url: "https://www.deskinculture.com/register",
       },
       {
         "@type": "SiteNavigationElement",
@@ -107,6 +107,26 @@ export default async function RootLayout({ children }) {
         "@type": "SiteNavigationElement",
         name: "Place Your Order",
         url: "https://www.deskinculture.com/store",
+      },
+      {
+        "@type": "SiteNavigationElement",
+        name: "Services",
+        url: "https://www.deskinculture.com/services",
+      },
+      {
+        "@type": "SiteNavigationElement",
+        name: "Consultations",
+        url: "https://www.deskinculture.com/consultation",
+      },
+      {
+        "@type": "SiteNavigationElement",
+        name: "Bookings",
+        url: "https://www.deskinculture.com/booking",
+      },
+      {
+        "@type": "SiteNavigationElement",
+        name: "Gallery",
+        url: "https://www.deskinculture.com/gallery",
       },
       // ...categories.map((cat) => ({
       //   "@type": "SiteNavigationElement",

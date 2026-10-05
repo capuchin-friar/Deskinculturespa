@@ -127,7 +127,7 @@ export default function Checkout() {
     <main className="dsc-checkout" aria-labelledby="dsc-checkout-title">
       <div className="dsc-checkout-inner">
         <nav className="dsc-checkout-breadcrumb" aria-label="Checkout progress">
-          <Link href="/customer/store/cart"><IoArrowBackOutline aria-hidden="true" /> Back to bag</Link>
+          <Link href="/store/cart"><IoArrowBackOutline aria-hidden="true" /> Back to bag</Link>
           <span aria-current="step">Checkout</span>
         </nav>
 

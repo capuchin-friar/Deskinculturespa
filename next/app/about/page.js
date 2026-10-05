@@ -17,7 +17,7 @@ export default function AboutPage() {
             carefully selected products, and personalized consultations to help
             you feel comfortable in your own skin.
           </p>
-          <Link className="dsc-about-hero-link" href="/customer/consultation">
+          <Link className="dsc-about-hero-link" href="/consultation">
             Explore consultations <span aria-hidden="true">↗</span>
           </Link>
         </div>
@@ -60,7 +60,7 @@ export default function AboutPage() {
 
       <section className="dsc-about-cta">
         <div><span>YOUR SKIN. YOUR JOURNEY.</span><h2>Ready to take better care of your skin?</h2></div>
-        <Link href="/customer/store">Explore our products <span aria-hidden="true">↗</span></Link>
+        <Link href="/store">Explore our products <span aria-hidden="true">↗</span></Link>
       </section>
     </main>
   );

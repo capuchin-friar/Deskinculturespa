@@ -6,8 +6,8 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import { useEffect, useMemo, useState } from "react";
-import Formatter from "../../../src/utils/formatter";
-import useToggler from "../../../src/hooks/toggler";
+import Formatter from "../../src/utils/formatter";
+import useToggler from "../../src/hooks/toggler";
 import { useSelector } from "react-redux";
 
 export default function Store() {
@@ -136,7 +136,7 @@ export default function Store() {
     }
 
     function handleClick(p) {
-        router.push(`/customer/packages/${p.id}`);
+        router.push(`/packages/${p.id}`);
     }
 
     async function handleCartClick(e, p) {

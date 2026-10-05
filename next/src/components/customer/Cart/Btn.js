@@ -1,11 +1,13 @@
-import { useState } from "react";
+"use client";
+
+import { useRouter } from "next/navigation";
 
 const Btn = ({subTotal,url}) => {
-    // let navigate = useNavigate();
+    const router = useRouter();
 
     return ( 
         <>
-            <button className="shadow-sm" onClick={e => window.location.href = (`/customer/store/checkout/`)}>
+            <button className="shadow-sm" onClick={() => router.push("/store/checkout")}>
                 <span>Proceed with Checkout</span>
                 <br />
             </button>

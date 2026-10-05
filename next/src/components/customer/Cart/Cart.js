@@ -65,7 +65,7 @@ export const Cart = () => {
             <span>Total</span>
             <strong>₦{formatPrice(subtotal)}</strong>
           </div>
-          <Link className="dsc-cart-summary__checkout" href="/customer/store/checkout">
+          <Link className="dsc-cart-summary__checkout" href="/store/checkout">
             Proceed to checkout <IoArrowForward aria-hidden="true" />
           </Link>
           <p className="dsc-cart-summary__note">Your order details will be confirmed at checkout.</p>

@@ -66,7 +66,7 @@ export default function Product({ item }) {
 
     setBusy(true);
     try {
-      const { data } = await baseApi.patch("/customers/cart/edit", {
+      const { data } = await baseApi.patch("/cart/edit", {
         id: String(cartItem.id),
         qty: next,
       });

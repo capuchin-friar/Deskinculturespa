@@ -18,7 +18,7 @@ export default function BlogsPage() {
           <span className="dsc-blogs-kicker">THE JOURNAL</span>
           <h2 id="dsc-blogs-empty-title">New stories are on their way.</h2>
           <p>There are no published articles to read right now. Please check back soon.</p>
-          <Link href="/customer/about">Discover De Skin Culture <span aria-hidden="true">↗</span></Link>
+          <Link href="/about">Discover De Skin Culture <span aria-hidden="true">↗</span></Link>
         </div>
       </section>
     </main>

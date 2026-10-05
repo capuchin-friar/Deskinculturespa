@@ -279,7 +279,7 @@ export default function PackageDetail() {
                 <h1>Package not found</h1>
 
                 <button
-                    onClick={() => router.push("/customer/store")}
+                    onClick={() => router.push("/store")}
                 >
                     Back to packages
                 </button>
@@ -342,7 +342,7 @@ export default function PackageDetail() {
          * Change this route to your actual booking route.
          */
         router.push(
-            `/customer/consultation?package=${packageItem.id}`
+            `/consultation?package=${packageItem.id}`
         );
     }
 
@@ -359,7 +359,7 @@ export default function PackageDetail() {
                 <div className="package-breadcrumb">
 
                     <button
-                        onClick={() => router.push("/customer/store")}
+                        onClick={() => router.push("/store")}
                     >
                         Packages
                     </button>

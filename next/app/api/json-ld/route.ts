@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { query } from "@/app/api/lib/database";
+import { query } from "../shared/database";
+// import { query } from "@/app/api/shared/database";
 
 export const dynamic = "force-dynamic";
 

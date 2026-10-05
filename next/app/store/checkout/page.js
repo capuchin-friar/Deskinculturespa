@@ -7,7 +7,7 @@ import "./styles/ipad.css";
 import "./styles/tablet.css";
 import "./styles/mobile.css";
 
-const CheckoutClient = dynamic(() => import("../../../../src/components/customer/Checkout"), { ssr: false });
+const CheckoutClient = dynamic(() => import("../../../src/components/customer/Checkout"), { ssr: false });
 
 export default function CheckoutPage() {
   return <CheckoutClient />;

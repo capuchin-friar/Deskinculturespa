@@ -120,7 +120,7 @@ export default function ShippingReturnsPage() {
 
                 </div>
 
-                <a href="/customer/contact">
+                <a href="/contact">
                     Contact Us →
                 </a>
 

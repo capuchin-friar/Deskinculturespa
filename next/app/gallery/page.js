@@ -112,7 +112,7 @@ export default function GalleryPage() {
       </section>
       <section className="dsc-gallery-cta">
         <div><span>YOUR JOURNEY STARTS HERE</span><h2>Want to talk through your skin goals?</h2></div>
-        <Link href="/customer/consultation">Explore consultations <span aria-hidden="true">↗</span></Link>
+        <Link href="/consultation">Explore consultations <span aria-hidden="true">↗</span></Link>
       </section>
     </main>
   );

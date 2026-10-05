@@ -1,16 +1,21 @@
 export default function sitemap() {
-    return [
-      {
-        url: 'https://www.deskinculture.com',
-        lastModified: new Date(),
-      },
-      {
-        url: 'https://www.deskinculture.com/about',
-        lastModified: new Date(),
-      },
-      {
-        url: 'https://www.deskinculture.com/contact',
-        lastModified: new Date(),
-      },
-    ];
-  }
+  const routes = [
+    "",
+    "/about",
+    "/blogs",
+    "/booking",
+    "/consultation",
+    "/contact",
+    "/gallery",
+    "/newsletter",
+    "/packages",
+    "/services",
+    "/shipping-returns",
+    "/store",
+  ];
+
+  return routes.map((route) => ({
+    url: `https://www.deskinculture.com${route}`,
+    lastModified: new Date(),
+  }));
+}

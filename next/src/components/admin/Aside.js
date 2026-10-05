@@ -18,7 +18,7 @@ export function Aside() {
         { name: "Dashboard", svg: IoGridOutline, path: "/" },
         { name: "Catalog", svg: IoPricetagsOutline, path: "/catalog" },
         { name: "Orders", svg: IoCartOutline, path: "/orders" },
-        { name: "Customers", svg: IoPeopleOutline, path: "/customers" },
+        { name: "Customers", svg: IoPeopleOutline, path: "/" },
         { name: "Settings", svg: IoSettingsOutline, path: "/settings" }
     ];
 

@@ -9,21 +9,21 @@ export default function Share({role,item,url,activeImg}) {
             <ul>
                 <li onClick={e => {
                     // const url = window.location.href;
-                    window.open(`https://www.facebook.com/sharer/sharer.php?u=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`, '_blank');
+                    window.open(`https://www.facebook.com/sharer/sharer.php?u=Check out this product on De Skin Culture ${encodeURIComponent(window.location.href)}`, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
                     <IoLogoFacebook color='var(--brand-green)' size={25} />
                 </li>
 
                 <li onClick={e => {
                     // const url = window.location.href;
-                    const twitterUrl = `https://twitter.com/intent/tweet?&text=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`;
+                    const twitterUrl = `https://twitter.com/intent/tweet?&text=Check out this product on De Skin Culture ${encodeURIComponent(window.location.href)}`;
                     window.open(twitterUrl, '_blank');
                 }} style={{border: 'none', padding: '0',cursor: 'pointer'}}>
                     <IoLogoTwitter color='var(--brand-green)' size={25} />
                 </li>
 
                 <li onClick={async e => {
-                    const whatsappUrl = `whatsapp://send?text=Check out this product on Campus Sphere ${encodeURIComponent(window.location.href)}`;
+                    const whatsappUrl = `whatsapp://send?text=Check out this product on De Skin Culture ${encodeURIComponent(window.location.href)}`;
                     window.open(whatsappUrl, '_blank');
 
                 }} style={{border: 'none', padding: '0', cursor: 'pointer'}}>

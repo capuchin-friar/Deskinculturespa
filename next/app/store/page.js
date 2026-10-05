@@ -78,7 +78,7 @@ export default function Store({ }) {
 
 
     function handleClick(p) {
-        router.push(`/customer/store/${p.id}`);
+        router.push(`/store/${p.id}`);
     }
 
 
