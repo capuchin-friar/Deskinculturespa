@@ -28,7 +28,7 @@ const galleryImages = [
   { file: "gallery-18.jpeg", title: "Chemical burn care", category: "Body Treatments", alt: "Foot care treatment before and after" },
   { file: "gallery-19.jpeg", title: "Hyperpigmentation care", category: "Body Treatments", alt: "Foot hyperpigmentation treatment before and after" },
   { file: "gallery-20.jpeg", title: "Dark knuckle care", category: "Knuckles Treatment", alt: "Hand treatment before and after" },
-  { file: "gallery-21.jpeg", title: "Manicure", category: "Pedicures", alt: "Hand manicure result" },
+  { file: "gallery-21.jpeg", title: "Dark knuckle care", category: "Knuckles Treatment", alt: "Hand treatment before and after" },
   { file: "gallery-22.jpeg", title: "Dark knuckle care", category: "Knuckles Treatment", alt: "Dark knuckle treatment progress" },
   { file: "gallery-23.jpeg", title: "Laser scar care", category: "Advanced Treatment", alt: "Laser scar treatment before and after" },
   { file: "gallery-24.jpeg", title: "Laser scar care", category: "Advanced Treatment", alt: "Laser scar treatment before and after" },

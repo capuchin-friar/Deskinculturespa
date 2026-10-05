@@ -7,8 +7,8 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 
-import Formatter from "../../../../src/utils/formatter";
-import useToggler from "../../../../src/hooks/toggler";
+import Formatter from "../../../src/utils/formatter";
+import useToggler from "../../../src/hooks/toggler";
 
 const packages = [
     {

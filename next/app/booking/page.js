@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { baseApi } from "../../api/shared/config";
-import useServiceToggler from "../../../src/hooks/serviceToggler";
-import useConsultationToggler from "../../../src/hooks/consultationToggler";
+import { baseApi } from "../api/shared/config";
+import useServiceToggler from "../../src/hooks/serviceToggler";
+import useConsultationToggler from "../../src/hooks/consultationToggler";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";

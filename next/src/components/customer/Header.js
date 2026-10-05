@@ -67,10 +67,10 @@ export function Header({
                     name: "About Us",
                     href: "/customer/about"
                 },
-                {
-                    name: "Blogs",
-                    href: "/customer/blogs"
-                },
+                // {
+                //     name: "Blogs",
+                //     href: "/customer/blogs"
+                // },
                 // {
                 //     name: "FAQ",
                 //     href: "/faq"
@@ -79,10 +79,10 @@ export function Header({
                     name: "Contact Us",
                     href: "/customer/contact"
                 },
-                {
-                    name: "Newsletter",
-                    href: "/customer/newsletter"
-                },
+                // {
+                //     name: "Newsletter",
+                //     href: "/customer/newsletter"
+                // },
                 // {
                 //     name: "Referral Program",
                 //     href: "/referral"

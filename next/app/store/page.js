@@ -5,10 +5,10 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import { useEffect, useState } from "react";
-import Formatter from "../../../src/utils/formatter";
-import useToggler from "../../../src/hooks/toggler";
+import Formatter from "../../src/utils/formatter";
+import useToggler from "../../src/hooks/toggler";
 import { useSelector } from "react-redux";
-import useProductHandler from "../../../src/hooks/product";
+import useProductHandler from "../../src/hooks/product";
 
 export default function Store({ }) {
 
