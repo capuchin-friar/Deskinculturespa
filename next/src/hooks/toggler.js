@@ -1,9 +1,11 @@
 import { useDispatch, useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 
 import { baseApi } from "../../app/api/shared/config";
 import { set_cart } from "../../redux/customer/cart";
 
 export default function useToggler() {
+  const router = useRouter();
   const dispatch = useDispatch();
   const { cart } = useSelector((state) => state.cart);
 
@@ -34,6 +36,12 @@ export default function useToggler() {
       await refreshCart();
       return true;
     } catch (error) {
+      if (error.response?.status === 401) {
+        const destination = `${window.location.pathname}${window.location.search}`;
+        router.push(`/login?next=${encodeURIComponent(destination)}`);
+        return false;
+      }
+
       console.error("Add to cart error:", error);
       return false;
     }

@@ -1,0 +1,136 @@
+@media screen and (min-width: 1024px) {
+  .customer-account-overview {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fff;
+    color: #363636;
+  }
+
+  .customer-account-overview__header {
+    padding: 16px 22px 13px;
+    border-bottom: 1px solid #ededed;
+  }
+
+  .customer-account-overview__header h1 {
+    margin: 0;
+    font-size: 25px;
+    font-weight: 650;
+    line-height: 1.3;
+  }
+
+  .customer-account-overview__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+
+  .customer-account-option {
+    min-height: 190px;
+    overflow: hidden;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  .customer-account-option__heading,
+  .customer-account-option__heading-row {
+    display: flex;
+    min-height: 56px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0;
+    padding: 0 18px;
+    border-bottom: 1px solid #d7d7d7;
+    color: #363636;
+    font-size: 15px;
+    font-weight: 650;
+    text-transform: uppercase;
+  }
+
+  .customer-account-option__heading-row .customer-account-option__heading {
+    min-height: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  .customer-account-option__edit-icon {
+    width: 19px;
+    height: 19px;
+    color: var(--brand-green);
+  }
+
+  .customer-account-option__body {
+    padding: 18px;
+  }
+
+  .customer-account-option__primary {
+    margin: 0;
+    color: #363636;
+    font-size: 17px;
+    line-height: 1.45;
+  }
+
+  .customer-account-option__muted {
+    margin: 5px 0 0;
+    color: #808087;
+    font-size: 15px;
+    overflow-wrap: anywhere;
+  }
+
+  .customer-account-option__address {
+    display: flex;
+    flex-direction: column;
+    margin-top: 6px;
+    color: #808087;
+    font-size: 15px;
+    font-style: normal;
+    line-height: 1.4;
+  }
+
+  .customer-account-option__credit {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    color: var(--brand-green);
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .customer-account-option__credit svg {
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .customer-account-option__body--newsletter {
+    display: flex;
+    min-height: 132px;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
+  .customer-account-option__link {
+    color: var(--brand-green);
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .customer-account-option__link:hover,
+  .customer-account-option__link:focus-visible {
+    color: var(--brand-dark);
+    text-decoration: underline;
+  }
+
+  .customer-account-option__link:focus-visible {
+    outline: 2px solid var(--brand-green);
+    outline-offset: 3px;
+  }
+}

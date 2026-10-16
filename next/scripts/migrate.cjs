@@ -84,6 +84,10 @@ async function runMigrations() {
         applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       )
     `);
+    await client.query(`
+      ALTER TABLE schema_migrations
+      ADD COLUMN IF NOT EXISTS checksum CHAR(64)
+    `);
 
     const migrations = await getMigrations();
     let appliedCount = 0;
@@ -95,7 +99,19 @@ async function runMigrations() {
       );
 
       if (existing.rowCount > 0) {
-        if (existing.rows[0].checksum.trim() !== migration.checksum) {
+        const appliedChecksum = existing.rows[0].checksum?.trim();
+        if (!appliedChecksum) {
+          await client.query(
+            "UPDATE schema_migrations SET checksum = $1 WHERE filename = $2 AND checksum IS NULL",
+            [migration.checksum, migration.filename],
+          );
+          console.warn(
+            `Legacy migration record found; recorded the current checksum without re-running: ${migration.filename}`,
+          );
+          continue;
+        }
+
+        if (appliedChecksum !== migration.checksum) {
           throw new Error(
             `Migration ${migration.filename} has changed since it was applied. ` +
               "Create a new migration instead of editing an applied migration.",

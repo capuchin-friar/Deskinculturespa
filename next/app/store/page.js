@@ -88,7 +88,7 @@ export default function Store({ }) {
                 <div className="customer-store-product-card-cnt">
                     {
                         filteredProducts.map((p, i) =>
-                            <div className="customer-store-product-card shadow-sm">
+                            <div key={i} className="customer-store-product-card shadow-sm">
                                 <div className="customer-store-product-thumbnail" style={{
                                     backgroundImage: `url(${p.thumbnail_url})`
                                 }}>

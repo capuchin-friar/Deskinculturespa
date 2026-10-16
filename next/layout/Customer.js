@@ -34,7 +34,7 @@ export default function Customer({ children }) {
 
     let pathname = usePathname();
     let isAuthPage = pathname === "/login" || pathname === "/register";
-    let path = pathname === "/store" || pathname.startsWith("/store/");
+    let path = pathname === "/store";
     let [storeFilterOpen, setStoreFilterOpen] = useState(false);
     let isStoreFilterOpen = path && storeFilterOpen;
 
