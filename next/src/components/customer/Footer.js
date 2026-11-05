@@ -5,7 +5,7 @@ export function Footer() {
         <footer className="dsc-footer">
 
             {/* Newsletter */}
-            <div className="dsc-footer-newsletter">
+            {/* <div className="dsc-footer-newsletter">
 
                 <div className="dsc-footer-newsletter-left">
                     <span className="dsc-footer-eyebrow">
@@ -53,7 +53,7 @@ export function Footer() {
 
                 </div>
 
-            </div>
+            </div> */}
 
 
             {/* Footer Navigation */}

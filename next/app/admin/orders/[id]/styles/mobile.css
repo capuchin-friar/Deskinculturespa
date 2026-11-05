@@ -1,3 +1,27 @@
 @media (max-width: 480px) {
+  .ops-header {
+    flex-direction: column;
+  }
 
+  .ops-header h1 {
+    font-size: 26px;
+  }
+
+  .ops-header-flags,
+  .ops-actions {
+    justify-content: flex-start;
+  }
+
+  .ops-timeline {
+    grid-template-columns: 1fr;
+  }
+
+  .ops-items li {
+    grid-template-columns: 44px minmax(0, 1fr);
+  }
+
+  .ops-item-price {
+    grid-column: 2;
+    text-align: left;
+  }
 }

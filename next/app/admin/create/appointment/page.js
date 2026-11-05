@@ -294,7 +294,7 @@ export default function CreateAppointmentPage() {
         ? `₦${new Intl.NumberFormat("en-NG").format(
             Number(form.price)
         )}`
-        : "₦10,000";
+        : "—";
 
     return (
         // <main className="appointment-page">

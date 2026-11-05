@@ -73,5 +73,33 @@ export default function useConsultationToggler() {
     }
   }, [activeAppointments, refreshAppointments]);
 
-  return { appointments, activeAppointments, loading, loadError, isBooked, toggleAppointment, refreshAppointments };
+  const scheduleAppointments = useCallback(async ({ scheduledAt, reference } = {}) => {
+    const date = new Date(scheduledAt);
+    if (!scheduledAt || Number.isNaN(date.getTime()) || date <= new Date()) {
+      throw new Error("Choose a valid future date and time.");
+    }
+    try {
+      const { data } = await baseApi.post("customers/appointments/schedule", {
+        scheduled_at: date.toISOString(),
+        ...(reference ? { reference } : {}),
+      });
+      if (!data?.success || !Array.isArray(data.data?.consultations)) {
+        throw new Error(data?.message || "Could not schedule your consultations.");
+      }
+      const updated = data.data.consultations;
+      const scheduledById = new Map(updated.map((entry) => [String(entry.id), entry]));
+      setAppointments((current) => {
+        const currentIds = new Set(current.map((entry) => String(entry.id)));
+        return [
+          ...current.map((entry) => scheduledById.has(String(entry.id)) ? { ...entry, ...scheduledById.get(String(entry.id)) } : entry),
+          ...updated.filter((entry) => !currentIds.has(String(entry.id))),
+        ];
+      });
+      return true;
+    } catch (error) {
+      throw new Error(errorMessage(error, "Could not schedule your consultations. Please try again."));
+    }
+  }, []);
+
+  return { appointments, activeAppointments, loading, loadError, isBooked, toggleAppointment, refreshAppointments, scheduleAppointments };
 }

@@ -1,3 +1,37 @@
 @media (min-width: 481px) and (max-width: 760px) {
+    .package-detail-container {
+        width: 100%;
+        padding: 0 20px 48px;
+    }
 
+    .package-detail-hero {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        padding: 8px 0 40px;
+    }
+
+    .package-gallery,
+    .package-gallery--single {
+        display: block;
+        width: 100%;
+        height: 360px;
+    }
+
+    .package-main-image {
+        position: relative;
+        width: 100%;
+        height: 360px;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #f3f7f4;
+    }
+
+    .package-main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
 }

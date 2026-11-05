@@ -29,8 +29,8 @@
   /* -------------------------------- */
   
   .paid-item-image-wrapper {
-    width: 90px;
-    height: 90px;
+    width: 64px;
+    height: 64px;
   
     flex-shrink: 0;
   
@@ -55,7 +55,7 @@
     align-items: center;
     justify-content: center;
   
-    font-size: 32px;
+    font-size: 22px;
     color: #555;
   }
   
@@ -97,7 +97,7 @@
   .paid-item-title {
     margin: 0;
   
-    font-size: 16px;
+    font-size: 14px;
     font-weight: 600;
   
     color: #171717;
@@ -184,8 +184,8 @@
   }
   
   .paid-item-price {
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 14px;
+    font-weight: 600;
   
     color: #171717;
   

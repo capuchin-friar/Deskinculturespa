@@ -41,18 +41,26 @@ function jsAgo(value) {
   return `${Math.floor(days / 365)}y ago`
 }
 
-function orderRowCustomerId(row) {
-  const v = row?.customer_id ?? row?.customerId
-  if (v == null || v === "") return null
-  return v
+function customerPhone(row) {
+  const raw = row?.customer_phone ?? row?.phone ?? ""
+  const digits = String(raw).replace(/[^\d]/g, "")
+  if (!digits) return ""
+  if (digits.startsWith("234")) return digits
+  if (digits.startsWith("0")) return `234${digits.slice(1)}`
+  return digits
 }
 
-function buildOrderInboxHref({ customerId, orderId, adminId }) {
-  const params = new URLSearchParams()
-  params.set("customerId", String(customerId))
-  if (orderId != null && String(orderId) !== "") params.set("orderId", String(orderId))
-  if (adminId != null && String(adminId) !== "") params.set("adminId", String(adminId))
-  // return `/admin/inbox?${params.toString()}`
+function whatsappHref(row) {
+  const phone = customerPhone(row)
+  if (!phone) return ""
+  const name = String(row?.customer || "").trim()
+  const orderId = row?.id ?? row?.order_id
+  const text = encodeURIComponent(
+    name
+      ? `Hello ${name}, this is Deskinculture regarding order #${orderId}.`
+      : `Hello, this is Deskinculture regarding order #${orderId}.`,
+  )
+  return `https://wa.me/${phone}?text=${text}`
 }
 
 export default function ManageOrders() {
@@ -61,30 +69,28 @@ export default function ManageOrders() {
   const adminId = useSelector((s) => s.admin?.admin_id)
 
   const [rows, setRows] = useState([])
+  const [kind, setKind] = useState("all")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
   useEffect(() => {
-    if (adminId == null) {
-      setLoading(false)
-      setRows([])
-      return
-    }
     let cancelled = false;
     (async () => {
       setLoading(true)
       setError("")
       try {
-        let orders; // Implement orders api for admin here
+        const query = kind && kind !== "all" ? `?kind=${encodeURIComponent(kind)}` : ""
+        const response = await fetch(`/api/admin/orders${query}`, { credentials: "include" })
+        const result = await response.json()
         if (cancelled) return
-        const orderList = Array.isArray(orders?.data) ? orders.data : [];
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || "Could not load orders.")
+        }
+        const orderList = Array.isArray(result.data) ? result.data : [];
         setRows(orderList);
         if (orderList.length === 0) {
-          setRows([])
           setError("No orders found.")
-          return
         }
-
       } catch (e) {
         if (!cancelled) {
           setRows([])
@@ -98,20 +104,14 @@ export default function ManageOrders() {
     return () => {
       cancelled = true
     }
-  }, [adminId])
+  }, [kind])
 
 
 
   const goToOrderChat = (row) => {
-    const cid = orderRowCustomerId(row)
-    if (cid == null) return
-    router.push(
-      buildOrderInboxHref({
-        customerId: cid,
-        orderId: row?.order_id,
-        adminId: selectedShopId,
-      })
-    )
+    const href = whatsappHref(row)
+    if (!href) return
+    window.open(href, "_blank", "noopener,noreferrer")
   }
 
   return (
@@ -120,12 +120,12 @@ export default function ManageOrders() {
         {/* <h5>Orders</h5> */}
         {(
           <div className="orders-shop-select">
-            <select aria-label="Type" value={""} onChange={""}>
+            <select aria-label="Type" value={kind} onChange={(event) => setKind(event.target.value)}>
               {[
-                {
-                  name: "All",
-                  value: "all"
-                },
+                // {
+                //   name: "All",
+                //   value: "all"
+                // },
                 {
                   name: "Products",
                   value: "products"
@@ -137,6 +137,10 @@ export default function ManageOrders() {
                 {
                   name: "Appointment",
                   value: "appointment",
+                },
+                {
+                  name: "Packages",
+                  value: "packages",
                 }
               ].map(({ name, value }, index) => {
                 return (
@@ -160,7 +164,7 @@ export default function ManageOrders() {
             <tr>
               {[
                 "Order ID",
-                "Type",
+                "Name",
                 "Buyer",
                 "Qty",
                 "Amount",
@@ -179,9 +183,9 @@ export default function ManageOrders() {
           <tbody>
             {!loading &&
               rows.map((r, index) => (
-                <tr key={r?.order_id ?? `order-${index}`}>
-                  <td>{r?.order_id ?? "—"}</td>
-                  <td>{r?.product ?? "—"}</td>
+                <tr key={`${r?.kind}-${r?.id ?? r?.order_id ?? index}`}>
+                  <td>{r?.id ?? r?.order_id ?? "—"}</td>
+                  <td>{r?.title ?? r?.product ?? "—"}</td>
                   <td>{r?.customer ?? "—"}</td>
                   <td>{r?.qty ?? 0}</td>
                   <td>{formatAmount(r?.amount)}</td>
@@ -190,24 +194,24 @@ export default function ManageOrders() {
                   <td>{r?.delivery ?? "—"}</td>
                   <td>{jsAgo(r?.date)}</td>
                   <td className="orders-actions-cell">
-                    <button
+                    {/* <button
                       type="button"
                       style={{ color: "#000" }}
                       className="orders-action-btn"
-                      onClick={() => router.push(`/admin/orders/${r?.order_id ?? ""}`)}
+                      onClick={() => router.push(`/admin/orders/${r?.id ?? ""}?kind=${encodeURIComponent(r?.kind || "product")}`)}
                     >
                       View
-                    </button>
+                    </button> */}
                     <button
                       type="button"
                       className="orders-chat-btn"
-                      disabled={orderRowCustomerId(r) == null}
+                      disabled={!customerPhone(r)}
                       title={
-                        orderRowCustomerId(r) == null
-                          ? "No registered customer on this order"
-                          : "Message this customer"
+                        customerPhone(r)
+                          ? "Message this customer on WhatsApp"
+                          : "No phone number on this customer"
                       }
-                    // onClick={() => goToOrderChat(r)}
+                     onClick={() => goToOrderChat(r)}
                     >
                       Chat
                     </button>

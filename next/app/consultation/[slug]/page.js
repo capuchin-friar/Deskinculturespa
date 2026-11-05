@@ -45,7 +45,7 @@ export default function ConsultationDetailPage() {
     setFeedback("");
     try {
       await toggleAppointment({ offeringId: offer.id, consultationSlug: consultation.id, consultationName: consultation.name });
-      setFeedback(isBooked(offer.id) ? "Consultation removed from your bookings." : "Consultation added to your bookings.");
+      setFeedback(isBooked(offer.id) ? "Consultation removed from your appointments." : "Consultation added to your appointments.");
     } catch (error) {
       setFeedback(error.message || "Could not update this consultation.");
     } finally { setBusyOfferId(""); }
@@ -74,7 +74,7 @@ export default function ConsultationDetailPage() {
         <section className="consultation-offerings" aria-labelledby="consultation-options-title">
           <div className="consultation-offerings-heading">
             <div><span className="consultation-detail-kicker">BOOK A SESSION</span><h2 id="consultation-options-title">Choose an option</h2></div>
-            <p>Your appointment time can be arranged together with any services in your bookings.</p>
+            <p>Choose a consultation option here, then pick a date and time just for your consultation.</p>
           </div>
           {loadingOffers || appointmentLoading ? <p className="consultation-state">Loading available options…</p> : null}
           {!loadingOffers && offerError ? <p className="consultation-state is-error" role="alert">{offerError}</p> : null}
@@ -85,7 +85,7 @@ export default function ConsultationDetailPage() {
               return (
                 <article className="consultation-offer-card" key={offer.id}>
                   <div><span className="consultation-offer-mode">{modeNames[offer.mode] || offer.mode}</span><h3>{offer.duration_minutes} minute session</h3><p>With a De Skin Culture specialist</p></div>
-                  <div className="consultation-offer-action"><strong>₦{Number(offer.price).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong><button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook(offer)}>{busyOfferId === String(offer.id) ? "Updating…" : booked ? "Remove" : "Add to bookings"}</button></div>
+                  <div className="consultation-offer-action"><strong>₦{Number(offer.price).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong><button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook(offer)}>{busyOfferId === String(offer.id) ? "Updating…" : booked ? "Remove" : "Add to appointments"}</button></div>
                 </article>
               );
             })}
@@ -95,7 +95,7 @@ export default function ConsultationDetailPage() {
           </div>
 
           <aside className="consultation-booking-summary" aria-labelledby="consultation-summary-title">
-            <div className="consultation-summary-heading"><span>YOUR APPOINTMENT</span><h2 id="consultation-summary-title">Booking summary</h2></div>
+            <div className="consultation-summary-heading"><span>YOUR CONSULTATION</span><h2 id="consultation-summary-title">Consultation summary</h2></div>
             <div className="consultation-summary-items">
               {activeAppointments.length === 0 && <p className="consultation-summary-empty">No consultations selected yet.</p>}
               {activeAppointments.map((appointment) => (
@@ -114,7 +114,7 @@ export default function ConsultationDetailPage() {
             </div>
             <div className="consultation-summary-total"><span>Total</span><strong>₦{consultationTotal.toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong></div>
             {hasActiveConsultation
-              ? <Link className="consultation-summary-schedule" href="/booking">Arrange appointment <span aria-hidden="true">→</span></Link>
+              ? <Link className="consultation-summary-schedule" href="/consultation/schedule">Arrange appointment <span aria-hidden="true">→</span></Link>
               : <span className="consultation-summary-schedule is-disabled" aria-disabled="true">Arrange appointment <span aria-hidden="true">→</span></span>}
           </aside>
         </div>

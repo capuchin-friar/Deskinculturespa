@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline, IoLeafOutline } from "react-icons/io5";
+import useToggler from "@/src/hooks/toggler";
 import "./auth-page.css";
 
 function getResponseMessage(payload, fallback) {
@@ -29,6 +30,7 @@ function getDestination() {
 export default function AuthPage({ mode }) {
   const isRegister = mode === "register";
   const router = useRouter();
+  const { refreshCart } = useToggler();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -78,6 +80,11 @@ export default function AuthPage({ mode }) {
         );
       }
 
+      try {
+        await refreshCart();
+      } catch (cartError) {
+        console.error("Could not load cart after sign in", cartError);
+      }
       router.replace(getDestination());
     } catch (submitError) {
       setError(
@@ -99,7 +106,7 @@ export default function AuthPage({ mode }) {
       <section className="dsc-auth-card" aria-labelledby="auth-title">
         <aside className="dsc-auth-intro">
           <Link href="/" className="dsc-auth-brand" aria-label="Deskinculture Spa home">
-            <Image src="/deskinculture_logo.png" alt="" width={42} height={42} />
+            <Image src="/deskinculture_logo.png" alt="DeSkinCulture logo" width={42} height={42} />
             <span>DESKIN<span>CULTURE</span></span>
           </Link>
           <div className="dsc-auth-intro-copy">

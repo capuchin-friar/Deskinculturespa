@@ -78,9 +78,11 @@ function ProductTableRow({
   type
 }) {
   const productId = item?.id ?? item?.product_id
-  const name = item?.name ?? item?.mode ?? item.subcategory ?? "—"
+  const name = String(item?.name ?? item?.mode ?? item?.subcategory ?? "—")
   const status = item?.status ?? item?.is_active ? "active" : "inactive" ?? "_"
-  const duration = item?.duration_minutes ?? "_"
+  const duration = type === "packages"
+    ? `${item?.duration_months ?? "_"} months`
+    : `${item?.duration_minutes ?? "_"} minutes`
   const createdAt = item?.created_at ?? item?.createdAt
   const totalSales = item?.total_sales ?? item?.totalSales
   const price = item?.price ?? "_"
@@ -132,7 +134,7 @@ function ProductTableRow({
           </span>
         </div>
       </td>
-      <td>{type === "appointment" ? `${duration} minutes` : status}</td>
+      <td>{type === "appointment" || type === "packages" ? duration : status}</td>
       <td className="product-list-num">{formatRevenue(price, "NGN")}</td>
       <td className="product-list-num">{formatSalesCount(totalSales)}</td>
       <td className="product-list-num">{formatCreatedAt(createdAt)}</td>
@@ -170,7 +172,7 @@ function ProductTableRow({
                 className="product-list-actions-item product-list-actions-item-danger"
                 role="menuitem"
                 onClick={() => {
-                  if (folderPath != null) onDeleteProduct(folderPath, productId)
+                  if (type === "packages" || folderPath != null) onDeleteProduct(folderPath, productId)
                 }}
               >
                 Delete
@@ -189,6 +191,7 @@ export default function ProductListPage() {
   let [prods, setProds] = useState([]);
   let [services, setServices] = useState([]);
   let [appointments, setAppointments] = useState([]);
+  let [packages, setPackages] = useState([]);
   let [type, setType] = useState("products");
   let [loading, setLoading] = useState(true)
   let [listError, setListError] = useState("")
@@ -216,27 +219,38 @@ export default function ProductListPage() {
       setListError("")
       try {
         await getCatalog(type);
-
-        setLoading(false);
-      } catch (e) {
-       
+      } catch (error) {
+        const status = error?.response?.status;
+        setListError(
+          status === 401
+            ? "Sign in with an admin account to load the catalog."
+            : error?.response?.data?.data || error?.message || "Could not load the catalog.",
+        );
       } finally {
+        setLoading(false);
       }
     })()
 
   }, [type])
 
 
+  function asList(value) {
+    return Array.isArray(value) ? value : [];
+  }
+
   async function getCatalog(type) {
     if (type === "products") {
       const { data: products } = await api.get("/products");
-      setProds(products.data);
+      setProds(asList(products.data));
     } else if (type === "services") {
       const { data: services } = await api.get("/services");
-      setServices(services.data);
+      setServices(asList(services.data));
+    } else if (type === "packages") {
+      const { data: packageRes } = await api.get("/packages");
+      setPackages(asList(packageRes.data));
     } else {
       const { data: appointments } = await api.get("/appointment_offerings");
-      setAppointments(appointments.data);
+      setAppointments(asList(appointments.data));
     }
   }
 
@@ -249,12 +263,38 @@ export default function ProductListPage() {
   }, [])
 
   function getTypeData() {
-    return type === "products" ? prods : type === "services" ? services : appointments
+    return type === "products"
+      ? prods
+      : type === "services"
+        ? services
+        : type === "packages"
+          ? packages
+          : appointments
   }
 
   const onDeleteProduct = useCallback(
     async (hash, productId) => {
       setDeleteError("")
+      if (type === "packages") {
+        if (!window.confirm("Delete this package? This cannot be undone.")) {
+          return
+        }
+        try {
+          const { data } = await api.delete("packages/delete", {
+            data: { package_id: productId },
+          })
+          if (!data.success) {
+            throw new Error(data.message || "Could not delete package.")
+          }
+          setPackages((prev) =>
+            prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
+          )
+          setMenuOpenId(null)
+        } catch (err) {
+          setDeleteError(err?.message || "Could not delete package.")
+        }
+        return
+      }
       if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
         return
       }
@@ -292,7 +332,7 @@ export default function ProductListPage() {
         setDeleteError(err?.message || "Could not delete product.")
       }
     },
-    [admin_id]
+    [admin_id, type]
   )
 
   return (
@@ -302,7 +342,7 @@ export default function ProductListPage() {
     }}>
       <div className="product-list-header">
         <span>
-          <select aria-label="Type" value={""} onChange={e => setType(e.target.value)}>
+          <select aria-label="Type" value={type} onChange={e => setType(e.target.value)}>
             {[
               {
                 name: "Products",
@@ -315,10 +355,14 @@ export default function ProductListPage() {
               {
                 name: "Appointments",
                 value: "appointment",
+              },
+              {
+                name: "Packages",
+                value: "packages",
               }
             ].map(({ name, value }, index) => {
               return (
-                <option selected={value.toLowerCase() === type.toLowerCase()} value={value} key={index}>
+                <option value={value} key={index}>
                   {name}
                 </option>
               )
@@ -327,7 +371,7 @@ export default function ProductListPage() {
         </span>
 
         <span className="add_btn">
-          <button onClick={e => window.location.href = `/admin/create/${type === "appointment" ? "appointment": type.slice(0, type.length - 1)}`}>
+          <button onClick={e => window.location.href = `/admin/create/${type === "appointment" ? "appointment" : type === "packages" ? "package" : type.slice(0, type.length - 1)}`}>
             + Add {`${type.charAt(0).toUpperCase()}${type.slice(1)}`}
           </button>
         </span>
@@ -344,7 +388,7 @@ export default function ProductListPage() {
             <tr>
               <th scope="col">S/N</th>
               <th scope="col">{`${type.charAt(0).toUpperCase()}${type.slice(1)}`}</th>
-              <th scope="col">{type === "appointment" ? "Duration (mins)" : "Status"}</th>
+              <th scope="col">{type === "appointment" || type === "packages" ? "Duration" : "Status"}</th>
               <th scope="col">Price</th>
               <th scope="col">Total sales</th>
               <th scope="col">Created</th>
@@ -357,9 +401,15 @@ export default function ProductListPage() {
             {
               (() => {
                 const data = getTypeData();
-
-                return !loading
-                  ? data.map((prod, index) => (
+                if (loading) return null;
+                if (!Array.isArray(data) || data.length === 0) {
+                  return (
+                    <tr>
+                      <td colSpan={7}>No {type} in the catalog yet.</td>
+                    </tr>
+                  );
+                }
+                return data.map((prod, index) => (
                     <ProductTableRow
                       key={
                         prod?.id ??
@@ -373,8 +423,7 @@ export default function ProductListPage() {
                       type={type}
                       onDeleteProduct={onDeleteProduct}
                     />
-                  ))
-                  : null;
+                  ));
               })()
             }
           </tbody>

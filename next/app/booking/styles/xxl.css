@@ -1,3 +1,33 @@
+.booking-page--paid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  text-align: center
+}
+
+.booking-paid-card {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 28px
+}
+
+.booking-paid-card h1 {
+  margin: 16px 0;
+  font-family: var(--font-body);
+  font-size: clamp(32px, 5vw, 48px);
+  font-weight: 400;
+  letter-spacing: -.04em;
+  line-height: 1.1
+}
+
+.booking-paid-card p {
+  margin: 0;
+  color: var(--booking-muted);
+  font-size: 15px;
+  line-height: 1.7
+}
+
 .booking-page {
   --booking-ink: var(--text-dark);
   --booking-green: var(--brand-green);
@@ -41,7 +71,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(300px, .8fr);
   gap: 28px;
-  align-items: start
+  align-items: start;
+  text-align: left
 }
 
 .booking-main, .booking-summary {
@@ -59,7 +90,8 @@
   align-items: end;
   gap: 24px;
   padding-bottom: 28px;
-  border-bottom: 1px solid var(--booking-line)
+  border-bottom: 1px solid var(--booking-line);
+  text-align: left
 }
 
 .appointment-header h2, .time-section h2, .summary-header h2 {
@@ -165,12 +197,14 @@
 .booking-summary {
   position: sticky;
   height: fit-content;
-  top: 24px
+  top: 24px;
+  text-align: left
 }
 
 .summary-header {
   padding: 24px 26px 18px;
-  border-bottom: 1px solid var(--booking-line)
+  border-bottom: 1px solid var(--booking-line);
+  text-align: left
 }
 
 .summary-header h2 {
@@ -205,7 +239,8 @@
 }
 
 .summary-services {
-  padding: 22px 26px
+  padding: 22px 26px;
+  text-align: left
 }
 
 .summary-services h3 {
@@ -216,19 +251,33 @@
 }
 
 .summary-service {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
   padding: 15px 0;
-  border-top: 1px solid var(--booking-line)
+  border-top: 1px solid var(--booking-line);
+  text-align: left
 }
 
 .summary-service-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  font-size: 12px
+  width: 100%;
+  font-size: 13px
 }
 
 .summary-service-top strong:first-child {
-  font-weight: 600
+  min-width: 0;
+  font-weight: 600;
+  text-align: left
+}
+
+.summary-service-top strong:last-child {
+  flex: 0 0 auto;
+  text-align: right;
+  white-space: nowrap
 }
 
 .summary-service p {
@@ -257,14 +306,17 @@
 
 .summary-total {
   padding: 18px 26px;
-  border-top: 1px solid var(--booking-line)
+  border-top: 1px solid var(--booking-line);
+  text-align: left
 }
 
 .total-line {
   display: flex;
+  align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  font-size: 14px
+  font-size: 14px;
+  text-align: left
 }
 
 .total-line strong {
@@ -666,6 +718,13 @@
 .appointment-save-button:disabled {
   opacity: .55;
   cursor: not-allowed
+}
+
+.booking-payment-note {
+  margin: 10px 0 0;
+  color: var(--booking-muted);
+  font-size: 12px;
+  line-height: 1.6
 }
 
 .appointment-feedback, .schedule-state, .schedule-error, .booking-contact-note {

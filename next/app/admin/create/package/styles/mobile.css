@@ -1,0 +1,5 @@
+@media (max-width: 480px) {
+  .include-row {
+    grid-template-columns: 1fr 32px;
+  }
+}

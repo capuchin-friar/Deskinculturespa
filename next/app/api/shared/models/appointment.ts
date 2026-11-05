@@ -67,8 +67,7 @@ export class AppointmentModel {
                 id
             } = payload;
             const { rows } = await query(
-                `SELECT * FROM consultations WHERE consultant_id = $1`,
-                [id]
+                `SELECT * FROM consultations ORDER BY created_at DESC, id DESC`
             );
 
             return rows;

@@ -40,6 +40,16 @@ export interface NewAppointmentDoc {
     admin_id: string | number
 }
 
+export interface NewPackageDoc {
+    name: string,
+    description: string,
+    price: number,
+    duration_months: number,
+    includes: string[],
+    image_url: string,
+    admin_id: string | number
+}
+
 export interface NewBlogDoc {
     title: string,
     summary: string | null,

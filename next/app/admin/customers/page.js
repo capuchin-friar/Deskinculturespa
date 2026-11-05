@@ -62,24 +62,24 @@ export default function InventoryPage() {
     }, []);
 
     useEffect(() => {
-        setRows(Array.isArray(data) ? data.filter(u => u.role.toLowerCase() === role.toLowerCase()) : [])
+        setRows(Array.isArray(data) ? data.filter(u => String(u.role || "").toLowerCase() === role.toLowerCase()) : [])
     }, [role, data])
 
     function formatLocation(obj){
-        let city;
-        let state;
-        Object.entries(obj).map(([key, value], index) => {
-            if(key === "city"){
-                city = value
+        if (!obj) return "—";
+        let location = obj;
+        if (typeof location === "string") {
+            try {
+                location = JSON.parse(location);
+            } catch {
+                return location;
             }
-            if(key === "state"){
-                state = value
-            }
-        })
-        if(city === null || state === null){
-            return `_`;
         }
-        return `${city}, ${state} State.`;
+        const city = location?.city;
+        const state = location?.state;
+        if (!city && !state) return "—";
+        if (city && state) return `${city}, ${state}`;
+        return city || state;
     }
 
 
@@ -130,7 +130,7 @@ export default function InventoryPage() {
                                     <td>{r?.email ?? "—"}</td>
                                     <td>{r?.phone ?? "—"}</td>
                                     <td>{formatLocation(r?.location) ?? "—"}</td>
-                                    <td>{jsAgo(r?.createdat)}</td>
+                                    <td>{jsAgo(r?.createdat ?? r?.createdAt)}</td>
                                 </tr>
                             ))}
                     </tbody>

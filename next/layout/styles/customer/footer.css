@@ -9,9 +9,9 @@
     position: relative;
 
     width: 100%;
-    min-height: 760px;
+    min-height: 360px;
 
-    padding: 55px 45px 0;
+    padding: 25px 45px 0;
 
     display: flex;
     flex-direction: column;

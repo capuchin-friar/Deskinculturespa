@@ -8,7 +8,7 @@ import "./styles/ipad.css";
 import Link from 'next/link'
 import { useDispatch } from 'react-redux'
 import location from "../../../src/json/location.json"
-import axios from 'axios'
+import { api } from "../../api/shared/config"
 
 const GENDER_SELECT_OPTIONS = [
   { value: "", label: "Prefer not to say" },
@@ -30,6 +30,14 @@ function normalizeUserRow(u) {
 
   
   let l = u.location;
+  if (typeof l === "string") {
+    try {
+      l = JSON.parse(l);
+    } catch {
+      l = {};
+    }
+  }
+  if (!l || typeof l !== "object") l = {};
 
   return {
     id: u.id,
@@ -45,14 +53,6 @@ function normalizeUserRow(u) {
   }
 }
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || "/api/",
-  withCredentials: true,
-  headers: {
-    Cookie: "admin_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJha3B1bHVmYWJpYW5AZ21haWwuY29tIiwibmFtZSI6IkFrcHVsdSBGYWJpYW4ifQ.1xDUorMOsEs6HYnDLZwOvvJrTax00bCzdWilOr01eIU; Path=/; Expires=Wed, 06 Sep 2027 16:52:47 GMT;",
-  },
-});
-
 export default function UserProfile() {
   const dispatch = useDispatch()
   const [active_panel, set_active_panel] = useState(1)
@@ -64,7 +64,7 @@ export default function UserProfile() {
     set_profileLoading(true)
     set_profileError("")
     try {
-      const { data: res } = await api.get("/admin/user");
+      const { data: res } = await api.get("/user");
       let user = res.data[0];
       if (user) {
         const normalized = normalizeUserRow(user);
@@ -236,7 +236,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_detailErr("")
     set_detailOk(false)
     try {
-      await api.patch(`/admin/user/edit`, {
+      await api.patch(`/user/edit`, {
         fname: fname.trim(),
         lname: lname.trim(),
         location: ({ state: state, city: city, zipcode: "" }),
@@ -260,7 +260,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_emailErr("")
     set_emailOk(false)
     try {
-      await api.patch(`/admin/user/email/`, { email: email.trim() })
+      await api.patch(`/user/email/`, { email: email.trim() })
       await onProfileRefresh?.()
       set_emailOk(true)
       window.setTimeout(() => set_emailOk(false), 2800)
@@ -279,7 +279,7 @@ function Genenral({ profile, profileLoading, onProfileRefresh }) {
     set_phoneErr("")
     set_phoneOk(false)
     try {
-      await api.patch(`/admin/user/phone`, { phone: phone.trim() })
+      await api.patch(`/user/phone`, { phone: phone.trim() })
       await onProfileRefresh?.()
       set_phoneOk(true)
       window.setTimeout(() => set_phoneOk(false), 2800)

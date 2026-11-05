@@ -34,7 +34,10 @@ export class DashboardModel {
                     COUNT(*) AS total_bookings,
                     COUNT(*) FILTER (
                         WHERE payment_status = 'paid'
-                    ) AS paid_bookings
+                    ) AS paid_bookings,
+                    COALESCE(SUM(price) FILTER (
+                        WHERE payment_status = 'paid'
+                    ), 0) AS paid_revenue
                 FROM bookings;
             `);
 
@@ -43,8 +46,77 @@ export class DashboardModel {
                     COUNT(*) AS total_appointments,
                     COUNT(*) FILTER (
                         WHERE payment_status = 'paid'
-                    ) AS paid_appointments
+                    ) AS paid_appointments,
+                    COALESCE(SUM(amount) FILTER (
+                        WHERE payment_status = 'paid'
+                    ), 0) AS paid_revenue
                 FROM appointments;
+            `);
+
+            const { rows: recentActivity } = await query(`
+                SELECT kind, id, title, amount, status, customer, created_at, scheduled_at, image_url
+                FROM (
+                    SELECT
+                        'product'::text AS kind,
+                        o.id,
+                        COALESCE((
+                            SELECT COALESCE(p.name, 'Product')
+                            FROM order_items oi
+                            LEFT JOIN products p ON p.id::text = oi.item_id
+                            WHERE oi.order_id = o.id
+                            ORDER BY oi.id
+                            LIMIT 1
+                        ), 'Product order') AS title,
+                        o.total_paid AS amount,
+                        o.payment_status AS status,
+                        TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')) AS customer,
+                        o.created_at::timestamptz,
+                        NULL::timestamptz AS scheduled_at,
+                        (
+                            SELECT p.thumbnail_url
+                            FROM order_items oi
+                            LEFT JOIN products p ON p.id::text = oi.item_id
+                            WHERE oi.order_id = o.id
+                            ORDER BY oi.id
+                            LIMIT 1
+                        ) AS image_url
+                    FROM orders o
+                    LEFT JOIN users u ON u.id::text = o.customer_id
+
+                    UNION ALL
+
+                    SELECT
+                        'service',
+                        b.id,
+                        COALESCE(NULLIF(s.subcategory, ''), s.category, 'Service'),
+                        b.price,
+                        b.payment_status,
+                        TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')),
+                        b.created_at,
+                        b.scheduled_at,
+                        s.image_url
+                    FROM bookings b
+                    INNER JOIN services s ON s.id = b.service_id
+                    LEFT JOIN users u ON u.id = b.user_id
+
+                    UNION ALL
+
+                    SELECT
+                        'appointment',
+                        a.id,
+                        COALESCE(NULLIF(a.consultation_name, ''), c.mode::text, 'Consultation'),
+                        a.amount,
+                        a.payment_status::text,
+                        TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')),
+                        a.created_at,
+                        a.scheduled_at,
+                        c.thumbnail_url
+                    FROM appointments a
+                    LEFT JOIN consultations c ON c.id = a.offering_id
+                    LEFT JOIN users u ON u.id = a.customer_id
+                ) activity
+                ORDER BY created_at DESC
+                LIMIT 12
             `);
 
             const { rows: [catalogue = {}] } = await query(`
@@ -65,11 +137,11 @@ export class DashboardModel {
             const { rows: [operations = {}] } = await query(`
                 SELECT
                     COUNT(*) FILTER (
-                        WHERE appointment_date >= NOW()
+                        WHERE COALESCE(scheduled_at, (appointment_date + start_time) AT TIME ZONE 'Africa/Lagos') >= NOW()
                     ) AS upcoming,
             
                     COUNT(*) FILTER (
-                        WHERE appointment_date < NOW()
+                        WHERE COALESCE(scheduled_at, (appointment_date + start_time) AT TIME ZONE 'Africa/Lagos') < NOW()
                     ) AS completed
             
                 FROM appointments
@@ -82,7 +154,8 @@ export class DashboardModel {
                 bookingBreakdown,
                 appointmentBreakdown,
                 catalogue,
-                operations
+                operations,
+                recentActivity,
             };
 
         }

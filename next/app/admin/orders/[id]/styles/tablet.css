@@ -1,3 +1,13 @@
 @media (min-width: 481px) and (max-width: 760px) {
+  .ops-header {
+    flex-direction: column;
+  }
 
+  .ops-header-flags {
+    justify-content: flex-start;
+  }
+
+  .ops-timeline {
+    grid-template-columns: 1fr 1fr;
+  }
 }

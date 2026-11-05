@@ -10,15 +10,37 @@ export default function useToggler() {
   const { cart } = useSelector((state) => state.cart);
 
   const refreshCart = async () => {
-    const { data } = await baseApi.get("customers/cart");
+    try {
+      const { data } = await baseApi.get("customers/cart");
 
-    if (!data.success) {
-      console.log("Error:", data.message);
+      if (!data.success) {
+        console.log("Error:", data.message);
+        return false;
+      }
+
+      dispatch(set_cart(Array.isArray(data.data) ? data.data : []));
+      return true;
+    } catch (error) {
+      console.error("Refresh cart error:", error);
       return false;
     }
+  };
 
-    dispatch(set_cart(data.data));
-    return true;
+  const clearCart = async () => {
+    try {
+      const { data } = await baseApi.delete("customers/cart");
+      if (!data.success) {
+        console.log("Error:", data.message);
+        dispatch(set_cart([]));
+        return false;
+      }
+      dispatch(set_cart([]));
+      return true;
+    } catch (error) {
+      console.error("Clear cart error:", error);
+      dispatch(set_cart([]));
+      return false;
+    }
   };
 
   const addToCart = async ({ item, qty = 1 }) => {
@@ -75,5 +97,5 @@ export default function useToggler() {
 
   const isCarted = (itemId) => cart.some((c) => c.product_id === itemId);
 
-  return { addToCart, rmFromCart, isCarted, refreshCart };
+  return { addToCart, rmFromCart, isCarted, refreshCart, clearCart };
 }

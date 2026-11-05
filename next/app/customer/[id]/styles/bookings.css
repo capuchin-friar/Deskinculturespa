@@ -69,7 +69,7 @@
   }
 
   .customer-bookings__tab:focus-visible,
-  .customer-booking__details summary:focus-visible {
+  .customer-booking__details-link:focus-visible {
     outline: 2px solid var(--brand-green);
     outline-offset: 3px;
   }
@@ -82,7 +82,7 @@
 
   .customer-booking {
     display: grid;
-    grid-template-columns: 112px minmax(0, 1fr) auto;
+    grid-template-columns: 112px minmax(0, 1fr);
     gap: 18px;
     min-height: 150px;
     padding: 16px;
@@ -185,49 +185,21 @@
     line-height: 1.4;
   }
 
-  .customer-booking__details {
-    min-width: 94px;
+  .customer-booking__details-link {
+    display: inline-flex;
+    grid-column: 1 / -1;
+    width: 100%;
+    margin-top: 4px;
+    padding: 14px 0 0;
+    border: 0;
+    border-top: 1px solid #ededed;
+    background: transparent;
     color: var(--brand-green);
-    font-size: 14px;
-    font-weight: 600;
-    text-align: right;
-  }
-
-  .customer-booking__details summary {
     cursor: pointer;
-    list-style: none;
-    white-space: nowrap;
-  }
-
-  .customer-booking__details summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .customer-booking__details summary:hover {
-    color: var(--brand-dark);
-    text-decoration: underline;
-  }
-
-  .customer-booking__details-content {
-    width: 230px;
-    margin-top: 12px;
-    padding: 12px;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    background: var(--off-white);
-    color: #555;
-    font-size: 13px;
-    font-weight: 400;
+    font-size: 15px;
+    font-weight: 600;
     text-align: left;
-    white-space: normal;
-  }
-
-  .customer-booking__details-content p {
-    margin: 0 0 8px;
-  }
-
-  .customer-booking__details-content p:last-child {
-    margin-bottom: 0;
+    text-decoration: none;
   }
 
   .customer-bookings__message {

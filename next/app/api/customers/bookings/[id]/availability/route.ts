@@ -10,7 +10,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   const month = request.nextUrl.searchParams.get("month") || "";
   if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return NextResponse.json({ success: false, message: "Invalid calendar month." }, { status: 400 });
   try {
-    const data = await AvailabilityModel.getCustomerMonthAvailability(userId, month);
+    const data = await AvailabilityModel.getCustomerMonthAvailability(userId, month, "service");
     if (!data || !data.bookings.some((booking) => String(booking.id) === id)) {
       return NextResponse.json({ success: false, message: "Booking not found." }, { status: 404 });
     }

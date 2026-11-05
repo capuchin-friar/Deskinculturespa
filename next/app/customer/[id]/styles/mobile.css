@@ -1,0 +1,393 @@
+.customer-account-nav-trigger,
+.customer-account-nav-backdrop,
+.customer-account-nav__top,
+.customer-account-nav__close {
+  display: none;
+}
+
+@media screen and (max-width: 1023px) {
+  .customer-body:has(.customer-account-page) {
+    overflow-x: hidden;
+  }
+
+  .customer-header .customer-features .customer-account-nav-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    order: 3;
+    width: 42px;
+    height: 44px;
+    min-width: 42px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #0b3b1a;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .customer-account-nav-trigger[aria-expanded="true"] {
+    background: var(--soft-green);
+    color: var(--brand-green);
+  }
+
+  .customer-account-page {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    width: calc(100% - 20px);
+    max-width: 100%;
+    min-width: 0;
+    margin: 12px auto 24px;
+  }
+
+  .customer-account-nav-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    border: 0;
+    background: rgb(11 59 26 / 38%);
+    cursor: pointer;
+  }
+
+  .customer-account-nav-backdrop.is-open {
+    display: block;
+  }
+
+  .customer-account-nav {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    bottom: 0;
+    z-index: 1105;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: min(280px, 86vw);
+    height: auto;
+    max-width: 86vw;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 12px;
+    border: 0;
+    border-right: 1px solid #e7e7e7;
+    border-radius: 0;
+    background: #fff;
+    box-shadow: 8px 0 24px rgb(0 0 0 / 8%);
+    transform: translateX(-105%);
+    transition: transform 220ms ease;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .customer-account-nav.is-open {
+    transform: translateX(0);
+  }
+
+  .customer-account-nav__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 6px;
+    padding: 4px 6px 10px;
+    border-bottom: 1px solid #ededed;
+  }
+
+  .customer-account-nav__top p {
+    margin: 0;
+    color: #363636;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .customer-account-nav__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #0b3b1a;
+    cursor: pointer;
+  }
+
+  .customer-account-nav hr {
+    width: 100%;
+    margin: 4px 0;
+    border-color: #ededed;
+  }
+
+  .customer-account-nav a {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    color: #555;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .customer-account-nav a svg {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .customer-account-nav a[aria-current="page"] {
+    background: var(--soft-green);
+    color: var(--brand-green);
+  }
+
+  .customer-orders,
+  .customer-appointments,
+  .customer-bookings,
+  .customer-account-overview {
+    display: block;
+    width: 100% !important;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    background: #fff;
+    color: #363636;
+  }
+
+  .customer-orders__header,
+  .customer-appointments__header,
+  .customer-bookings__header,
+  .customer-account-overview__header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid #ededed;
+  }
+
+  .customer-orders__header h1,
+  .customer-appointments__header h1,
+  .customer-bookings__header h1,
+  .customer-account-overview__header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 650;
+    line-height: 1.3;
+  }
+
+  .customer-orders__content,
+  .customer-appointments__content,
+  .customer-bookings__content {
+    padding: 12px 14px 16px;
+  }
+
+  .customer-orders__tabs,
+  .customer-appointments__tabs,
+  .customer-bookings__tabs {
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+    border-bottom: 1px solid #ededed;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .customer-orders__tab,
+  .customer-appointments__tab,
+  .customer-bookings__tab {
+    position: relative;
+    flex: 1 0 auto;
+    padding: 12px 10px 13px;
+    border: 0;
+    background: transparent;
+    color: #77777d;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 650;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .customer-orders__tab::after,
+  .customer-appointments__tab::after,
+  .customer-bookings__tab::after {
+    position: absolute;
+    right: 0;
+    bottom: -1px;
+    left: 0;
+    height: 2px;
+    background: transparent;
+    content: "";
+  }
+
+  .customer-orders__tab.is-active,
+  .customer-appointments__tab.is-active,
+  .customer-bookings__tab.is-active {
+    color: var(--brand-green);
+  }
+
+  .customer-orders__tab.is-active::after,
+  .customer-appointments__tab.is-active::after,
+  .customer-bookings__tab.is-active::after {
+    background: var(--brand-green);
+  }
+
+  .customer-orders__list,
+  .customer-appointments__list,
+  .customer-bookings__list {
+    display: grid;
+    gap: 12px;
+    padding-top: 14px;
+  }
+
+  .customer-booking {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid #d7d7d7;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  .customer-booking__icon {
+    display: grid;
+    min-height: 72px;
+    place-items: center;
+    border-radius: 4px;
+    background: var(--soft-green);
+    color: var(--brand-green);
+    font-size: 28px;
+  }
+
+  .customer-booking__title {
+    margin: 0 0 3px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .customer-booking__id,
+  .customer-booking__description {
+    margin: 0;
+    color: #686868;
+    font-size: 13px;
+  }
+
+  .customer-booking__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin-top: 8px;
+    color: #666;
+    font-size: 12px;
+  }
+
+  .customer-booking__status {
+    display: inline-flex;
+    margin-top: 8px;
+    padding: 3px 7px;
+    border-radius: 3px;
+    background: var(--soft-green);
+    color: var(--brand-dark);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .customer-booking__date {
+    margin: 6px 0 0;
+    font-size: 14px;
+    font-weight: 650;
+  }
+
+  .customer-booking__details-link {
+    grid-column: 1 / -1;
+  }
+
+  .customer-orders__empty {
+    margin: 8px 0 0;
+    padding: 18px 4px;
+    color: #6f6f76;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .customer-order__heading {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .customer-order__total {
+    font-size: 16px;
+  }
+
+  .customer-order__delivery {
+    margin: 6px 0 0;
+    font-size: 14px;
+    font-weight: 650;
+    line-height: 1.4;
+  }
+
+  .customer-order__item {
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .customer-order__item strong {
+    grid-column: 2;
+    justify-self: start;
+    font-size: 14px;
+  }
+
+  .customer-order__item .customer-order__image,
+  .customer-order__item .customer-order__image img {
+    width: 56px;
+    height: 56px;
+    min-height: 56px;
+  }
+
+  .customer-order__title {
+    font-size: 15px;
+  }
+
+  .customer-order__details {
+    color: var(--brand-green);
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .customer-order__details-content {
+    box-sizing: border-box;
+  }
+}
+
+@media screen and (max-width: 760px) {
+  .customer-account-nav {
+    top: 64px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .customer-account-page {
+    width: calc(100% - 16px);
+    margin: 10px auto 20px;
+  }
+
+  .customer-orders .customer-order {
+    padding: 12px;
+  }
+
+  .customer-account-overview__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+}

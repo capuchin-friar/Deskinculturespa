@@ -10,16 +10,16 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { decodeAdminPayload } from "@/app/api/shared/jwt";
+import { getRequestAdminId } from "@/app/api/shared/adminAuth";
 import { DashboardModel } from "../../shared/models/dashboard";
 
 
 export const GET = async (request: NextRequest) => {
 
     try {
-        const getCookie = request.cookies.get("admin_token");
+        const admin_id = await getRequestAdminId(request);
 
-        if (!getCookie?.value) {
+        if (!admin_id) {
             return NextResponse.json(
                 {
                     success: false,
@@ -28,25 +28,6 @@ export const GET = async (request: NextRequest) => {
                 { status: 401 }
             );
         }
-
-        // Decode JWT
-        const decoded = decodeAdminPayload(getCookie.value);
-
-        if (
-            !decoded ||
-            typeof decoded !== "object" ||
-            !("id" in decoded)
-        ) {
-            return NextResponse.json(
-                {
-                    success: false,
-                    data: "Invalid authentication token",
-                },
-                { status: 401 }
-            );
-        }
-
-        const admin_id = decoded.id;
 
         // Get dashboard metrics
         const response = await DashboardModel.getDashboardDoc();

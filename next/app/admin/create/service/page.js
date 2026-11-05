@@ -887,7 +887,7 @@ export default function AddServicePage() {
             ).format(
                 Number(form.price)
             )}`
-            : "₦25,000";
+            : "—";
 
     /*
     |--------------------------------------------------------------------------

@@ -129,7 +129,14 @@ LARGE SCREEN ONLY
 
         gap: 14px;
 
+        min-width: 0;
+
         height: 560px;
+    }
+
+
+    .package-gallery--single {
+        grid-template-columns: minmax(0, 1fr);
     }
 
 
@@ -197,6 +204,8 @@ LARGE SCREEN ONLY
 
         width: 100%;
 
+        min-width: 0;
+
         height: 560px;
 
         overflow: hidden;
@@ -214,6 +223,8 @@ LARGE SCREEN ONLY
         height: 100%;
 
         object-fit: cover;
+
+        object-position: center;
 
         display: block;
     }

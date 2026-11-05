@@ -78,7 +78,7 @@ export class BookingModel {
        FROM bookings b
        INNER JOIN services s ON s.id = b.service_id
        WHERE b.user_id = $1
-       ORDER BY b.scheduled_at DESC`,
+       ORDER BY b.scheduled_at DESC NULLS LAST, b.id DESC`,
       [payload.user_id],
     );
 

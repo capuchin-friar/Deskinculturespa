@@ -67,8 +67,7 @@ export class ServiceModel {
                 id
             } = payload;
             const { rows } = await query(
-                `SELECT * FROM services WHERE admin_id = $1`,
-                [id]
+                `SELECT * FROM services ORDER BY created_at DESC, id DESC`
             );
 
             return rows;
@@ -79,7 +78,9 @@ export class ServiceModel {
         async () => {
            
             const { rows } = await query(
-                `SELECT * FROM services`
+                `SELECT * FROM services
+                 WHERE COALESCE(is_active, TRUE) = TRUE
+                 ORDER BY category, subcategory, id`
             );
 
             return rows;

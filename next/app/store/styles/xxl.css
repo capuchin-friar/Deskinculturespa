@@ -8,6 +8,7 @@
 
 .customer-store{
     height: 100vh;
+    overflow: scroll;
     width: 100%;
 }
 

@@ -1,0 +1,101 @@
+.customer-orders .customer-order,
+.customer-bookings .customer-order {
+  display: block;
+  min-height: 0;
+  padding: 16px;
+  border: 1px solid #d7d7d7;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.customer-orders .customer-order__details,
+.customer-bookings .customer-order__details {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #ededed;
+  min-width: 0;
+  text-align: left;
+}
+
+.customer-orders .customer-order__details-content,
+.customer-bookings .customer-order__details-content {
+  width: 100%;
+  max-width: none;
+}
+
+.customer-order__heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.customer-order__total {
+  color: #363636;
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.customer-order__item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.customer-order__item .customer-order__image {
+  width: 72px;
+  min-height: 72px;
+  height: 72px;
+  overflow: hidden;
+  font-size: 28px;
+}
+
+.customer-order__item .customer-order__image img {
+  width: 100%;
+  height: 72px;
+  object-fit: cover;
+}
+
+.customer-order__item .customer-order__title {
+  -webkit-line-clamp: 2;
+}
+
+.customer-order__more {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.customer-order__item strong {
+  color: #363636;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.customer-order__status {
+  display: inline-flex;
+  margin-top: 4px;
+  padding: 3px 6px;
+  border-radius: 2px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.customer-order__status--blue {
+  background: #2872e8;
+}
+
+.customer-order__status--green {
+  background: #078c63;
+}
+
+.customer-order__status--gray {
+  background: #707780;
+}

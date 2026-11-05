@@ -3,7 +3,8 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 
-import { useCallback } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
     IoPeopleOutline,
     IoCartOutline,
@@ -66,65 +67,105 @@ const renderOverviewCards = ((overview) => {
 
 
 
+function toCount(value) {
+    const number = Number(value);
+    return Number.isFinite(number) ? number : 0;
+}
+
+function formatNaira(value) {
+    return new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(toCount(value));
+}
+
+function formatActivityDate(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
+}
+
+function formatActivityTime(value) {
+    if (!value) return "";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return date.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
+}
+
 export default function page() {
+    const [metrics, setMetrics] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        let mounted = true;
+        fetch("/api/admin/dashboard", { credentials: "include" })
+            .then(async (response) => {
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.data || result.message || "Could not load dashboard.");
+                }
+                if (mounted) setMetrics(result.data);
+            })
+            .catch((err) => {
+                if (mounted) setError(err.message || "Could not load dashboard.");
+            })
+            .finally(() => {
+                if (mounted) setLoading(false);
+            });
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     const overview = [
         {
             name: "Total customers",
-            value: 0,
+            value: toCount(metrics?.overview?.customers),
             svg: IoPeopleOutline,
-            duration: "",
-            conversion: ""
         },
         {
             name: "Total orders",
-            value: 0,
+            value: toCount(metrics?.overview?.orders),
             svg: IoCartOutline,
-            duration: "",
-            conversion: ""
         },
         {
             name: "Revenue",
-            value: 0,
+            value: formatNaira(metrics?.overview?.revenue),
             svg: IoTrendingUpOutline,
-            duration: "",
-            conversion: ""
         }
-    ];
-
-    const orderBreakdown = [
-
     ];
 
     const catalog = [
         {
             name: "Products listed",
-            value: 0,
+            value: toCount(metrics?.catalogue?.products),
             svg: IoBagHandleOutline,
-            summary: "Total products in catalog"
         },
         {
             name: "Services offered",
-            value: 0,
+            value: toCount(metrics?.catalogue?.services),
             svg: IoSparklesOutline,
-            summary: "Total services in catalog"
         },
         {
             name: "Appointments",
-            value: 0,
+            value: toCount(metrics?.catalogue?.appoinment_offerings),
             svg: IoCalendarOutline,
-            summary: "Total appointment offers"
         }
     ];
 
+    if (loading) {
+        return <p>Loading dashboard…</p>;
+    }
 
+    if (error) {
+        return <p>{error}</p>;
+    }
 
     return (
         <>
             {
                 [
                     { title: "Bussiness Overview", jsx: renderOverviewCards([...overview, ...catalog]) },
-                    { title: "Business Summary", jsx: <OrderBreakdown /> },
+                    { title: "Business Summary", jsx: <OrderBreakdown metrics={metrics} /> },
                 ].map((content, i) =>
                     <div key={i}>
                         <Headline title={`${i + 1}. ${content.title}`} />
@@ -145,37 +186,61 @@ function MetricCard({
     return (
         <div className="admin-metric-card">
             <span>
-                <Icon size={35} />
+                <Icon size={22} />
             </span>
 
             <span>
                 <p>{name}</p>
-                <h3><b>{value}</b></h3>
+                <h3>{value}</h3>
             </span>
         </div>
     );
 }
 
 function OrderBreakdown({
-    products = [],
-    services = [],
-    appointments = []
+    metrics
 }) {
+    const router = useRouter();
+    const [activityKind, setActivityKind] = useState("all");
 
-    const data = [
+    const orderData = [
         {
             name: "Products",
-            value: 53
+            value: toCount(metrics?.orderBreakdown?.products)
         },
         {
             name: "Services",
-            value: 41
+            value: toCount(metrics?.bookingBreakdown?.paid_bookings)
         },
         {
             name: "Appointments",
-            value: 32
+            value: toCount(metrics?.appointmentBreakdown?.paid_appointments)
         }
     ];
+
+    const revenueData = [
+        {
+            name: "Products",
+            value: toCount(metrics?.overview?.revenue)
+        },
+        {
+            name: "Services",
+            value: toCount(metrics?.bookingBreakdown?.paid_revenue)
+        },
+        {
+            name: "Appointments",
+            value: toCount(metrics?.appointmentBreakdown?.paid_revenue)
+        }
+    ];
+
+    const activities = useMemo(() => {
+        const rows = Array.isArray(metrics?.recentActivity) ? metrics.recentActivity : [];
+        if (activityKind === "all") return rows;
+        const match = activityKind === "products" ? "product" : activityKind === "services" ? "service" : "appointment";
+        return rows.filter((row) => row.kind === match);
+    }, [metrics?.recentActivity, activityKind]);
+
+    const data = orderData;
 
     const COLORS = [
         "#5B21B6",
@@ -237,7 +302,7 @@ function OrderBreakdown({
                         <ResponsiveContainer width="90%" height="100%">
                             <PieChart>
                                 <Pie
-                                    data={data}
+                                    data={revenueData}
                                     dataKey="value"
                                     nameKey="name"
                                     cx="50%"
@@ -247,14 +312,14 @@ function OrderBreakdown({
                                     paddingAngle={0}
                                     stroke="none"
                                 >
-                                    {data.map((entry, index) => (
+                                    {revenueData.map((entry, index) => (
                                         <Cell
-                                            key={`cell-${index}`}
+                                            key={`rev-cell-${index}`}
                                             fill={COLORS[index]}
                                         />
                                     ))}
                                 </Pie>
-                                <Tooltip />
+                                <Tooltip formatter={(value) => formatNaira(value)} />
                                 <Legend
                                     verticalAlign="middle"
                                     align="right"
@@ -273,15 +338,14 @@ function OrderBreakdown({
                     <div className="activity-headline">
                         <div className="input-cnt">
                             <span>Activities: </span>
-                            <select name="" id="">
-                                <option value="">Select activity</option>
+                            <select value={activityKind} onChange={(event) => setActivityKind(event.target.value)}>
                                 <option value="all">All</option>
                                 <option value="products">Products</option>
                                 <option value="services">Services</option>
                                 <option value="appointments">Appointments</option>
                             </select>
                         </div>
-                        <button className="view-all">
+                        <button className="view-all" type="button" onClick={() => router.push("/admin/orders")}>
                             <span>View all {""}</span>
                             &nbsp;
                             &nbsp;
@@ -292,55 +356,24 @@ function OrderBreakdown({
                     </div>
 
                     <div className="activity-card-cnt">
-                        {
-                            [
-                                {
-                                    type: "appointment",
-                                    title: "Medical Consultation",
-                                    image: "/images/appointment.jpg",
-                                    price: "₦25,000",
-                                    date: "September 5, 2026",
-                                    time: "10:30 AM",
-                                    provider: "Dr. James Okafor",
-                                    location: "Lagos",
-                                    status: "paid"
-                                },
-                                {
-                                    type: "product",
-                                    title: "iPhone 15 Pro Max",
-                                    image: "/images/iphone.jpg",
-                                    price: "₦1,250,000",
-                                    quantity: 1,
-                                    provider: "Fabian Store",
-                                    location: "Lagos",
-                                    status: "paid"
-                                },
-                                {
-                                    type: "service",
-                                    title: "Professional Website Development",
-                                    image: "/images/web-development.jpg",
-                                    price: "₦350,000",
-                                    date: "September 10, 2026",
-                                    provider: "ThetaSoft",
-                                    location: "Lagos",
-                                    status: "paid"
-                                }
-                            ].map((a, i) => (
-                                <PaidItemCard
-                                    key={i}
-                                    type={a.type}
-                                    title={a.title}
-                                    image={a.image}
-                                    price={a.price}
-                                    date={a.date}
-                                    time={a.time}
-                                    quantity={a.quantity}
-                                    provider={a.provider}
-                                    location={a.location}
-                                    status={a.status}
-                                />
-                            ))
-                        }
+                        {activities.length === 0 ? (
+                            <p>No activity recorded yet.</p>
+                        ) : activities.map((a) => (
+                            <PaidItemCard
+                                key={`${a.kind}-${a.id}`}
+                                type={a.kind}
+                                title={a.title}
+                                image={a.image_url}
+                                price={formatNaira(a.amount)}
+                                date={formatActivityDate(a.scheduled_at || a.created_at)}
+                                time={formatActivityTime(a.scheduled_at || a.created_at)}
+                                quantity={a.kind === "product" ? null : null}
+                                provider={a.customer}
+                                location=""
+                                status={a.status}
+                                onClick={() => router.push(`/admin/orders/${a.id}?kind=${encodeURIComponent(a.kind)}`)}
+                            />
+                        ))}
                     </div>
                 </section>
             </div>
@@ -374,7 +407,7 @@ function Headline({
     title
 }) {
     return (
-        <p>{title}</p>
+        <p className="admin-section-title">{title}</p>
     )
 }
 

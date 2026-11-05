@@ -78,7 +78,7 @@ export const PATCH = async (
       }
     }
     const schedulingResult = scheduledAt
-      ? await AvailabilityModel.scheduleCustomerBookings(user_id, scheduledAt)
+      ? await AvailabilityModel.scheduleCustomerBookings(user_id, scheduledAt, { kind: "service" })
       : null;
     if (schedulingResult?.error === "BOOKING_NOT_FOUND") {
       return NextResponse.json({ success: false, message: "Booking not found or can no longer be scheduled." }, { status: 404 });

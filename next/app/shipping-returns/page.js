@@ -18,12 +18,12 @@ const policies = [
     {
         number: "03",
         title: "Returns",
-        text: "If you receive a damaged, incorrect, or defective product, contact us as soon as possible so we can review the issue."
+        text: "We do not accept returns of opened, used, or unwanted products. If an item arrives damaged, incorrect, or defective, contact us promptly so we can look into a replacement where appropriate."
     },
     {
         number: "04",
-        title: "Refunds",
-        text: "Approved refunds are processed after the returned item has been reviewed and the return has been accepted."
+        title: "No refunds",
+        text: "All sales are final. De Skin Culture does not offer refunds once payment has been confirmed."
     }
 ];
 
@@ -44,9 +44,9 @@ export default function ShippingReturnsPage() {
                 </h1>
 
                 <p>
-                    Everything you need to know about receiving
-                    your De Skin Culture order and what happens
-                    if something isn't right.
+                    How we process and deliver your De Skin Culture
+                    order, and our no-refund policy if something
+                    isn't right.
                 </p>
 
             </section>

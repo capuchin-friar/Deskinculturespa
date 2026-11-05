@@ -1,6 +1,7 @@
 import { createHash, timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../shared/database";
+import { OrderModel } from "../shared/models/order";
 import { generatePaystackSignature } from "../shared/paystack";
 
 export const runtime = "nodejs";
@@ -229,79 +230,51 @@ export async function POST(request: NextRequest) {
       ],
     );
 
-    for (const value of orders.items) {
-      if (!isObject(value)) {
-        throw new Error("Invalid order details in Paystack metadata");
-      }
+    const items = orders.items
+      .filter(isObject)
+      .map((item) => {
+        const units = Math.max(1, Math.round(getNumber(item.units ?? item.quantity)));
+        const unitPrice = getNumber(item.unit_price ?? item.price);
+        return {
+          item_id: String(item.item_id ?? item.product_id ?? ""),
+          units,
+          unit_price: unitPrice,
+          total_price: getNumber(item.total ?? item.total_price) || unitPrice * units,
+        };
+      })
+      .filter((item) => item.item_id);
 
-      const o = value;
-      if (/*!Array.isArray(items)**/ typeof o !== "object") {
-        throw new Error("Invalid order items in Paystack metadata");
-      }
-      const subtotal = getNumber(orders.subtotal ?? 0);
-      const shippingFee = getNumber(o.shipping_fee ?? 0);
-      const tax = getNumber(metadata.tax);
-      const charges = 0;
-      const totalPaid = subtotal + shippingFee + tax + charges;
-      console.log("shippingAddress", shippingAddress)
-      const { rows } = await client.query<{ id: number }>(
-        `INSERT INTO orders(
-          customer_id, amount_paid, shipping_fee, tax, charges, total_paid,
-          currency, fulfillment_status, payment_status, shipping_address,
-          payment_reference, shipping_method, tracking_number
-        ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, '')
-        RETURNING id`,
-        [
-          customerId,
-          subtotal,
-          shippingFee,
-          tax,
-          charges,
-          totalPaid,
-          getString(verifiedData.currency) || "NGN",
-          "order_placed",
-          "pending",
-          shippingAddress,
-          reference,
-          getString(o.shipping_method) || "3rd part logistics",
-        ],
-      );
-      const orderId = rows[0]?.id;
-      if (!orderId) {
-        throw new Error("Could not create order");
-      }
-
-    //   await client.query(
-    //     `INSERT INTO order_events(
-    //       order_id, event_type, stage, actor_type, actor_id, outcome, notes, meta
-    //     ) VALUES($1, 'payment', 'payment_received', 'customer', $2, 'success', $3, $4)`,
-    //     [
-    //       orderId,
-    //       customerId,
-    //       `Payment received via Paystack - Reference: ${reference}`,
-    //       JSON.stringify({
-    //         channel: verifiedData.channel,
-    //         paystack_charge_id: verifiedData.id,
-    //         paid_at: verifiedData.paid_at,
-    //       }),
-    //     ],
-    //   );
-
-      await client.query(
-        `INSERT INTO order_items(order_id, item_id, units, unit_price, total_price)
-        VALUES($1, $2, $3, $4, $5)`,
-        [
-          orderId,
-          String(o.item_id ?? ""),
-          getNumber(o.units ?? o.quantity),
-          getNumber(o.unit_price),
-          getNumber(o.total),
-        ],
-      );
-      
+    if (items.length === 0) {
+      throw new Error("Invalid order items in Paystack metadata");
     }
 
+    const { rows: matchedUsers } = await client.query<{ id: string | number }>(
+      `SELECT id FROM users WHERE $1 <> '' AND LOWER(TRIM(email)) = LOWER(TRIM($1)) LIMIT 1`,
+      [getString(customer.email)],
+    );
+    const resolvedCustomerId = String(matchedUsers[0]?.id || customerId);
+    const subtotal = getNumber(orders.subtotal) || items.reduce((sum, item) => sum + item.total_price, 0);
+    const shippingFee = getNumber(metadata.shipping_fee);
+    const tax = getNumber(metadata.tax);
+    const charges = 0;
+
+    await OrderModel.createPaidOrderWithClient(client, {
+      customerId: resolvedCustomerId,
+      reference,
+      currency: getString(verifiedData.currency) || "NGN",
+      shippingAddress,
+      shippingMethod: "standard",
+      items,
+      amountPaid: subtotal,
+      shippingFee,
+      tax,
+      charges,
+      totalPaid: getNumber(verifiedData.amount) / 100 || subtotal + shippingFee + tax + charges,
+      clearCart: true,
+    });
+
     await client.query("COMMIT");
+
     return NextResponse.json(
       { success: true, message: "Webhook processed successfully" },
       { status: 200 },

@@ -4,6 +4,7 @@ import {
     IoClose,
     IoCartOutline,
     IoFilterOutline,
+    IoListOutline,
     IoMenu,
     IoPersonOutline
 } from "react-icons/io5";
@@ -14,6 +15,7 @@ import useProductHandler from "@/src/hooks/product";
 import useServiceHandler from "@/src/hooks/service";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useAccountNav } from "@/src/components/customer/AccountNavContext";
 
 function serviceCategoryHref(service) {
     const category = String(service?.category ?? "").trim().toLowerCase().replace(/\s+/g, "-");
@@ -30,6 +32,7 @@ export function Header({
     const [mobileMenuStack, setMobileMenuStack] = useState([]);
     const mobileMenuCloseRef = useRef(null);
     const router = useRouter();
+    const accountNav = useAccountNav();
 
     let {
         cart
@@ -210,6 +213,7 @@ export function Header({
                     disabled={storeFilterOpen}
                     onClick={() => {
                         onCloseStoreFilter?.();
+                        accountNav.close();
                         setMobileMenuStack([]);
                         setMobileMenuOpen(true);
                     }}
@@ -524,8 +528,8 @@ export function Header({
                 <span className="customer-logo">
 
                     <img
-                        src="deskinculture_logo.png"
-                        alt="De Skin Culture"
+                        src="/deskinculture_logo.png"
+                        alt="DeSkinCulture logo"
                         style={{
                             height: "35px",
                             width: "35px"
@@ -575,7 +579,7 @@ export function Header({
                         background: "#278a3d",
                         borderRadius: "50%",
                         padding: "0px 4px"
-                    }}>{(cart.length ?? 0)}</small>
+                    }}>{(Array.isArray(cart) ? cart : []).reduce((count, item) => count + (Number(item?.quantity) || 0), 0)}</small>
                 </button>
 
 
@@ -603,6 +607,23 @@ export function Header({
                         size={20}
                     />
                 </button>
+
+                {accountNav.enabled && (
+                    <button
+                        type="button"
+                        className="customer-account-nav-trigger"
+                        aria-label={accountNav.open ? "Close account menu" : "Open account menu"}
+                        aria-expanded={accountNav.open}
+                        aria-controls="customer-account-nav"
+                        onClick={() => {
+                            onCloseStoreFilter?.();
+                            closeMobileMenu();
+                            accountNav.toggle();
+                        }}
+                    >
+                        <IoListOutline size={22} aria-hidden="true" />
+                    </button>
+                )}
 
             </div>
 

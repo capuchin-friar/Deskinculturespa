@@ -14,11 +14,10 @@ import useToggler from "../src/hooks/toggler";
 import useProductHandler from "../src/hooks/product";
 import { useRouter } from "next/navigation";
 export default function Home() {
+
   const router = useRouter();
   const [products, setProducts] = useState([]);
-
   const { addToCart, rmFromCart, isCarted } = useToggler();
-
   const { products: prods } = useProductHandler();
 
   useEffect(() => {
@@ -28,43 +27,37 @@ export default function Home() {
   const services = [
     {
       title: "Relaxing Full Body Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-full-body-massage.jpg",
       description:
         "A calming full-body massage designed to release tension, improve circulation, and leave you feeling deeply relaxed.",
     },
     {
       title: "Luxury Facial Treatment",
-      thumbnail:
-        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-luxury-facial.jpg",
       description:
         "A personalized facial treatment that cleanses, hydrates, and rejuvenates your skin for a fresh and radiant appearance.",
     },
     {
       title: "Hot Stone Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-hot-stone.jpg",
       description:
         "Experience deep relaxation with heated stones combined with therapeutic massage techniques to ease muscle tension.",
     },
     {
       title: "Aromatherapy Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-aromatherapy.jpg",
       description:
         "A soothing massage enhanced with aromatic essential oils to promote relaxation and create a tranquil wellness experience.",
     },
     {
       title: "Deep Cleansing Facial",
-      thumbnail:
-        "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-deep-cleansing-facial.jpg",
       description:
         "A thorough facial treatment focused on deep cleansing, exfoliation, and hydration to refresh and revitalize your skin.",
     },
     {
       title: "Body Scrub & Exfoliation",
-      thumbnail:
-        "https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-body-scrub.jpg",
       description:
         "A luxurious exfoliating treatment that removes dead skin cells, smooths the body, and leaves your skin soft and renewed.",
     },
@@ -73,29 +66,25 @@ export default function Home() {
   const packages = [
     {
       title: "Relaxing Full Body Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-full-body-massage.jpg",
       description:
         "A calming full-body massage designed to release tension, improve circulation, and leave you feeling deeply relaxed.",
     },
     {
       title: "Luxury Facial Treatment",
-      thumbnail:
-        "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-luxury-facial.jpg",
       description:
         "A personalized facial treatment that cleanses, hydrates, and rejuvenates your skin for a fresh and radiant appearance.",
     },
     {
       title: "Hot Stone Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1515377905703-c4788e51af15?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-hot-stone.jpg",
       description:
         "Experience deep relaxation with heated stones combined with therapeutic massage techniques to ease muscle tension.",
     },
     {
       title: "Aromatherapy Massage",
-      thumbnail:
-        "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&auto=format&fit=crop",
+      thumbnail: "/home/home-aromatherapy.jpg",
       description:
         "A soothing massage enhanced with aromatic essential oils to promote relaxation and create a tranquil wellness experience.",
     },
@@ -113,7 +102,7 @@ export default function Home() {
                   height: "120px",
                   width: "120px",
                 }}
-                alt="Logo"
+                alt="DeSkinCulture logo"
               />
             </div>
             <br />
@@ -191,7 +180,7 @@ export default function Home() {
                   height: "90px",
                   width: "90px",
                 }}
-                alt="Logo"
+                alt="DeSkinCulture logo"
               />
             </div>
             <br />
@@ -361,7 +350,17 @@ export default function Home() {
             over 20 years of dermatology practice.
           </p>
 
-          <button className="customer-admin-meet-btn">
+          <button
+            type="button"
+            className="customer-admin-meet-btn"
+            onClick={() => {
+              window.open(
+                "https://wa.me/2348101321973?text=" + encodeURIComponent("I would love to meet you"),
+                "_blank",
+                "noopener,noreferrer",
+              );
+            }}
+          >
             Meet Dr. Chinelo Stella
           </button>
         </div>

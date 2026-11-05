@@ -14,7 +14,8 @@ export async function GET(request: NextRequest) {
   try {
     const data = await ConsultationBookingModel.getCustomerAppointments(customerId);
     return NextResponse.json({ success: true, data });
-  } catch {
+  } catch (error) {
+    console.error("Could not load customer appointments", error);
     return NextResponse.json({ success: false, message: "Could not load your consultations." }, { status: 500 });
   }
 }

@@ -6,6 +6,7 @@ import { baseApi } from "../../app/api/shared/config";
 export default function useServiceHandler() {
 
     const [services, setServices] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
 
@@ -31,7 +32,7 @@ export default function useServiceHandler() {
                 setServices([]);
 
             } finally {
-
+                setLoading(false);
             }
         };
 
@@ -40,6 +41,7 @@ export default function useServiceHandler() {
     }, []);
 
     return {
-        services
+        services,
+        loading,
     };
 }

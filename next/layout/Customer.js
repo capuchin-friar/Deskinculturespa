@@ -22,6 +22,7 @@ import "./styles/customer/tablet.css"
 import "./styles/customer/ipad.css"
 import "./styles/customer/mobile-menu.css"
 import { Aside } from "@/src/components/customer/Aside";
+import { AccountNavProvider } from "@/src/components/customer/AccountNavContext";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { baseApi } from "@/app/api/shared/config";
@@ -43,12 +44,12 @@ export default function Customer({ children }) {
         if (isAuthPage) return;
         (async () => {
             try {
-                const { data } = await baseApi.get("/cart");
+                const { data } = await baseApi.get("customers/cart");
 
                 if (!data.success) {
-                    throw new Error("Error: ", data.message);
+                    throw new Error(data.message || "Could not load cart");
                 }
-                dispatch(set_cart(data.data));
+                dispatch(set_cart(Array.isArray(data.data) ? data.data : []));
             } catch (error) {
                 console.log(error);
             }
@@ -102,10 +103,8 @@ export default function Customer({ children }) {
     }
 
     return (
-        <>
+        <AccountNavProvider>
             <div className="customer-cnt">
-
-
                 <div className="customer-content">
                     <Header
                         storeFilterEnabled={path}
@@ -134,6 +133,6 @@ export default function Customer({ children }) {
                     <Footer />
                 </div>
             </div>
-        </>
+        </AccountNavProvider>
     )
 }

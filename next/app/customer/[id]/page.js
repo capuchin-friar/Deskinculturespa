@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { IoArrowBackOutline, IoClose } from "react-icons/io5";
+import { baseApi } from "@/app/api/shared/config";
+import { useAccountNav } from "@/src/components/customer/AccountNavContext";
+import { formatOrderPrice, mapCustomerOrder } from "./orderUtils";
 import {
   FiBookmark,
   FiCalendar,
@@ -20,6 +24,10 @@ import "./styles/laptop.css";
 import "./styles/appointments.css";
 import "./styles/bookings.css";
 import "./styles/account.css";
+import "./styles/orders.css";
+import "./styles/order-detail.css";
+import "./styles/booking-detail.css";
+import "./styles/mobile.css";
 
 const sampleAccount = {
   name: "Amara Okafor",
@@ -33,108 +41,6 @@ const sampleAccount = {
   ],
   storeCredit: 0,
 };
-
-const sampleAppointments = [
-  {
-    id: 481,
-    customer_id: 102,
-    consultant_id: 14,
-    offering_id: 6,
-    consultation_name: "Skincare Consultation",
-    appointment_date: "2026-10-20",
-    start_time: "10:00:00",
-    end_time: "10:45:00",
-    scheduled_at: "2026-10-20T09:00:00.000Z",
-    amount: "25000.00",
-    status: "confirmed",
-    payment_status: "paid",
-    notes: "Discuss sensitive skin and a simple daily routine.",
-    mode: "video",
-    duration_minutes: 45,
-  },
-  {
-    id: 482,
-    customer_id: 102,
-    consultant_id: 14,
-    offering_id: 9,
-    consultation_name: "Body Treatment Consultation",
-    appointment_date: null,
-    start_time: null,
-    end_time: null,
-    scheduled_at: null,
-    amount: "18000.00",
-    status: "pending",
-    payment_status: "pending",
-    notes: null,
-    mode: "physical",
-    duration_minutes: 30,
-  },
-  {
-    id: 456,
-    customer_id: 102,
-    consultant_id: 14,
-    offering_id: 6,
-    consultation_name: "Skincare Consultation",
-    appointment_date: "2026-09-18",
-    start_time: "13:00:00",
-    end_time: "13:45:00",
-    scheduled_at: "2026-09-18T12:00:00.000Z",
-    amount: "25000.00",
-    status: "completed",
-    payment_status: "paid",
-    notes: "Follow-up consultation.",
-    mode: "video",
-    duration_minutes: 45,
-  },
-];
-
-const sampleBookings = [
-  {
-    id: 730,
-    user_id: 102,
-    service_id: 21,
-    scheduled_at: "2026-10-22T10:00:00.000Z",
-    price: "35000.00",
-    status: "confirmed",
-    payment_status: "paid",
-    notes: "Please focus on hydration.",
-    category: "Facial Treatment",
-    subcategory: "Hydrating Facial",
-    description: "A nourishing facial treatment to refresh and hydrate the skin.",
-    duration_minutes: 60,
-    image_url: null,
-  },
-  {
-    id: 731,
-    user_id: 102,
-    service_id: 24,
-    scheduled_at: null,
-    price: "22000.00",
-    status: "pending",
-    payment_status: "pending",
-    notes: null,
-    category: "Body Care",
-    subcategory: "Body Polish",
-    description: "A gentle exfoliating treatment for softer, smoother skin.",
-    duration_minutes: 45,
-    image_url: null,
-  },
-  {
-    id: 704,
-    user_id: 102,
-    service_id: 18,
-    scheduled_at: "2026-09-12T11:00:00.000Z",
-    price: "28000.00",
-    status: "completed",
-    payment_status: "paid",
-    notes: "Thank you for the great service.",
-    category: "Facial Treatment",
-    subcategory: "Brightening Facial",
-    description: "A facial treatment focused on a brighter, more even-looking complexion.",
-    duration_minutes: 50,
-    image_url: null,
-  },
-];
 
 export default function Page() {
   const params = useParams();
@@ -152,6 +58,8 @@ export default function Page() {
         <Appointments />
       ) : section === "bookings" ? (
         <Bookings />
+      ) : section === "packages" ? (
+        <Packages />
       ) : section === "account" ? (
         <AccountOverview />
       ) : (
@@ -162,104 +70,234 @@ export default function Page() {
 }
 
 function Aside({ section }) {
+  const { open, close } = useAccountNav();
+
   return (
-    <aside className="customer-account-nav" aria-label="Account navigation">
-      <Link
-        href="/customer/account"
-        aria-current={section === "account" ? "page" : undefined}
+    <>
+      <button
+        type="button"
+        className={`customer-account-nav-backdrop${open ? " is-open" : ""}`}
+        aria-label="Close account menu"
+        aria-hidden={!open}
+        tabIndex={open ? 0 : -1}
+        onClick={close}
+      />
+      <aside
+        id="customer-account-nav"
+        className={`customer-account-nav${open ? " is-open" : ""}`}
+        aria-label="Account navigation"
       >
-        <FiUser aria-hidden="true" />
-        My Account
-      </Link>
-      <hr />
-      {[
-        { name: "Appointments", id: "appointments", Icon: FiCalendar },
-        { name: "Bookings", id: "bookings", Icon: FiBookmark },
-        { name: "Orders", id: "orders", Icon: FiPackage },
-      ].map((o, i) => {
-        const Icon = o.Icon;
-        return (
-          <Link
-            href={`/customer/${o.id}`}
-            key={i}
-            aria-current={section === o.id ? "page" : undefined}
+        <div className="customer-account-nav__top">
+          <p>Account</p>
+          <button
+            type="button"
+            className="customer-account-nav__close"
+            aria-label="Close account menu"
+            onClick={close}
           >
-            <Icon aria-hidden="true" />
-            {o.name}
-          </Link>
-        );
-      })}
-    </aside>
+            <IoClose size={22} aria-hidden="true" />
+          </button>
+        </div>
+        <Link
+          href="/customer/account"
+          aria-current={section === "account" ? "page" : undefined}
+          onClick={close}
+        >
+          <FiUser aria-hidden="true" />
+          My Account
+        </Link>
+        <hr />
+        {[
+          { name: "Appointments", id: "appointments", Icon: FiCalendar },
+          { name: "Bookings", id: "bookings", Icon: FiBookmark },
+          { name: "Packages", id: "packages", Icon: FiPackage },
+          { name: "Orders", id: "orders", Icon: FiPackage },
+        ].map((o, i) => {
+          const Icon = o.Icon;
+          return (
+            <Link
+              href={`/customer/${o.id}`}
+              key={i}
+              aria-current={section === o.id ? "page" : undefined}
+              onClick={close}
+            >
+              <Icon aria-hidden="true" />
+              {o.name}
+            </Link>
+          );
+        })}
+      </aside>
+    </>
+  );
+}
+
+function OrderDetailView({ order, onBack }) {
+  return (
+    <div className="customer-order-detail">
+      <header className="customer-order-detail__header">
+        <button className="customer-order-detail__back" type="button" onClick={onBack}>
+          <IoArrowBackOutline aria-hidden="true" />
+          <span>Order Details</span>
+        </button>
+      </header>
+
+      <section className="customer-order-detail__summary">
+        <h1 id="customer-order-detail-title">Order nº {order.id}</h1>
+        <p>
+          {order.quantity} {order.quantity === 1 ? "Item" : "Items"}
+        </p>
+        {order.placedOn ? <p>Placed on {order.placedOn}</p> : null}
+        <p>Total: ₦{formatOrderPrice(order.total)}</p>
+      </section>
+
+      <section className="customer-order-detail__items" aria-labelledby="order-items-title">
+        <h2 id="order-items-title">Items in your order</h2>
+        <ul>
+          {order.items.map((item) => (
+            <li className="customer-order-detail__item" key={item.id || item.item_id}>
+              <div className="customer-order-detail__item-copy">
+                <div className="customer-order-detail__badges">
+                  <span className={`customer-order__status customer-order__status--${order.color}`}>
+                    {order.status}
+                  </span>
+                </div>
+                {order.estimatedDelivery || order.placedOn ? (
+                  <p className="customer-order-detail__item-date">
+                    {order.estimatedDelivery ? `On ${order.estimatedDelivery}` : `Placed ${order.placedOn}`}
+                  </p>
+                ) : null}
+                <div className="customer-order-detail__item-body">
+                  <div className="customer-order-detail__image">
+                    {item.thumbnail_url ? (
+                      <img src={item.thumbnail_url} alt="" />
+                    ) : (
+                      <FiPackage aria-hidden="true" />
+                    )}
+                  </div>
+                  <div>
+                    <h3>{item.name || "Product"}</h3>
+                    <p>Qty: {item.units}</p>
+                    <strong>₦{formatOrderPrice(item.total_price)}</strong>
+                  </div>
+                </div>
+              </div>
+              {item.item_id ? (
+                <Link className="customer-order-detail__again" href={`/store/${item.item_id}`}>
+                  Buy again
+                </Link>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="customer-order-detail__info">
+        <section aria-labelledby="payment-info-title">
+          <h2 id="payment-info-title">Payment information</h2>
+          <h3>Payment method</h3>
+          <p>Paystack · Card, bank transfer or USSD</p>
+          <h3>Payment details</h3>
+          <p>Items total: ₦{formatOrderPrice(order.amountPaid || order.total)}</p>
+          <p>Delivery fees: ₦{formatOrderPrice(order.shippingFee)}</p>
+          {Number(order.tax) > 0 ? <p>Tax: ₦{formatOrderPrice(order.tax)}</p> : null}
+          <p>
+            <strong>Total: ₦{formatOrderPrice(order.total)}</strong>
+          </p>
+          {order.reference ? (
+            <p>
+              Reference: <strong>{order.reference}</strong>
+            </p>
+          ) : null}
+          <p>Status: {order.paymentStatus || "paid"}</p>
+        </section>
+
+        <section aria-labelledby="delivery-info-title">
+          <h2 id="delivery-info-title">Delivery information</h2>
+          <h3>Delivery method</h3>
+          <p>{order.shippingMethod || "Standard delivery"}</p>
+          <h3>Delivery address</h3>
+          {order.shipping?.street ? <p>{order.shipping.street}</p> : null}
+          {order.shipping?.town || order.shipping?.state ? (
+            <p>{[order.shipping.town, order.shipping.state].filter(Boolean).join(", ")}</p>
+          ) : order.address ? (
+            <p>{order.address}</p>
+          ) : (
+            <p>No delivery address was saved for this order.</p>
+          )}
+          {order.logisticProvider ? (
+            <>
+              <h3>Logistics</h3>
+              <p>{order.logisticProvider}</p>
+            </>
+          ) : null}
+          {order.trackingNumber ? (
+            <>
+              <h3>Tracking number</h3>
+              <p>{order.trackingNumber}</p>
+            </>
+          ) : null}
+          {order.estimatedDelivery ? (
+            <>
+              <h3>Estimated delivery</h3>
+              <p>{order.estimatedDelivery}</p>
+            </>
+          ) : null}
+        </section>
+      </div>
+    </div>
   );
 }
 
 function Orders() {
   const [activeTab, setActiveTab] = useState("active");
-  const orders = {
-    active: [
-      {
-        id: "1339383626",
-        title:
-          "PRO LED 600 + 2 BATTERIES + CHARGER DOCK + CABLE +2.1m Stand + Remote",
-        quantity: 2,
-        status: "Shipped",
-        delivery: "Delivered between Friday 16 October and Monday 19 October",
-        color: "blue",
-        details: "Your order has been shipped and is on its way.",
-      },
-      {
-        id: "1339383626",
-        title: "Lightweight Portable Tripod Stand With Remote Control",
-        quantity: 1,
-        status: "Shipped",
-        delivery: "Delivered between Friday 16 October and Monday 19 October",
-        color: "blue",
-        details: "Your order has been shipped and is on its way.",
-      },
-      {
-        id: "1964494446",
-        title: "Rubik’s Cube 3by3 Puzzle Cube 3 X 3 Speed Cube - Multi",
-        variation: "…",
-        status: "Delivered",
-        delivery: "On 22-04",
-        color: "green",
-        details: "This order was delivered successfully.",
-      },
-    ],
-    archived: [
-      {
-        id: "1964494447",
-        title: "LED Desk Lamp with Adjustable Stand",
-        quantity: 1,
-        status: "Returned",
-        delivery: "Return completed",
-        color: "gray",
-        details: "Your return has been completed.",
-      },
-      {
-        id: "1964494448",
-        title: "Portable Phone Tripod With Remote",
-        quantity: 1,
-        status: "Cancelled",
-        delivery: "Cancelled on 12 October",
-        color: "gray",
-        details: "This order was cancelled.",
-      },
-    ],
-  };
-  const currentOrders = orders[activeTab];
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data } = await baseApi.get("customers/orders");
+        if (!data?.success) throw new Error(data?.message || "Could not load orders.");
+        if (!cancelled) setOrders(Array.isArray(data.data) ? data.data.map(mapCustomerOrder) : []);
+      } catch (loadError) {
+        if (!cancelled) {
+          setOrders([]);
+          setError(loadError?.response?.data?.message || loadError?.message || "Could not load your orders.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const activeOrders = orders.filter((order) => !order.archived);
+  const archivedOrders = orders.filter((order) => order.archived);
+  const currentOrders = activeTab === "active" ? activeOrders : archivedOrders;
+  const selectedOrder = orders.find((order) => String(order.id) === String(selectedOrderId));
 
   return (
     <section
-      className="customer-orders"
-      aria-labelledby="customer-orders-title"
+      className={`customer-orders${selectedOrder ? " customer-orders--detail" : ""}`}
+      aria-labelledby={selectedOrder ? "customer-order-detail-title" : "customer-orders-title"}
     >
+      {selectedOrder ? (
+        <OrderDetailView order={selectedOrder} onBack={() => setSelectedOrderId(null)} />
+      ) : (
+        <>
       <header className="customer-orders__header">
         <h1 id="customer-orders-title">Orders</h1>
       </header>
 
       <div className="customer-orders__content">
-        <div
+        {/* <div
           className="customer-orders__tabs"
           role="tablist"
           aria-label="Order status"
@@ -273,7 +311,7 @@ function Orders() {
             aria-controls="orders-panel"
             onClick={() => setActiveTab("active")}
           >
-            Ongoing/Delivered <span>(11)</span>
+            Ongoing/Delivered <span>({activeOrders.length})</span>
           </button>
           <button
             type="button"
@@ -284,9 +322,9 @@ function Orders() {
             aria-controls="orders-panel"
             onClick={() => setActiveTab("archived")}
           >
-            Canceled/Returned <span>(22)</span>
+            Canceled/Returned <span>({archivedOrders.length})</span>
           </button>
-        </div>
+        </div> */}
 
         <div
           className="customer-orders__list"
@@ -296,49 +334,108 @@ function Orders() {
             activeTab === "active" ? "orders-tab-active" : "orders-tab-archived"
           }
         >
-          {currentOrders.map((order, index) => (
-            <article className="customer-order" key={`${order.id}-${index}`}>
-              <div className="customer-order__image" aria-hidden="true">
-                <FiPackage />
-              </div>
+          {loading ? (
+            <p className="customer-orders__empty">Loading your orders…</p>
+          ) : null}
+          {!loading && error ? (
+            <p className="customer-orders__empty">{error}</p>
+          ) : null}
+          {!loading && !error && currentOrders.length === 0 ? (
+            <p className="customer-orders__empty">
+              {activeTab === "active"
+                ? "You don’t have any ongoing orders yet."
+                : "You don’t have any cancelled or returned orders."}
+            </p>
+          ) : null}
+          {!loading && !error
+            ? currentOrders.map((order) => (
+            <article className="customer-order" key={order.id}>
               <div className="customer-order__main">
-                <h2 className="customer-order__title">{order.title}</h2>
-                <p className="customer-order__id">Order {order.id}</p>
-                {order.quantity ? (
-                  <p className="customer-order__meta">Qty: {order.quantity}</p>
-                ) : null}
-                {order.variation ? (
-                  <p className="customer-order__meta">
-                    Variation: {order.variation}
-                  </p>
-                ) : null}
-                <span
-                  className={`customer-order__status customer-order__status--${order.color}`}
-                >
-                  {order.status}
-                </span>
-                <p className="customer-order__delivery">{order.delivery}</p>
-              </div>
-              <details className="customer-order__details">
-                <summary>See details</summary>
-                <div className="customer-order__details-content">
-                  <p>{order.details}</p>
-                  <p>
-                    Order number: <strong>{order.id}</strong>
-                  </p>
+                <div className="customer-order__heading">
+                  <div>
+                    <p className="customer-order__id">Order #{order.id}</p>
+                    <span
+                      className={`customer-order__status customer-order__status--${order.color}`}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                  <strong className="customer-order__total">₦{formatOrderPrice(order.total)}</strong>
                 </div>
-              </details>
+                <p className="customer-order__delivery">{order.delivery}</p>
+                {order.items[0] ? (
+                  <div className="customer-order__item">
+                    <div className="customer-order__image" aria-hidden={!order.items[0].thumbnail_url}>
+                      {order.items[0].thumbnail_url ? (
+                        <img src={order.items[0].thumbnail_url} alt="" />
+                      ) : (
+                        <FiPackage />
+                      )}
+                    </div>
+                    <div>
+                      <h2 className="customer-order__title">
+                        {order.items[0].name || "Product"}
+                        {order.items.length > 1 ? (
+                          <span className="customer-order__more">
+                            {` +${order.items.length - 1} other ${order.items.length - 1 === 1 ? "item" : "items"}`}
+                          </span>
+                        ) : null}
+                      </h2>
+                      <p className="customer-order__meta">
+                        Qty: {order.items[0].units}
+                      </p>
+                    </div>
+                  </div>
+                ) : null}
+                <button
+                  className="customer-order__details-link"
+                  type="button"
+                  onClick={() => setSelectedOrderId(order.id)}
+                >
+                  See details
+                </button>
+              </div>
             </article>
-          ))}
+              ))
+            : null}
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 }
 
 function Appointments() {
-  const appointments = sampleAppointments;
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data } = await baseApi.get("customers/appointments");
+        if (!data?.success || !Array.isArray(data.data)) {
+          throw new Error(data?.message || "Could not load your consultations.");
+        }
+        if (!cancelled) setAppointments(data.data);
+      } catch (loadError) {
+        if (!cancelled) {
+          setAppointments([]);
+          setError(loadError?.response?.data?.message || loadError?.message || "Could not load your consultations.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const upcoming = appointments.filter((appointment) =>
     ["pending", "confirmed"].includes(String(appointment.status).toLowerCase()),
@@ -393,7 +490,11 @@ function Appointments() {
           role="tabpanel"
           aria-labelledby={`appointments-tab-${activeTab}`}
         >
-          {shownAppointments.length === 0 ? (
+          {loading ? (
+            <p className="customer-appointments__message">Loading your appointments…</p>
+          ) : error ? (
+            <p className="customer-appointments__message" role="alert">{error}</p>
+          ) : shownAppointments.length === 0 ? (
             <p className="customer-appointments__message">
               {activeTab === "upcoming"
                 ? "You don’t have any upcoming appointments."
@@ -491,21 +592,330 @@ function Appointments() {
   );
 }
 
-function Bookings() {
-  const bookings = sampleBookings;
-  const [activeTab, setActiveTab] = useState("upcoming");
+function formatBookingWhen(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return date.toLocaleString(undefined, {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
 
-  const upcoming = bookings.filter((booking) =>
-    ["pending", "confirmed"].includes(String(booking.status).toLowerCase()),
-  );
-  const past = bookings.filter(
-    (booking) =>
-      !["pending", "confirmed"].includes(String(booking.status).toLowerCase()),
-  );
-  const shownBookings = activeTab === "upcoming" ? upcoming : past;
+function bookingServiceName(booking) {
+  return booking.subcategory || booking.category || "Service";
+}
+
+function bookingVisitKey(booking) {
+  const payment = String(booking.payment_status || "pending").toLowerCase();
+  const scheduled = booking.scheduled_at
+    ? new Date(booking.scheduled_at).toISOString()
+    : "unscheduled";
+  return `${payment}:${scheduled}`;
+}
+
+function bookingStatusView(items) {
+  const statuses = items.map((item) => String(item.status || "pending").toLowerCase());
+  const paid = items.every((item) => String(item.payment_status || "").toLowerCase() === "paid");
+  if (statuses.every((status) => ["cancelled", "canceled"].includes(status))) {
+    return { label: "Cancelled", color: "gray" };
+  }
+  if (statuses.every((status) => status === "completed")) {
+    return { label: "Completed", color: "green" };
+  }
+  if (statuses.some((status) => status === "confirmed")) {
+    return { label: "Confirmed", color: "green" };
+  }
+  if (paid) return { label: "Booked", color: "blue" };
+  return { label: "Pending", color: "blue" };
+}
+
+function mapBookingVisits(bookings) {
+  const groups = new Map();
+  for (const booking of bookings) {
+    const key = bookingVisitKey(booking);
+    const group = groups.get(key) || [];
+    group.push(booking);
+    groups.set(key, group);
+  }
+
+  return [...groups.values()].map((group) => {
+    const items = [...group].sort((left, right) => Number(left.id) - Number(right.id));
+    const first = items[0];
+    const status = bookingStatusView(items);
+    return {
+      id: `visit-${items.map((item) => item.id).join("-")}`,
+      number: first.id,
+      scheduled_at: first.scheduled_at,
+      payment_status: first.payment_status,
+      notes: items.map((item) => item.notes).find(Boolean) || "",
+      status: status.label,
+      color: status.color,
+      archived: items.every((item) => !["pending", "confirmed"].includes(String(item.status || "").toLowerCase())),
+      quantity: items.length,
+      duration_minutes: items.reduce((sum, item) => sum + Number(item.duration_minutes || 0), 0),
+      total: items.reduce((sum, item) => sum + Number(item.price || 0), 0),
+      items: items.map((item) => ({
+        id: item.id,
+        service_id: item.service_id,
+        name: bookingServiceName(item),
+        thumbnail_url: item.image_url,
+        units: 1,
+        unit_price: Number(item.price || 0),
+        total_price: Number(item.price || 0),
+        duration_minutes: item.duration_minutes,
+      })),
+    };
+  });
+}
+
+function BookingDetailView({ visit, onBack }) {
+  const scheduledLabel = formatBookingWhen(visit.scheduled_at);
 
   return (
-    <section className="customer-bookings" aria-labelledby="customer-bookings-title">
+    <div className="customer-order-detail">
+      <header className="customer-order-detail__header">
+        <button className="customer-order-detail__back" type="button" onClick={onBack}>
+          <IoArrowBackOutline aria-hidden="true" />
+          <span>Booking Details</span>
+        </button>
+      </header>
+
+      <section className="customer-order-detail__summary">
+        <h1 id="customer-booking-detail-title">Booking nº {visit.number}</h1>
+        <p>
+          {visit.quantity} {visit.quantity === 1 ? "Item" : "Items"}
+        </p>
+        {scheduledLabel ? <p>{scheduledLabel}</p> : <p>No appointment time has been saved yet.</p>}
+        <p>Total: ₦{formatOrderPrice(visit.total)}</p>
+      </section>
+
+      <section className="customer-order-detail__items" aria-labelledby="booking-items-title">
+        <h2 id="booking-items-title">Items in your booking</h2>
+        <ul>
+          {visit.items.map((item) => (
+            <li className="customer-order-detail__item" key={item.id}>
+              <div className="customer-order-detail__item-copy">
+                <div className="customer-order-detail__badges">
+                  <span className={`customer-order__status customer-order__status--${visit.color}`}>
+                    {visit.status}
+                  </span>
+                </div>
+                {scheduledLabel ? (
+                  <p className="customer-order-detail__item-date">{scheduledLabel}</p>
+                ) : null}
+                <div className="customer-order-detail__item-body">
+                  <div className="customer-order-detail__image">
+                    {item.thumbnail_url ? (
+                      <img src={item.thumbnail_url} alt="" />
+                    ) : (
+                      <FiBookmark aria-hidden="true" />
+                    )}
+                  </div>
+                  <div>
+                    <h3>{item.name}</h3>
+                    <p>
+                      Qty: {item.units}
+                      {item.duration_minutes ? ` · ${item.duration_minutes} min` : ""}
+                    </p>
+                    <strong>₦{formatOrderPrice(item.total_price)}</strong>
+                  </div>
+                </div>
+              </div>
+              <Link className="customer-order-detail__again" href="/booking">
+                Book again
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <div className="customer-order-detail__info">
+        <section aria-labelledby="booking-payment-title">
+          <h2 id="booking-payment-title">Payment information</h2>
+          <h3>Payment method</h3>
+          <p>Paystack · Card, bank transfer or USSD</p>
+          <h3>Payment details</h3>
+          <p>Items total: ₦{formatOrderPrice(visit.total)}</p>
+          <p>
+            <strong>Total: ₦{formatOrderPrice(visit.total)}</strong>
+          </p>
+          <p>Status: {formatStatus(visit.payment_status)}</p>
+        </section>
+
+        <section aria-labelledby="booking-visit-title">
+          <h2 id="booking-visit-title">Visit information</h2>
+          <h3>Appointment time</h3>
+          <p>{scheduledLabel || "Choose a time to schedule this service"}</p>
+          <h3>Duration</h3>
+          <p>{visit.duration_minutes ? `${visit.duration_minutes} minutes` : "Duration not set"}</p>
+          <h3>Status</h3>
+          <p>{visit.status}</p>
+          <h3>Notes</h3>
+          <p>{visit.notes || "No notes added"}</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+
+function Packages() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("upcoming");
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data } = await baseApi.get("customers/package-bookings");
+        if (!data?.success || !Array.isArray(data.data)) {
+          throw new Error(data?.message || "Could not load your packages.");
+        }
+        if (!cancelled) setBookings(data.data);
+      } catch (loadError) {
+        if (!cancelled) {
+          setBookings([]);
+          setError(loadError?.response?.data?.message || loadError?.message || "Could not load your packages.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const upcoming = bookings.filter((booking) => ["pending", "confirmed"].includes(String(booking.status || "")));
+  const past = bookings.filter((booking) => !["pending", "confirmed"].includes(String(booking.status || "")));
+  const shown = activeTab === "upcoming" ? upcoming : past;
+
+  return (
+    <section className="customer-appointments" aria-labelledby="customer-packages-title">
+      <header className="customer-appointments__header">
+        <h1 id="customer-packages-title">Packages</h1>
+        <p>Review your booked packages separately from consultations.</p>
+      </header>
+      <div className="customer-appointments__content">
+        <div className="customer-appointments__tabs" role="tablist" aria-label="Package status">
+          <button
+            type="button"
+            className={`customer-appointments__tab${activeTab === "upcoming" ? " is-active" : ""}`}
+            onClick={() => setActiveTab("upcoming")}
+          >
+            Upcoming <span>({upcoming.length})</span>
+          </button>
+          <button
+            type="button"
+            className={`customer-appointments__tab${activeTab === "past" ? " is-active" : ""}`}
+            onClick={() => setActiveTab("past")}
+          >
+            Past <span>({past.length})</span>
+          </button>
+        </div>
+        <div className="customer-appointments__list">
+          {loading ? (
+            <p className="customer-appointments__message">Loading your packages…</p>
+          ) : error ? (
+            <p className="customer-appointments__message" role="alert">{error}</p>
+          ) : shown.length === 0 ? (
+            <p className="customer-appointments__message">
+              {activeTab === "upcoming" ? "You don’t have any upcoming packages." : "No past packages to show."}
+            </p>
+          ) : (
+            shown.map((booking) => (
+              <article className="customer-order" key={booking.id}>
+                <div className="customer-order__main">
+                  <div className="customer-order__heading">
+                    <div>
+                      <p className="customer-order__id">Package #{booking.id}</p>
+                      <span className={`customer-order__status customer-order__status--${booking.payment_status === "paid" ? "paid" : "pending"}`}>
+                        {booking.status}
+                      </span>
+                    </div>
+                    <strong className="customer-order__total">₦{formatOrderPrice(booking.price)}</strong>
+                  </div>
+                  <p className="customer-order__delivery">
+                    {booking.scheduled_at
+                      ? new Date(booking.scheduled_at).toLocaleString()
+                      : "Choose a time to start this package"}
+                  </p>
+                  <div className="customer-order__item">
+                    <div className="customer-order__image">
+                      {booking.image_url ? <img src={booking.image_url} alt="" /> : <FiPackage />}
+                    </div>
+                    <div>
+                      <h2 className="customer-order__title">{booking.name || "Package"}</h2>
+                      {booking.duration_months ? (
+                        <p className="customer-order__meta">{booking.duration_months} months</p>
+                      ) : null}
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Bookings() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("upcoming");
+  const [selectedVisitId, setSelectedVisitId] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data } = await baseApi.get("customers/bookings");
+        if (!data?.success || !Array.isArray(data.data)) {
+          throw new Error(data?.message || "Could not load your bookings.");
+        }
+        if (!cancelled) setBookings(data.data);
+      } catch (loadError) {
+        if (!cancelled) {
+          setBookings([]);
+          setError(loadError?.response?.data?.message || loadError?.message || "Could not load your bookings.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const visits = mapBookingVisits(bookings);
+  const upcoming = visits.filter((visit) => !visit.archived);
+  const past = visits.filter((visit) => visit.archived);
+  const shownVisits = activeTab === "upcoming" ? upcoming : past;
+  const selectedVisit = visits.find((visit) => String(visit.id) === String(selectedVisitId));
+
+  return (
+    <section
+      className={`customer-bookings${selectedVisit ? " customer-bookings--detail" : ""}`}
+      aria-labelledby={selectedVisit ? "customer-booking-detail-title" : "customer-bookings-title"}
+    >
+      {selectedVisit ? (
+        <BookingDetailView visit={selectedVisit} onBack={() => setSelectedVisitId(null)} />
+      ) : (
+        <>
       <header className="customer-bookings__header">
         <h1 id="customer-bookings-title">Bookings</h1>
         <p>Review your booked services and their schedule.</p>
@@ -545,92 +955,75 @@ function Bookings() {
           role="tabpanel"
           aria-labelledby={`bookings-tab-${activeTab}`}
         >
-          {shownBookings.length === 0 ? (
+          {loading ? (
+            <p className="customer-bookings__message">Loading your bookings…</p>
+          ) : error ? (
+            <p className="customer-bookings__message" role="alert">{error}</p>
+          ) : shownVisits.length === 0 ? (
             <p className="customer-bookings__message">
               {activeTab === "upcoming"
                 ? "You don’t have any upcoming bookings."
                 : "No past bookings to show."}
             </p>
           ) : (
-            shownBookings.map((booking) => {
-              const scheduledAt = booking.scheduled_at
-                ? new Date(booking.scheduled_at)
-                : null;
-              const validDate =
-                scheduledAt && !Number.isNaN(scheduledAt.getTime());
-              const status = String(booking.status || "pending");
-              const serviceName = [booking.subcategory, booking.category]
-                .filter(Boolean)
-                .join(" · ");
-
+            shownVisits.map((visit) => {
+              const firstItem = visit.items[0];
+              const extraCount = visit.items.length - 1;
               return (
-                <article className="customer-booking" key={booking.id}>
-                  <div className="customer-booking__icon" aria-hidden="true">
-                    <FiBookmark />
-                  </div>
-                  <div className="customer-booking__main">
-                    <h2 className="customer-booking__title">
-                      {serviceName || "Booked service"}
-                    </h2>
-                    <p className="customer-booking__id">Booking #{booking.id}</p>
-                    {booking.description ? (
-                      <p className="customer-booking__description">
-                        {booking.description}
-                      </p>
-                    ) : null}
-                    <div className="customer-booking__facts">
-                      <span>
-                        <FiClock aria-hidden="true" />
-                        {booking.duration_minutes
-                          ? `${booking.duration_minutes} minutes`
-                          : "Duration not set"}
-                      </span>
-                      <span>
-                        <FiDollarSign aria-hidden="true" />
-                        {formatCustomerPrice(booking.price)}
-                      </span>
-                      <span>
-                        <FiCreditCard aria-hidden="true" />
-                        {formatStatus(booking.payment_status)}
-                      </span>
+                <article className="customer-order" key={visit.id}>
+                  <div className="customer-order__main">
+                    <div className="customer-order__heading">
+                      <div>
+                        <p className="customer-order__id">Booking #{visit.number}</p>
+                        <span className={`customer-order__status customer-order__status--${visit.color}`}>
+                          {visit.status}
+                        </span>
+                      </div>
+                      <strong className="customer-order__total">₦{formatOrderPrice(visit.total)}</strong>
                     </div>
-                    <span
-                      className={`customer-booking__status customer-booking__status--${status.toLowerCase().replace(/[^a-z]+/g, "-")}`}
-                    >
-                      {formatStatus(status)}
-                    </span>
-                    <p className="customer-booking__date">
-                      {validDate
-                        ? scheduledAt.toLocaleString(undefined, {
-                            weekday: "long",
-                            day: "numeric",
-                            month: "long",
-                            year: "numeric",
-                            hour: "numeric",
-                            minute: "2-digit",
-                          })
-                        : "Choose a time to schedule this service"}
+                    <p className="customer-order__delivery">
+                      {formatBookingWhen(visit.scheduled_at) || "Choose a time to schedule this service"}
                     </p>
+                    {firstItem ? (
+                      <div className="customer-order__item">
+                        <div className="customer-order__image" aria-hidden={!firstItem.thumbnail_url}>
+                          {firstItem.thumbnail_url ? (
+                            <img src={firstItem.thumbnail_url} alt="" />
+                          ) : (
+                            <FiBookmark />
+                          )}
+                        </div>
+                        <div>
+                          <h2 className="customer-order__title">
+                            {firstItem.name}
+                            {extraCount > 0 ? (
+                              <span className="customer-order__more">
+                                {` +${extraCount} other ${extraCount === 1 ? "booking" : "bookings"}`}
+                              </span>
+                            ) : null}
+                          </h2>
+                          {firstItem.duration_minutes ? (
+                            <p className="customer-order__meta">{firstItem.duration_minutes} minutes</p>
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : null}
+                    <button
+                      className="customer-order__details-link"
+                      type="button"
+                      onClick={() => setSelectedVisitId(visit.id)}
+                    >
+                      See details
+                    </button>
                   </div>
-                  <details className="customer-booking__details">
-                    <summary>See details</summary>
-                    <div className="customer-booking__details-content">
-                      <p>
-                        Payment:{" "}
-                        <strong>{formatStatus(booking.payment_status)}</strong>
-                      </p>
-                      <p>
-                        Notes:{" "}
-                        <strong>{booking.notes || "No notes added"}</strong>
-                      </p>
-                    </div>
-                  </details>
                 </article>
               );
             })
           )}
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 }

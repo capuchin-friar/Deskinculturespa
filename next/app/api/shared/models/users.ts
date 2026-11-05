@@ -27,7 +27,9 @@ export class UsersModel {
 
         if (count > 0) {
         const { rows: users } = await query<User>(
-                `SELECT * FROM users`
+                `SELECT id, role, fname, lname, email, phone, gender, photo, location, createdat
+                 FROM users
+                 ORDER BY createdat DESC, id DESC`
             );
 
             return users;

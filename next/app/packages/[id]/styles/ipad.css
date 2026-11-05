@@ -1,3 +1,45 @@
 @media (min-width: 761px) and (max-width: 1199px) {
+    .package-detail-container {
+        width: 100%;
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 28px 60px;
+    }
 
+    .package-detail-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+        gap: 32px;
+        padding: 10px 0 50px;
+    }
+
+    .package-gallery {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        min-width: 0;
+        height: 420px;
+    }
+
+    .package-gallery:not(.package-gallery--single) {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 12px;
+    }
+
+    .package-main-image {
+        position: relative;
+        width: 100%;
+        min-width: 0;
+        height: 420px;
+        overflow: hidden;
+        border-radius: 10px;
+        background: #f3f7f4;
+    }
+
+    .package-main-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+        display: block;
+    }
 }

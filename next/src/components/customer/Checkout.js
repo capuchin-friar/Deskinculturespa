@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { usePaystackPayment } from "react-paystack";
 import {
   IoArrowBackOutline,
@@ -10,7 +11,9 @@ import {
   IoLockClosedOutline,
   IoShieldCheckmarkOutline,
 } from "react-icons/io5";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { baseApi } from "@/app/api/shared/config";
+import { set_cart } from "@/redux/customer/cart";
 import locations from "../../../src/json/location.json";
 
 const formatPrice = (value) =>
@@ -32,12 +35,16 @@ const initialDetails = {
 };
 
 export default function Checkout() {
+  const router = useRouter();
+  const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart?.cart || []);
   const [details, setDetails] = useState(initialDetails);
   const [touched, setTouched] = useState({});
   const [paymentState, setPaymentState] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [isCompletingOrder, setIsCompletingOrder] = useState(false);
   const [summaryOpen, setSummaryOpen] = useState(false);
+  const paidOrderRef = useRef(null);
 
   const subtotal = useMemo(
     () =>
@@ -93,27 +100,77 @@ export default function Checkout() {
         items: cart.map((i) => ({
           item_id: i.product_id,
           units: i.quantity,
+          unit_price: Number(i.price || 0),
+          total: Number(i.price || 0) * Number(i.quantity || 0),
         })),
+        subtotal: total,
         shipping_address: {
           state: details.state,
           town: details.town,
           street: details.street,
-        }
+        },
       },
     }),
-    [details, total],
+    [cart, details, total],
   );
   const initializePayment = usePaystackPayment(paystackConfig);
 
+  const snapshotPaidOrder = () => ({
+    items: cart.map((item) => ({
+      item_id: item.product_id,
+      units: item.quantity,
+      unit_price: Number(item.price || 0),
+      total: Number(item.price || 0) * Number(item.quantity || 0),
+      name: item.name,
+    })),
+    shipping_address: {
+      state: details.state,
+      town: details.town,
+      street: details.street,
+    },
+    subtotal: total,
+  });
+
+  const finishPurchase = async (reference) => {
+    const paidOrder = paidOrderRef.current || snapshotPaidOrder();
+    paidOrderRef.current = paidOrder;
+    setIsCompletingOrder(true);
+    setPaymentState({ type: "success", reference });
+    try {
+      const { data } = await baseApi.post("customers/orders", {
+        reference,
+        shipping_address: paidOrder.shipping_address,
+        items: paidOrder.items,
+      });
+      if (!data?.success) {
+        throw new Error(data?.message || "Could not save your order.");
+      }
+      dispatch(set_cart([]));
+      router.replace("/customer/orders");
+    } catch (error) {
+      console.error("Could not create order after payment", error);
+      setIsCompletingOrder(false);
+      setPaymentState({
+        type: "error",
+        reference,
+        message:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Payment was received, but we could not save your order. Please try again.",
+      });
+    }
+  };
+
   const beginPayment = () => {
-    if (!readyToPay || isProcessingPayment || paymentState?.type === "success")
+    if (!readyToPay || isProcessingPayment || isCompletingOrder)
       return;
     setPaymentState(null);
     setIsProcessingPayment(true);
+    paidOrderRef.current = snapshotPaidOrder();
     initializePayment({
       onSuccess: (response) => {
         setIsProcessingPayment(false);
-        setPaymentState({ type: "success", reference: response?.reference });
+        void finishPurchase(response?.reference);
       },
       onClose: () => {
         setIsProcessingPayment(false);
@@ -121,6 +178,24 @@ export default function Checkout() {
       },
     });
   };
+
+  if (isCompletingOrder) {
+    return (
+      <section
+        className="dsc-checkout dsc-checkout--empty"
+        aria-labelledby="dsc-checkout-title"
+      >
+        <div className="dsc-checkout-empty-card">
+          <span className="dsc-checkout-empty-icon" aria-hidden="true">
+            <IoCheckmarkCircleOutline />
+          </span>
+          <p className="dsc-checkout-eyebrow">PAYMENT RECEIVED</p>
+          <h1 id="dsc-checkout-title">Thank you for your order</h1>
+          <p>We’re saving your order and taking you to your orders.</p>
+        </div>
+      </section>
+    );
+  }
 
   if (cart.length === 0) {
     return (
@@ -159,21 +234,24 @@ export default function Checkout() {
           <p>Review your details and complete your payment.</p>
         </header> */}
 
-        {paymentState?.type === "success" && (
+        {paymentState?.type === "error" && (
           <div
-            className="dsc-checkout-alert dsc-checkout-alert--success"
-            role="status"
+            className="dsc-checkout-alert dsc-checkout-alert--notice"
+            role="alert"
           >
-            <IoCheckmarkCircleOutline aria-hidden="true" />
             <div>
-              <strong>Paystack returned a successful payment response.</strong>
-              <span>
-                Reference: {paymentState.reference || "Not provided"}. Keep this
-                reference for your records.
-              </span>
-              <span>
-                This checkout currently does not create or verify an order.
-              </span>
+              <strong>Payment was received, but the order was not saved.</strong>
+              <span>{paymentState.message}</span>
+              {paymentState.reference ? (
+                <span>Reference: {paymentState.reference}</span>
+              ) : null}
+              <button
+                className="dsc-checkout-secondary-link"
+                type="button"
+                onClick={() => void finishPurchase(paymentState.reference)}
+              >
+                Save order again
+              </button>
             </div>
           </div>
         )}
@@ -421,7 +499,7 @@ export default function Checkout() {
                 disabled={
                   !readyToPay ||
                   isProcessingPayment ||
-                  paymentState?.type === "success"
+                  isCompletingOrder
                 }
               >
                 {isProcessingPayment

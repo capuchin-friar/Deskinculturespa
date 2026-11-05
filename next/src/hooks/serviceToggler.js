@@ -100,7 +100,7 @@ export default function useServiceToggler() {
     }
   }, [bookings, refreshBookings]);
 
-  const scheduleBookings = useCallback(async ({ scheduledAt } = {}) => {
+  const scheduleBookings = useCallback(async ({ scheduledAt, reference } = {}) => {
     const pendingBookings = bookings.filter((entry) => activeStatuses.has(entry.status));
     const serviceIds = pendingBookings.map((entry) => String(entry.service_id));
     if (serviceIds.some((id) => pendingServiceIds.current.has(id))) return false;
@@ -111,8 +111,11 @@ export default function useServiceToggler() {
       if (!scheduledAt || Number.isNaN(date.getTime()) || date <= new Date()) {
         throw new Error("Choose a valid future date and time.");
       }
-      const { data } = await baseApi.post("customers/bookings/schedule", { scheduled_at: date.toISOString() });
-      if (!data?.success || !Array.isArray(data.data?.bookings) || !Array.isArray(data.data?.consultations)) throw new Error(data?.message || "Could not schedule your bookings.");
+      const { data } = await baseApi.post("customers/bookings/schedule", {
+        scheduled_at: date.toISOString(),
+        ...(reference ? { reference } : {}),
+      });
+      if (!data?.success || !Array.isArray(data.data?.bookings)) throw new Error(data?.message || "Could not schedule your bookings.");
       const updatedBookings = data.data.bookings;
       const scheduledById = new Map(updatedBookings.map((entry) => [String(entry.id), entry]));
       setBookings((current) => {

@@ -15,11 +15,11 @@ import {
 export function Aside() {
 
     const navs = [
-        { name: "Dashboard", svg: IoGridOutline, path: "/" },
-        { name: "Catalog", svg: IoPricetagsOutline, path: "/catalog" },
-        { name: "Orders", svg: IoCartOutline, path: "/orders" },
-        { name: "Customers", svg: IoPeopleOutline, path: "/" },
-        { name: "Settings", svg: IoSettingsOutline, path: "/settings" }
+        { name: "Dashboard", svg: IoGridOutline, path: "" },
+        { name: "Catalog", svg: IoPricetagsOutline, path: "catalog" },
+        { name: "Orders", svg: IoCartOutline, path: "orders" },
+        { name: "Customers", svg: IoPeopleOutline, path: "customers" },
+        { name: "Settings", svg: IoSettingsOutline, path: "profile" }
     ];
 
     const renderAsideOptions = useCallback((navs) => {
@@ -48,7 +48,7 @@ export function Aside() {
             <aside>
                 <section>
                     <span>
-                        <img src={null} alt="logo" />
+                        <img src="/deskinculture_logo.png" alt="DeSkinCulture logo" />
                     </span>
                     <span>
                         <p>Deskinculture</p>

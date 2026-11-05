@@ -82,8 +82,7 @@ export class ProductModel {
                 id
             } = payload;
             const { rows } = await query(
-                `SELECT * FROM products WHERE admin_id = $1`,
-                [id]
+                `SELECT * FROM products ORDER BY created_at DESC, id DESC`
             );
 
             return rows;

@@ -35,7 +35,7 @@ const CartCard = ({ item }) => {
     setBusy(true);
     setErrorMessage("");
     try {
-      const { data } = await baseApi.patch("/cart/edit", {
+      const { data } = await baseApi.patch("customers/cart/edit", {
         id: String(item.id),
         qty: next,
       });
@@ -58,7 +58,7 @@ const CartCard = ({ item }) => {
     setBusy(true);
     setErrorMessage("");
     try {
-      const { data } = await baseApi.delete("/cart/delete", {
+      const { data } = await baseApi.delete("customers/cart/delete", {
         data: { id: String(item.id) },
       });
       if (!data?.success) {

@@ -35,6 +35,17 @@ export class CartModel {
     },
   );
 
+  static clearCartDoc = withErrorHandling(
+    async (payload: { user_id: string }) => {
+      const { rowCount } = await query(
+        `DELETE FROM cart_items WHERE user_id = $1`,
+        [payload.user_id],
+      );
+
+      return rowCount ?? 0;
+    },
+  );
+
   static updateCartDoc = withErrorHandling(
     async (payload: { cart_id: string; qty: number; user_id: string }) => {
       const { cart_id, qty, user_id } = payload;

@@ -71,6 +71,7 @@ export const POST = async (req: NextRequest) => {
             {
                 id: user.id,
                 email: user.email,
+                role: user.role,
                 ...(displayName ? { name: displayName } : {}),
             },
             secret,
@@ -94,6 +95,15 @@ export const POST = async (req: NextRequest) => {
             path: "/",
             maxAge: 60 * 60 * 24 * 7,
         });
+        if (String(user.role || "").toLowerCase() === "admin") {
+            response.cookies.set("admin_token", token, {
+                httpOnly: true,
+                sameSite: "lax",
+                secure: process.env.NODE_ENV === "production",
+                path: "/",
+                maxAge: 60 * 60 * 24 * 7,
+            });
+        }
 
         return response;
     } catch (err) {
