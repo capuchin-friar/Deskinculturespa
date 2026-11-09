@@ -11,7 +11,7 @@ import { Footer } from "@/src/components/customer/Footer"
 
 /**
  * @Styles import
- */
+*/
 
 import "./styles/customer/xxl.css";
 import "./styles/customer/why.css";
