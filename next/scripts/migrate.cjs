@@ -19,7 +19,10 @@ function getPoolConfig() {
 
   if (process.env.DB_URL?.trim()) {
     return {
-      connectionString: process.env.DB_URL.trim(),
+      connectionString: process.env.DB_URL.trim().replace(
+        /([?&])sslmode=(prefer|require|verify-ca)\b/i,
+        "$1sslmode=verify-full",
+      ),
       max,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,

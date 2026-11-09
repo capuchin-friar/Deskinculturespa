@@ -20,11 +20,20 @@ export type SqlParameter =
 
 let pool: Pool | null = null;
 
+function withVerifiedSsl(connectionString: string) {
+  return connectionString.replace(
+    /([?&])sslmode=(prefer|require|verify-ca)\b/i,
+    "$1sslmode=verify-full",
+  );
+}
+
 function getPool(): Pool {
   if (pool) return pool;
 
   const max = Number(process.env.DB_POOL_MAX ?? 10);
-  const connectionString = process.env.DB_URL?.trim() || undefined;
+  const connectionString = process.env.DB_URL?.trim()
+    ? withVerifiedSsl(process.env.DB_URL.trim())
+    : undefined;
 
   pool = connectionString
     ? new Pool({ connectionString, max, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 10_000 })
