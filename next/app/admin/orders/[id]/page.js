@@ -54,9 +54,9 @@ function parseAddress(raw) {
 function parseLocation(raw) {
   if (!raw) return "";
   if (typeof raw === "string") {
-    try {
+      try {
       return parseLocation(JSON.parse(raw));
-    } catch {
+      } catch {
       return raw;
     }
   }
@@ -214,7 +214,7 @@ function OrderDetailsScreen() {
     } catch (loadError) {
       setRecord(null);
       setError(loadError.message || "Could not load this record.");
-    } finally {
+      } finally {
       setLoading(false);
     }
   };
@@ -281,14 +281,14 @@ function OrderDetailsScreen() {
       {!loading && record ? (
         <>
           <header className="ops-header">
-            <div>
+              <div>
               <p className="ops-kicker">{kindLabel(record.kind)}</p>
               <h1>#{record.id}</h1>
               <p className="ops-meta">
                 Created {formatWhen(record.created_at) || "—"}
                 {record.title ? ` · ${record.title}` : ""}
               </p>
-            </div>
+                  </div>
             <div className="ops-header-flags">
               <Badge tone={statusTone(record.fulfillment_status || record.status)}>
                 {labelize(record.fulfillment_status || record.status || "pending")}
@@ -297,24 +297,24 @@ function OrderDetailsScreen() {
                 Payment {labelize(record.payment_status || "pending")}
               </Badge>
               {needsAttention ? <Badge tone="alert">{needsAttention}</Badge> : null}
-            </div>
+                </div>
           </header>
 
           {actions.length ? (
             <div className="ops-actions" role="toolbar" aria-label="Order actions">
               {actions.map((status) => (
-                <button
+                      <button
                   key={status}
-                  type="button"
+                        type="button"
                   className={`ops-btn${status === "cancelled" ? " ops-btn--danger" : " ops-btn--primary"}`}
                   disabled={Boolean(saving)}
                   onClick={() => setConfirmStatus(status)}
                 >
                   {status === "cancelled" ? "Cancel" : `Mark ${labelize(status)}`}
-                </button>
+                      </button>
               ))}
-            </div>
-          ) : null}
+                    </div>
+                  ) : null}
 
           {confirmStatus ? (
             <div className="ops-confirm" role="dialog" aria-modal="true" aria-labelledby="ops-confirm-title">
@@ -324,17 +324,17 @@ function OrderDetailsScreen() {
               <div className="ops-confirm-actions">
                 <button type="button" className="ops-btn" onClick={() => setConfirmStatus("")} disabled={Boolean(saving)}>
                   Keep current status
-                </button>
-                <button
-                  type="button"
+                        </button>
+                      <button
+                        type="button"
                   className={`ops-btn${confirmStatus === "cancelled" ? " ops-btn--danger" : " ops-btn--primary"}`}
                   disabled={Boolean(saving)}
                   onClick={() => patch({ status: confirmStatus }, "status")}
                 >
                   {saving === "status" ? "Updating…" : "Confirm"}
-                </button>
-              </div>
-            </div>
+                      </button>
+                    </div>
+                  </div>
           ) : null}
 
           {message ? <p className="ops-feedback" role="status">{message}</p> : null}
@@ -346,7 +346,7 @@ function OrderDetailsScreen() {
                 <span>
                   <strong>{step.label}</strong>
                   {step.at ? <small>{formatWhen(step.at)}</small> : <small>{step.done ? "Complete" : "Pending"}</small>}
-                </span>
+                    </span>
               </li>
             ))}
           </ol>
@@ -363,7 +363,7 @@ function OrderDetailsScreen() {
                       <li key={item.id || item.item_id}>
                         <div className="ops-item-thumb">
                           {item.thumbnail_url ? <img src={item.thumbnail_url} alt="" /> : <span aria-hidden />}
-                        </div>
+                  </div>
                         <div>
                           <p className="ops-item-name">{item.name || "Item"}</p>
                           <p className="ops-item-meta">
@@ -371,7 +371,7 @@ function OrderDetailsScreen() {
                             {item.duration_minutes ? ` · ${item.duration_minutes} min` : ""}
                             {item.mode ? ` · ${labelize(item.mode)}` : ""}
                           </p>
-                        </div>
+                  </div>
                         <div className="ops-item-price">
                           <span>{money(item.unit_price, currency)}</span>
                           <strong>{money(item.total_price, currency)}</strong>
@@ -379,8 +379,8 @@ function OrderDetailsScreen() {
                       </li>
                     ))}
                   </ul>
-                )}
-              </section>
+                  )}
+                </section>
 
               <section className="ops-card">
                 <h2>Payment</h2>
@@ -388,39 +388,39 @@ function OrderDetailsScreen() {
                   <div>
                     <dt>Items</dt>
                     <dd>{money(record.amount_paid || record.amount, currency)}</dd>
-                  </div>
+                    </div>
                   {record.kind === "product" ? (
                     <>
                       <div>
                         <dt>Shipping</dt>
                         <dd>{money(record.shipping_fee, currency)}</dd>
-                      </div>
+                    </div>
                       <div>
                         <dt>Tax</dt>
                         <dd>{money(record.tax, currency)}</dd>
-                      </div>
+                  </div>
                       <div>
                         <dt>Charges</dt>
                         <dd>{money(record.charges, currency)}</dd>
-                      </div>
-                    </>
-                  ) : null}
+            </div>
+          </>
+        ) : null}
                   <div className="ops-facts-total">
                     <dt>Total paid</dt>
                     <dd>{money(record.total_paid || record.amount, currency)}</dd>
-                  </div>
+      </div>
                   <div>
                     <dt>Method</dt>
                     <dd>{record.payment_reference ? "Paystack" : "—"}</dd>
-                  </div>
+          </div>
                   <div>
                     <dt>Reference</dt>
                     <dd>{record.payment_reference || "—"}</dd>
-                  </div>
+                </div>
                   <div>
                     <dt>Status</dt>
                     <dd>{labelize(record.payment_status || "pending")}</dd>
-                  </div>
+              </div>
                 </dl>
               </section>
 
@@ -466,7 +466,7 @@ function OrderDetailsScreen() {
                     </label>
                     <button className="ops-btn ops-btn--primary" type="submit" disabled={saving === "shipping"}>
                       {saving === "shipping" ? "Saving…" : "Save shipping"}
-                    </button>
+              </button>
                   </form>
                 </section>
               ) : (
@@ -476,13 +476,13 @@ function OrderDetailsScreen() {
                     <div>
                       <dt>Scheduled</dt>
                       <dd>{record.scheduled_at ? formatWhen(record.scheduled_at) : "Not scheduled"}</dd>
-                    </div>
+            </div>
                     {record.consultant ? (
                       <div>
                         <dt>Consultant</dt>
                         <dd>{record.consultant}</dd>
-                      </div>
-                    ) : null}
+        </div>
+      ) : null}
                   </dl>
                 </section>
               )}
@@ -534,11 +534,11 @@ function OrderDetailsScreen() {
                   />
                   <button className="ops-btn ops-btn--primary" type="submit" disabled={saving === "note" || !note.trim()}>
                     {saving === "note" ? "Posting…" : "Add note"}
-                  </button>
+              </button>
                 </form>
               </section>
             </aside>
-          </div>
+            </div>
         </>
       ) : null}
     </div>
