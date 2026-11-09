@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { IoEyeOffOutline, IoEyeOutline, IoLeafOutline } from "react-icons/io5";
 import "../customer/auth-page.css";
@@ -23,7 +22,6 @@ function getDestination() {
 
 export default function AdminAuthPage({ mode }) {
   const isRegister = mode === "register";
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -68,7 +66,7 @@ export default function AdminAuthPage({ mode }) {
       if (!response.ok || !result?.success) {
         throw new Error(getResponseMessage(result, "We couldn’t sign you in. Please try again."));
       }
-      router.replace(getDestination());
+      window.location.assign(getDestination());
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Something went wrong. Please try again.");
     } finally {

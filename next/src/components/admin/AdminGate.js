@@ -15,6 +15,7 @@ export default function AdminGate({ children }) {
       .then(async (response) => {
         if (!mounted) return;
         if (!response.ok) {
+          if (pathname === "/admin/login" || pathname === "/admin/signup") return;
           const next = pathname?.startsWith("/admin") ? pathname : "/admin";
           router.replace(`/admin/login?next=${encodeURIComponent(next)}`);
           return;
