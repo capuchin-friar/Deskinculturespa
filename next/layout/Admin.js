@@ -5,18 +5,27 @@ import { Main } from "@/src/components/admin/Main"
 import { Header } from "@/src/components/admin/Header"
 import AdminGate from "@/src/components/admin/AdminGate"
 import "./styles/admin/xxl.css";
+import "./styles/admin/s.css";
 import "./styles/admin/paidItem.css";
 import { usePathname } from "next/navigation";
 
 export default function Admin({ children }) {
     const path = usePathname();
     const isAuthPage = path === "/admin/login" || path === "/admin/signup";
+    const isProfile = path === "/admin/profile" || path.startsWith("/admin/profile/");
 
     if (isAuthPage) {
         return <main className="customer-auth-shell">{children}</main>;
     }
 
-    const shell = path.split("/").splice(-1)[0] !== "profile" ? (
+    const shell = isProfile ? (
+        <>
+            <div style={{ width: "100%" }}>
+                {children}
+            </div>
+            <Aside />
+        </>
+    ) : (
         <>
             <Aside />
             <div className="admin-content">
@@ -24,15 +33,11 @@ export default function Admin({ children }) {
                 <Main children={children} />
             </div>
         </>
-    ) : (
-        <div style={{ width: "100%" }}>
-            {children}
-        </div>
     );
 
     return (
         <AdminGate>
-            <div className="admin-cnt">
+            <div className={`admin-cnt${isProfile ? " admin-cnt--profile" : ""}`}>
                 {shell}
             </div>
         </AdminGate>

@@ -3,6 +3,7 @@
 import React, { Suspense, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams, useSearchParams } from "next/navigation";
+import AdminLoader from "@/src/components/admin/AdminLoader";
 import "./styles/s.css";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
@@ -275,7 +276,7 @@ function OrderDetailsScreen() {
         ← Orders
       </Link>
 
-      {loading ? <p className="ops-state">Loading order…</p> : null}
+      {loading ? <AdminLoader label="Loading order" /> : null}
       {!loading && error ? <p className="ops-state ops-state--error" role="alert">{error}</p> : null}
 
       {!loading && record ? (
@@ -547,7 +548,7 @@ function OrderDetailsScreen() {
 
 export default function AdminOrderDetailsPage() {
   return (
-    <Suspense fallback={<p className="ops-state">Loading order…</p>}>
+    <Suspense fallback={<AdminLoader label="Loading order" />}>
       <OrderDetailsScreen />
     </Suspense>
   );

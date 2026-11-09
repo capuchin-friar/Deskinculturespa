@@ -1,0 +1,209 @@
+@media (max-width: 760px) {
+
+    .admin-cnt {
+        height: 100vh;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-content {
+        display: flex;
+        min-width: 0;
+        flex: 1 1 auto;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        height: 100vh;
+        width: calc(100% - 180px);
+    }
+
+    .admin-bottom-nav {
+        display: none;
+    }
+
+    /**
+* - Header 
+*/
+    .admin-header {
+        height: 60px;
+        width: 100%;
+        background-color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0px 15px;
+    }
+
+    .admin-header .admin-welcome-box {
+        height: 60px;
+        width: 70%;
+        display: flex;
+        color: #000;
+        align-items: flex-start;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .admin-header .admin-welcome-box h3 {
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.3;
+        margin: 0;
+    }
+
+    .admin-header .admin-welcome-box small {
+        font-size: 12px;
+        font-weight: 400;
+        color: #57534e;
+    }
+
+    .admin-header button span:nth-child(2) small {
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 1.25;
+    }
+
+    .admin-header button span:nth-child(2) small b {
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .admin-header button {
+        margin: 0px 0px 0px 0px;
+        padding: 0px;
+        display: flex;
+        color: #000;
+        width: fit-content;
+        cursor: pointer;
+    }
+
+    .admin-header button span:nth-child(1) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #d8d8d8;
+        border-radius: 50%;
+        height: 35px;
+        width: 33px;
+    }
+
+    .admin-header button span:nth-child(2) {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .admin-header button span:nth-child(2) p {
+        margin-bottom: -2.5px;
+
+    }
+
+    /**
+* - Main 
+*/
+    .admin-main {
+        height: calc(100vh - 60px);
+        width: 100%;
+        background-color: #f9f9f9;
+        overflow: auto;
+        color: #000;
+        padding: 15px 15px;
+    }
+
+    .admin-loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: calc(100vh - 110px);
+    }
+
+    .admin-loader__spinner {
+        width: 36px;
+        height: 36px;
+        border: 3px solid var(--soft-green);
+        border-top-color: var(--brand-green);
+        border-radius: 50%;
+        animation: admin-spin 0.7s linear infinite;
+    }
+
+    @keyframes admin-spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .admin-cnt--profile .admin-aside {
+        display: none;
+    }
+
+    @media (max-width: 760px) {
+        .admin-aside {
+            display: none;
+        }
+
+        .admin-content {
+            width: 100%;
+        }
+
+        .admin-main {
+            padding-bottom: 88px;
+        }
+
+        .admin-cnt--profile {
+            padding-bottom: 72px;
+        }
+
+        .admin-bottom-nav {
+            display: flex;
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 50;
+            height: 64px;
+            padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px));
+            background: #fff;
+            border-top: 1px solid var(--border);
+            justify-content: space-around;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .admin-bottom-nav .admin-nav-link {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            text-decoration: none;
+            color: #737373;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 6px 4px;
+            border-radius: 8px;
+        }
+
+        .admin-bottom-nav .admin-nav-link__icon {
+            display: flex;
+            font-size: 20px;
+            line-height: 1;
+        }
+
+        .admin-bottom-nav .admin-nav-link__label {
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .admin-bottom-nav .admin-nav-link.is-active {
+            color: var(--brand-green);
+            background: var(--soft-green);
+        }
+    }
+
+
+}

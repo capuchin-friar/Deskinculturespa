@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import "./styles.css";
+import AdminLoader from "@/src/components/admin/AdminLoader";
 
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const initialDays = weekdays.map((label, day_of_week) => ({ day_of_week, label, is_available: false, start_time: "", end_time: "", slot_interval_minutes: 30, timezone: "Africa/Lagos" }));
@@ -51,7 +52,7 @@ export default function AdminAvailabilityPage() {
     <Link className="availability-back" href="/admin/profile">← Back to profile</Link>
     <header><span>BOOKING SETTINGS</span><h1>Weekly availability</h1><p>Choose the days and hours customers can request appointments. Existing appointments are automatically blocked from new requests.</p></header>
     {message && <p className={`availability-message${isError ? " error" : ""}`} role={isError ? "alert" : "status"}>{message}</p>}
-    {loading ? <p>Loading your schedule…</p> : <form onSubmit={save}>
+    {loading ? <AdminLoader label="Loading schedule" /> : <form onSubmit={save}>
       <label className="availability-timezone"><span>Business time zone</span><select value={timezone} onChange={(event) => setTimezone(event.target.value)}><option value="Africa/Lagos">West Africa Time (Lagos)</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="America/New_York">New York</option></select></label>
       <div className="availability-day-list">{days.map((day, index) => <section className={`availability-day${day.is_available ? " enabled" : ""}`} key={day.day_of_week}>
         <label className="availability-toggle"><input type="checkbox" checked={Boolean(day.is_available)} onChange={(event) => updateDay(index, "is_available", event.target.checked)} /><span>{day.label}</span></label>

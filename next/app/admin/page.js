@@ -1,10 +1,11 @@
 "use client"
 import "./styles/mobile.css";
 import "./styles/tablet.css";
-import "./styles/ipad.css";
+import "./styles/laptop.css";
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import AdminLoader from "@/src/components/admin/AdminLoader";
 import {
     IoPeopleOutline,
     IoCartOutline,
@@ -153,7 +154,7 @@ export default function page() {
     ];
 
     if (loading) {
-        return <p>Loading dashboard…</p>;
+        return <AdminLoader label="Loading dashboard" />;
     }
 
     if (error) {
@@ -185,7 +186,7 @@ function MetricCard({
 }) {
     return (
         <div className="admin-metric-card">
-            <span>
+            <span className="shadow-md">
                 <Icon size={22} />
             </span>
 
@@ -201,7 +202,7 @@ function OrderBreakdown({
     metrics
 }) {
     const router = useRouter();
-    const [activityKind, setActivityKind] = useState("all");
+    const [activityKind, setActivityKind] = useState("products");
 
     const orderData = [
         {
@@ -243,10 +244,11 @@ function OrderBreakdown({
     const data = orderData;
 
     const COLORS = [
-        "#5B21B6",
-        "#EC4899",
-        "#FBBF24"
+        "#278a3d", // brand-green
+        "#0b3b1a", // brand-dark
+        "#63d94f", // brand-light
     ];
+
 
     const totalOrders = data.reduce(
         (total, item) => total + item.value,
@@ -337,9 +339,8 @@ function OrderBreakdown({
                 <section className="activity-cnt">
                     <div className="activity-headline">
                         <div className="input-cnt">
-                            <span>Activities: </span>
-                            <select value={activityKind} onChange={(event) => setActivityKind(event.target.value)}>
-                                <option value="all">All</option>
+                            <label htmlFor="activity-kind">Offers</label>
+                            <select id="activity-kind" value={activityKind} onChange={(event) => setActivityKind(event.target.value)}>
                                 <option value="products">Products</option>
                                 <option value="services">Services</option>
                                 <option value="appointments">Appointments</option>

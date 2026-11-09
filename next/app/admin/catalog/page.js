@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux"
 import "./styles/xxl.css"
 import "./styles/s.css"
 import { api } from "../../api/shared/config"
+import AdminLoader from "@/src/components/admin/AdminLoader"
 import {
   IoVideocamOutline,
   IoLocationOutline
@@ -378,7 +379,7 @@ export default function ProductListPage() {
       </div>
 
 
-      {loading ? <p>Loading {type}</p> : null}
+      {loading ? <AdminLoader label={`Loading ${type}`} /> : null}
       {!loading && listError ? <p style={{ color: "#c00" }}>{listError}</p> : null}
       {!loading && deleteError ? <p style={{ color: "#c00" }}>{deleteError}</p> : null}
 

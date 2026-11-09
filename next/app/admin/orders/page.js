@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/navigation"
+import AdminLoader from "@/src/components/admin/AdminLoader"
 import { useDispatch, useSelector } from "react-redux"
 // import { getOrdersByShop, getShopsByOwner } from "../../../lib/productApi"
 // import { set_admin_shop_details } from "../../../redux/admin/admin_shop"
@@ -155,7 +156,7 @@ export default function ManageOrders() {
 
       </div>
 
-      {loading ? <p>Loading orders…</p> : null}
+      {loading ? <AdminLoader label="Loading orders" /> : null}
       {!loading && error ? <p className="orders-error">{error}</p> : null}
 
       <div className="orders-table-wrap">

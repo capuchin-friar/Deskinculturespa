@@ -8,6 +8,7 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import { api } from "../../api/shared/config"
+import AdminLoader from "@/src/components/admin/AdminLoader"
 
 
 function jsAgo(value) {
@@ -102,7 +103,7 @@ export default function InventoryPage() {
                 ) : null}
             </div>
 
-            {loading ? <p>Loading Users</p> : null}
+            {loading ? <AdminLoader label="Loading customers" /> : null}
             {!loading && error ? <p style={{ color: "#c00" }}>{error}</p> : null}
 
             <div className="inventory-table-wrap">
