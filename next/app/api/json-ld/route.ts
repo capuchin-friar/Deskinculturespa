@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { query } from "../shared/database";
+import { absoluteUrl } from "../shared/config";
 // import { query } from "@/app/api/shared/database";
 
 export const dynamic = "force-dynamic";
@@ -44,7 +45,7 @@ export async function GET() {
         "@type": "Products",
         name: item.name,
         image: productImageUrl(item.thumbnail_url),
-        url: `https://www.deskinculture.com/store/${item.id}`,
+        url: absoluteUrl(`/store/${item.id}`),
         offers: {
           "@type": "Offer",
           price: productPrice(item.price),
@@ -64,7 +65,7 @@ export async function GET() {
           name: "Trending Products",
           description: "Discover trending Products on DeSkinCulture",
           numberOfItems: result.rows.length,
-          url: "https://www.deskinculture.com/store",
+          url: absoluteUrl("/store"),
           itemListElement: productData,
         },
       },

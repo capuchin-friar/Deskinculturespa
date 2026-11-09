@@ -1,3 +1,5 @@
+import { absoluteUrl } from "./api/shared/config";
+
 export default function sitemap() {
   const routes = [
     "",
@@ -15,7 +17,7 @@ export default function sitemap() {
   ];
 
   return routes.map((route) => ({
-    url: `https://www.deskinculture.com${route}`,
+    url: absoluteUrl(route || "/"),
     lastModified: new Date(),
   }));
 }

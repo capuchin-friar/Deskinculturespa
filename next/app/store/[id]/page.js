@@ -2,6 +2,11 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 import ProductPageClient from "./product";
+import { absoluteUrl } from "../../api/shared/config";
+
+function productApiUrl(id) {
+  return absoluteUrl(`/api/customers/product?id=${encodeURIComponent(id)}`);
+}
 
 export async function generateMetadata({ params }) {
   const { id } = await params;
@@ -15,13 +20,10 @@ export async function generateMetadata({ params }) {
   }
 
   try {
-    const res = await fetch(
-      `/api/product?id=${encodeURIComponent(id)}`,
-      {
+    const res = await fetch(productApiUrl(id), {
         method: "GET",
         cache: "no-store",
-      }
-    );
+      });
 
     if (!res.ok) {
       return;
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }) {
       Number(product?.price || 0)
     )}`;
 
-    const productUrl = `https://www.deskinculture.com/store/${product.id}`;
+    const productUrl = absoluteUrl(`/store/${product.id}`);
 
     return {
       title: formattedTitle,
@@ -116,13 +118,10 @@ export default async function ProductPage({ params }) {
     return <div>Error: No product ID provided.</div>;
   }
 
-  const res = await fetch(
-    `http://localhost:3000/api/product?id=${encodeURIComponent(id)}`,
-    {
-      method: "GET",
-      cache: "no-store",
-    }
-  );
+  const res = await fetch(productApiUrl(id), {
+    method: "GET",
+    cache: "no-store",
+  });
 
   if (!res.ok) {
     return;

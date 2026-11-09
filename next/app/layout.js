@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import App from "../App";
+import { absoluteUrl } from "./api/shared/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,19 +23,19 @@ export const Metadata = {
 import StructuredData from "./StructuredData";
 
 export async function generateMetadata() {
-  const imageUrl = "https://www.deskinculture.com/api/logo";
+  const imageUrl = absoluteUrl("/api/logo");
 
   return {
     title: "DeSkinCulture | Where Skin Gets the Care It Deserves",
     description:
       "From relaxing spa treatments to targeted skincare solutions, our goal is to create experiences that feel thoughtful, comfortable, and genuinely useful.",
-    alternates: { canonical: "https://www.deskinculture.com" },
+    alternates: { canonical: absoluteUrl("/") },
     robots: { index: true, follow: true },
     openGraph: {
       title: "DeSkinCulture | Where Skin Gets the Care It Deserves",
       description:
         "From relaxing spa treatments to targeted skincare solutions, our goal is to create experiences that feel thoughtful, comfortable, and genuinely useful.",
-      url: "https://www.deskinculture.com",
+      url: absoluteUrl("/"),
       type: "website",
       images: [{ url: imageUrl, width: 1200, height: 630 }],
     },
@@ -48,7 +49,7 @@ export async function generateMetadata() {
   };
 }
 
-const productSchema = await fetch("https://www.deskinculture.com/api/json-ld", {
+const productSchema = await fetch(absoluteUrl("/api/json-ld"), {
   next: { revalidate: 3600 },
 })
   .then((res) => (res.ok ? res.json() : null))
@@ -82,7 +83,7 @@ export default async function RootLayout({ children }) {
     "@context": "https://schema.org",
     "@type": "WebSite",
     name: "DeSkinCulture",
-    url: "https://www.deskinculture.com/",
+    url: absoluteUrl("/"),
     logo: "https://res.cloudinary.com/daqbhghwq/image/upload/v1791192261/deskinculture_logo_cnyrcj.png",
     sameAs: [
       "https://www.tiktok.com/@deskinculturespa12?_r=1&_t=ZS-9AHYvvOnyrZ",
@@ -96,37 +97,37 @@ export default async function RootLayout({ children }) {
       {
         "@type": "SiteNavigationElement",
         name: "Register",
-        url: "https://www.deskinculture.com/register",
+        url: absoluteUrl("/register"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Sign In",
-        url: "https://www.deskinculture.com/login",
+        url: absoluteUrl("/login"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Place Your Order",
-        url: "https://www.deskinculture.com/store",
+        url: absoluteUrl("/store"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Services",
-        url: "https://www.deskinculture.com/services",
+        url: absoluteUrl("/services"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Consultations",
-        url: "https://www.deskinculture.com/consultation",
+        url: absoluteUrl("/consultation"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Bookings",
-        url: "https://www.deskinculture.com/booking",
+        url: absoluteUrl("/booking"),
       },
       {
         "@type": "SiteNavigationElement",
         name: "Gallery",
-        url: "https://www.deskinculture.com/gallery",
+        url: absoluteUrl("/gallery"),
       },
       // ...categories.map((cat) => ({
       //   "@type": "SiteNavigationElement",

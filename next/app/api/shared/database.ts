@@ -20,23 +20,38 @@ export type SqlParameter =
 
 let pool: Pool | null = null;
 
-function withVerifiedSsl(connectionString: string) {
-  return connectionString.replace(
-    /([?&])sslmode=(prefer|require|verify-ca)\b/i,
-    "$1sslmode=verify-full",
+function databaseUrl() {
+  return (
+    process.env.DB_URL?.trim() ||
+    process.env.DATABASE_URL?.trim() ||
+    process.env.POSTGRES_URL?.trim() ||
+    ""
   );
+}
+
+function poolFromUrl(connectionString: string, max: number) {
+  const url = new URL(connectionString);
+  return new Pool({
+    user: decodeURIComponent(url.username),
+    password: decodeURIComponent(url.password),
+    host: url.hostname,
+    port: url.port ? Number(url.port) : undefined,
+    database: decodeURIComponent(url.pathname.replace(/^\/+/, "")),
+    ssl: { rejectUnauthorized: true },
+    max,
+    idleTimeoutMillis: 30_000,
+    connectionTimeoutMillis: 10_000,
+  });
 }
 
 function getPool(): Pool {
   if (pool) return pool;
 
   const max = Number(process.env.DB_POOL_MAX ?? 10);
-  const connectionString = process.env.DB_URL?.trim()
-    ? withVerifiedSsl(process.env.DB_URL.trim())
-    : undefined;
+  const connectionString = databaseUrl();
 
   pool = connectionString
-    ? new Pool({ connectionString, max, idleTimeoutMillis: 30_000, connectionTimeoutMillis: 10_000 })
+    ? poolFromUrl(connectionString, max)
     : new Pool({
         user: process.env.DB_USER || "postgres",
         password: process.env.DB_PASSWORD || "postgres",

@@ -18,11 +18,14 @@ function getPoolConfig() {
   }
 
   if (process.env.DB_URL?.trim()) {
+    const url = new URL(process.env.DB_URL.trim());
     return {
-      connectionString: process.env.DB_URL.trim().replace(
-        /([?&])sslmode=(prefer|require|verify-ca)\b/i,
-        "$1sslmode=verify-full",
-      ),
+      user: decodeURIComponent(url.username),
+      password: decodeURIComponent(url.password),
+      host: url.hostname,
+      port: url.port ? Number(url.port) : undefined,
+      database: decodeURIComponent(url.pathname.replace(/^\/+/, "")),
+      ssl: { rejectUnauthorized: true },
       max,
       idleTimeoutMillis: 30_000,
       connectionTimeoutMillis: 10_000,
