@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonObject } from "../../../../shared/utils/request";
-import { decodeUserId } from "../../../../shared/jwt";
-import { AvailabilityModel } from "../../../../shared/models/availability";
-import { verifyPaystackTransaction } from "../../../../shared/paystack";
-import { query } from "../../../../shared/database";
+import { readJsonObject } from "../../../shared/utils/request";
+import { decodeUserId } from "../../../shared/jwt";
+import { AvailabilityModel } from "../../../shared/models/availability";
+import { verifyPaystackTransaction } from "../../../shared/paystack";
+import { query } from "../../../shared/database";
 
 async function unpaidConsultationTotal(userId: string) {
   const { rows } = await query<{ unpaid: string | number }>(

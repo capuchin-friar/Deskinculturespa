@@ -1,7 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
-import ScheduleVisit from "../../src/components/customer/ScheduleVisit";
+import dynamic from "next/dynamic";
+
+const ScheduleVisit = dynamic(() => import("../../src/components/customer/ScheduleVisit"), { ssr: false });
 import useServiceToggler from "../../src/hooks/serviceToggler";
 import "./styles/xxl.css";
 import "./styles/mobile.css";

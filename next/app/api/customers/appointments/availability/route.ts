@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { decodeUserId } from "../../../../shared/jwt";
-import { AvailabilityModel } from "../../../../shared/models/availability";
+import { decodeUserId } from "../../../shared/jwt";
+import { AvailabilityModel } from "../../../shared/models/availability";
 
 export async function GET(request: NextRequest) {
   const userId = decodeUserId(request.cookies.get("user_token")?.value || "");

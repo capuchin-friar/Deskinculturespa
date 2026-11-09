@@ -1,5 +1,5 @@
 import type { PoolClient } from "pg";
-import { db, query } from "../database";
+import { db, query, type SqlParameter } from "../database";
 
 export type OrderItemInput = {
   item_id: string;
@@ -38,6 +38,101 @@ function groupedTitle(names: string[], noun: "item" | "booking" | "appointment" 
   const label = extra === 1 ? noun : `${noun}s`;
   return `${cleaned[0]} +${extra} other ${label}`;
 }
+
+type OrderSeedRow = {
+  customer_id: string;
+  payment_status: string;
+  scheduled_at: Date | string | null;
+};
+
+type AdminVisitItem = {
+  id: number;
+  name: string;
+  thumbnail_url: unknown;
+  units: number;
+  unit_price: unknown;
+  total_price: unknown;
+  duration_minutes: unknown;
+  mode?: unknown;
+};
+
+type ServiceOrderRow = {
+  id: number;
+  customer_id: string;
+  customer: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  customer_location: string | null;
+  title: string;
+  amount: number | string | null;
+  payment_status: string;
+  status: string;
+  scheduled_at: Date | string | null;
+  created_at: Date | string | null;
+  notes: string | null;
+  image_url: string | null;
+  duration_minutes: number | null;
+};
+
+type AppointmentOrderRow = ServiceOrderRow & {
+  consultant: string | null;
+  appointment_date: Date | string | null;
+  start_time: string | null;
+  end_time: string | null;
+  mode: string | null;
+};
+
+type ProductOrderRow = {
+  id: string;
+  customer_id: string | null;
+  amount_paid: number | string | null;
+  shipping_fee: number | string | null;
+  tax: number | string | null;
+  charges: number | string | null;
+  total_paid: number | string | null;
+  currency: string | null;
+  fulfillment_status: string | null;
+  payment_status: string | null;
+  shipping_address: string | null;
+  payment_reference: string | null;
+  shipping_method: string | null;
+  logistic_provider: string | null;
+  estimated_delivery_date: Date | string | null;
+  tracking_number: string | null;
+  created_at: Date | string | null;
+  updated_at: Date | string | null;
+  customer: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  customer_location: string | null;
+  items: unknown;
+};
+
+type AdminVisitOrder = {
+  kind: "service" | "appointment";
+  id: number;
+  customer_id: string;
+  customer: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  customer_location: string | null;
+  consultant?: string | null;
+  title: string;
+  amount: number;
+  payment_status: string;
+  status: string;
+  scheduled_at: Date | string | null;
+  created_at: Date | string | null;
+  notes: string;
+  items: AdminVisitItem[];
+};
+
+type AdminProductOrder = ProductOrderRow & {
+  kind: "product";
+  events: unknown;
+};
+
+type AdminOrderDetail = AdminVisitOrder | AdminProductOrder;
 
 function visitGroupKey(row: { customer_id?: string; payment?: string; payment_status?: string; scheduled_at?: Date | string | null }) {
   const payment = String(row.payment || row.payment_status || "pending").toLowerCase();
@@ -413,16 +508,16 @@ export class OrderModel {
     );
   }
 
-  static async getAdminOrder(kind: string, id: string) {
+  static async getAdminOrder(kind: string, id: string): Promise<AdminOrderDetail | null> {
     const normalized = String(kind || "product").toLowerCase();
     if (normalized === "service") {
-      const { rows: seed } = await query(
+      const { rows: seed } = await query<OrderSeedRow>(
         `SELECT user_id::text AS customer_id, payment_status, scheduled_at
          FROM bookings WHERE id::text = $1 LIMIT 1`,
         [String(id)],
       );
       if (!seed[0]) return null;
-      const { rows } = await query(
+      const { rows } = await query<ServiceOrderRow>(
         `SELECT
            b.id,
            b.user_id::text AS customer_id,
@@ -453,7 +548,7 @@ export class OrderModel {
       );
       if (!rows[0]) return null;
       const first = rows[0];
-      const items = rows.map((row) => ({
+      const items: AdminVisitItem[] = rows.map((row) => ({
         id: row.id,
         name: row.title,
         thumbnail_url: row.image_url,
@@ -482,13 +577,13 @@ export class OrderModel {
     }
 
     if (normalized === "appointment") {
-      const { rows: seed } = await query(
+      const { rows: seed } = await query<OrderSeedRow>(
         `SELECT customer_id::text AS customer_id, payment_status::text AS payment_status, scheduled_at
          FROM appointments WHERE id::text = $1 LIMIT 1`,
         [String(id)],
       );
       if (!seed[0]) return null;
-      const { rows } = await query(
+      const { rows } = await query<AppointmentOrderRow>(
         `SELECT
            a.id,
            a.customer_id::text AS customer_id,
@@ -525,7 +620,7 @@ export class OrderModel {
       );
       if (!rows[0]) return null;
       const first = rows[0];
-      const items = rows.map((row) => ({
+      const items: AdminVisitItem[] = rows.map((row) => ({
         id: row.id,
         name: row.title,
         thumbnail_url: row.image_url,
@@ -555,7 +650,7 @@ export class OrderModel {
       };
     }
 
-    const { rows } = await query(
+    const { rows } = await query<ProductOrderRow>(
       `SELECT
          o.id,
          o.customer_id,
@@ -633,9 +728,9 @@ export class OrderModel {
     const normalized = String(kind || "product").toLowerCase();
     if (normalized === "service") {
       const current = await this.getAdminOrder("service", id);
-      if (!current) return null;
+      if (!current || current.kind !== "service") return null;
       if (patch.status) {
-        const ids = (current.items || []).map((item: { id: number }) => item.id);
+        const ids = (current.items || []).map((item) => Number(item.id)).filter(Number.isFinite);
         if (ids.length) {
           await query(`UPDATE bookings SET status = $1, updated_at = NOW() WHERE id = ANY($2::int[])`, [
             patch.status,
@@ -646,7 +741,7 @@ export class OrderModel {
       if (patch.note) {
         await query(
           `UPDATE bookings SET notes = TRIM(BOTH FROM CONCAT_WS(E'\n', notes, $1)), updated_at = NOW() WHERE id = $2`,
-          [patch.note, current.id],
+          [patch.note, Number(current.id)],
         );
       }
       return this.getAdminOrder("service", id);
@@ -654,9 +749,9 @@ export class OrderModel {
 
     if (normalized === "appointment") {
       const current = await this.getAdminOrder("appointment", id);
-      if (!current) return null;
+      if (!current || current.kind !== "appointment") return null;
       if (patch.status) {
-        const ids = (current.items || []).map((item: { id: number }) => item.id);
+        const ids = (current.items || []).map((item) => Number(item.id)).filter(Number.isFinite);
         if (ids.length) {
           await query(`UPDATE appointments SET status = $1::appointment_status, updated_at = NOW() WHERE id = ANY($2::int[])`, [
             patch.status,
@@ -667,18 +762,18 @@ export class OrderModel {
       if (patch.note) {
         await query(
           `UPDATE appointments SET notes = TRIM(BOTH FROM CONCAT_WS(E'\n', notes, $1)), updated_at = NOW() WHERE id = $2`,
-          [patch.note, current.id],
+          [patch.note, Number(current.id)],
         );
       }
       return this.getAdminOrder("appointment", id);
     }
 
     const current = await this.getAdminOrder("product", id);
-    if (!current) return null;
+    if (!current || current.kind !== "product") return null;
 
     const assignments: string[] = [];
-    const values: unknown[] = [];
-    const add = (column: string, value: unknown) => {
+    const values: SqlParameter[] = [];
+    const add = (column: string, value: SqlParameter) => {
       values.push(value);
       assignments.push(`${column} = $${values.length}`);
     };
@@ -706,7 +801,7 @@ export class OrderModel {
         [
           current.id,
           patch.note ? "note" : patch.status ? "status_update" : "shipping_update",
-          patch.status || current.fulfillment_status || "processing",
+          patch.status || (current.kind === "product" ? current.fulfillment_status : null) || "processing",
           String(actorId),
           patch.note ||
             (patch.status ? `Fulfillment updated to ${patch.status}` : `Tracking updated to ${patch.tracking_number}`),
