@@ -10,13 +10,13 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../models/user";
-import { getJwtSecret } from "../../jwt";
+import { getAdminJwtSecret } from "../../jwt";
 
 
 export const POST = async (req: NextRequest) => {
 
     try {
-        const secret = getJwtSecret(process.env.ADMIN_JWT_SECRET as string);
+        const secret = getAdminJwtSecret();
         if (!secret) {
             console.error("Signin: JWT_SECRET is not set");
             return NextResponse.json(

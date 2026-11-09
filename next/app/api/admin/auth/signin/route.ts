@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { readJsonObject } from "../../../shared/utils/request";
 import { UserModel } from "../../../shared/models/user";
 import { attachAdminSession, createAdminToken } from "../../../shared/adminAuth";
+import { getAdminJwtSecret } from "../../../shared/jwt";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,6 +12,9 @@ export async function POST(request: NextRequest) {
     const password = typeof body.password === "string" ? body.password : "";
     if (!email || !password) {
       return NextResponse.json({ success: false, data: "Enter your email and password." }, { status: 400 });
+    }
+    if (!getAdminJwtSecret()) {
+      return NextResponse.json({ success: false, data: "Server configuration error (JWT)." }, { status: 500 });
     }
 
     const users = await UserModel.findUserByEmailNormalized(email);

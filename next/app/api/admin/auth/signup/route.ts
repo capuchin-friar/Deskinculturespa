@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { readJsonObject } from "../../../shared/utils/request";
 import { UserModel } from "../../../shared/models/user";
 import { attachAdminSession, createAdminToken } from "../../../shared/adminAuth";
+import { getAdminJwtSecret } from "../../../shared/jwt";
 
 const SALT_ROUNDS = 10;
 
@@ -19,6 +20,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, data: { mssg: "Enter your name, email, and a password of at least 8 characters." } },
         { status: 400 },
+      );
+    }
+
+    if (!getAdminJwtSecret()) {
+      return NextResponse.json(
+        { success: false, data: { mssg: "Server configuration error (JWT)." } },
+        { status: 500 },
       );
     }
 
@@ -59,7 +67,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Admin signup failed", error);
     return NextResponse.json(
-      { success: false, data: { mssg: error instanceof Error ? error.message : "An error occurred" } },
+      { success: false, data: { mssg: "Could not finish creating this admin account. Try signing in, or try again." } },
       { status: 500 },
     );
   }

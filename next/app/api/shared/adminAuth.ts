@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { UserModel } from "./models/user";
-import { getJwtSecret } from "./jwt";
+import { getAdminJwtSecret } from "./jwt";
 
 const cookieOptions = {
   httpOnly: true,
@@ -12,7 +12,10 @@ const cookieOptions = {
 };
 
 export function createAdminToken(user: { id: number | string; email?: string; fname?: string; lname?: string; role?: string }) {
-  const secret = getJwtSecret(process.env.ADMIN_JWT_SECRET as string);
+  const secret = getAdminJwtSecret();
+  if (!secret) {
+    throw new Error("Admin JWT secret is not configured");
+  }
   const displayName = [user.fname, user.lname].filter(Boolean).join(" ").trim();
   return jwt.sign(
     {

@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { UserModel } from "../../models/user";
-import { getJwtSecret } from "../../jwt";
+import { getAdminJwtSecret, getJwtSecret } from "../../jwt";
 import type { UserRole } from "../../types/user";
 
 const SALT_ROUNDS = 10;
@@ -42,8 +42,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const secretValue = process.env.ADMIN_JWT_SECRET;
-        if (!secretValue?.trim()) {
+        const secretValue = getAdminJwtSecret();
+        if (!secretValue) {
             return NextResponse.json(
                 { success: false, data: { mssg: "Server configuration error (JWT)" } },
                 { status: 500 },

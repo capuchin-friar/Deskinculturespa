@@ -1,17 +1,24 @@
 import jwt from "jsonwebtoken";
 
-/**
- * JWT secret normalization.
- * Must match the Node backend's getJwtSecret() so tokens signed here verify there.
- */
+function readProcessEnv(name: string): string {
+  const value = process.env[name];
+  return typeof value === "string" ? value : "";
+}
 
-export function getJwtSecret(jwt: string): string {
-  // const raw = process.env.JWT_SECRET ?? "";
-  const trimmed = jwt.trim();
+export function getJwtSecret(value?: string | null): string {
+  const trimmed = (typeof value === "string" ? value : "").trim();
   if (trimmed.length >= 2 && trimmed.startsWith('"') && trimmed.endsWith('"')) {
     return trimmed.slice(1, -1);
   }
   return trimmed;
+}
+
+export function getAdminJwtSecret(): string {
+  return getJwtSecret(
+    readProcessEnv("ADMIN_JWT_SECRET") ||
+      readProcessEnv("CUSTOMER_JWT_SECRET") ||
+      readProcessEnv("JWT_SECRET"),
+  );
 }
 
 export function decodeAdminId(token: string): number {
