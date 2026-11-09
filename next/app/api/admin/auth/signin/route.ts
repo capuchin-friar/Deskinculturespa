@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+
+export const runtime = "nodejs";
 import bcrypt from "bcryptjs";
 import { readJsonObject } from "../../../shared/utils/request";
 import { UserModel } from "../../../shared/models/user";

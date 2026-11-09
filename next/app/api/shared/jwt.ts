@@ -1,8 +1,22 @@
+import { existsSync } from "node:fs";
+import { resolve } from "node:path";
+import { loadEnvConfig } from "@next/env";
 import jwt from "jsonwebtoken";
 
-function readProcessEnv(name: string): string {
-  const value = process.env[name];
-  return typeof value === "string" ? value : "";
+let envLoaded = false;
+
+function projectDirWithEnv() {
+  const candidates = [process.cwd(), resolve(process.cwd(), ".."), resolve(process.cwd(), "../..")];
+  return candidates.find((dir) => existsSync(resolve(dir, ".env"))) || process.cwd();
+}
+
+function ensureJwtEnv() {
+  if (envLoaded) return;
+  envLoaded = true;
+  if (process.env.ADMIN_JWT_SECRET || process.env.CUSTOMER_JWT_SECRET || process.env.JWT_SECRET) {
+    return;
+  }
+  loadEnvConfig(projectDirWithEnv());
 }
 
 export function getJwtSecret(value?: string | null): string {
@@ -14,10 +28,9 @@ export function getJwtSecret(value?: string | null): string {
 }
 
 export function getAdminJwtSecret(): string {
+  ensureJwtEnv();
   return getJwtSecret(
-    readProcessEnv("ADMIN_JWT_SECRET") ||
-      readProcessEnv("CUSTOMER_JWT_SECRET") ||
-      readProcessEnv("JWT_SECRET"),
+    process.env.ADMIN_JWT_SECRET || process.env.CUSTOMER_JWT_SECRET || process.env.JWT_SECRET,
   );
 }
 
