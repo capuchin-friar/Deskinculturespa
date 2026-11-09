@@ -37,6 +37,9 @@ export interface NewAppointmentDoc {
     mode: string,
     duration_minutes: number,
     price: number,
+    slug: string,
+    thumbnail_url: string,
+    description?: string | null,
     admin_id: string | number
 }
 

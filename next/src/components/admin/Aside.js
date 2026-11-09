@@ -7,6 +7,7 @@ import {
     IoPeopleOutline,
     IoCartOutline,
     IoPricetagsOutline,
+    IoCalendarOutline,
     IoSettingsOutline,
 } from "react-icons/io5";
 
@@ -14,7 +15,8 @@ const navs = [
     { name: "Dashboard", svg: IoGridOutline, path: "" },
     { name: "Catalog", svg: IoPricetagsOutline, path: "catalog" },
     { name: "Orders", svg: IoCartOutline, path: "orders" },
-    { name: "Customers", svg: IoPeopleOutline, path: "customers" },
+    { name: "Users", svg: IoPeopleOutline, path: "users" },
+    { name: "Availability", svg: IoCalendarOutline, path: "availability" },
     { name: "Settings", svg: IoSettingsOutline, path: "profile" },
 ];
 
@@ -28,10 +30,9 @@ function isNavActive(pathname, path) {
         return pathname.startsWith("/admin/catalog") || pathname.startsWith("/admin/create");
     }
     if (path === "orders") return pathname.startsWith("/admin/orders");
-    if (path === "customers") return pathname.startsWith("/admin/customers");
-    if (path === "profile") {
-        return pathname.startsWith("/admin/profile") || pathname.startsWith("/admin/availability");
-    }
+    if (path === "users") return pathname.startsWith("/admin/users");
+    if (path === "availability") return pathname.startsWith("/admin/availability");
+    if (path === "profile") return pathname.startsWith("/admin/profile");
     return pathname === `/admin/${path}` || pathname.startsWith(`/admin/${path}/`);
 }
 

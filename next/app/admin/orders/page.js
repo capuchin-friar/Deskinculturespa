@@ -51,6 +51,20 @@ function customerPhone(row) {
   return digits
 }
 
+function toneClass(value) {
+  const v = String(value || "").toLowerCase()
+  if (["paid", "completed", "confirmed", "delivered", "success", "successful"].includes(v)) {
+    return "orders-pill orders-pill--ok"
+  }
+  if (["pending", "processing", "unpaid", "scheduled"].includes(v)) {
+    return "orders-pill orders-pill--warn"
+  }
+  if (["failed", "cancelled", "canceled", "refunded", "declined"].includes(v)) {
+    return "orders-pill orders-pill--bad"
+  }
+  return "orders-pill"
+}
+
 function whatsappHref(row) {
   const phone = customerPhone(row)
   if (!phone) return ""
@@ -70,7 +84,7 @@ export default function ManageOrders() {
   const adminId = useSelector((s) => s.admin?.admin_id)
 
   const [rows, setRows] = useState([])
-  const [kind, setKind] = useState("all")
+  const [kind, setKind] = useState("products")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
@@ -123,10 +137,6 @@ export default function ManageOrders() {
           <div className="orders-shop-select">
             <select aria-label="Type" value={kind} onChange={(event) => setKind(event.target.value)}>
               {[
-                // {
-                //   name: "All",
-                //   value: "all"
-                // },
                 {
                   name: "Products",
                   value: "products"
@@ -182,27 +192,39 @@ export default function ManageOrders() {
             </tr>
           </thead>
           <tbody>
+            {!loading && rows.length === 0 ? (
+              <tr>
+                <td className="orders-empty-cell" colSpan={10}>
+                  No orders in this list yet.
+                </td>
+              </tr>
+            ) : null}
             {!loading &&
               rows.map((r, index) => (
                 <tr key={`${r?.kind}-${r?.id ?? r?.order_id ?? index}`}>
-                  <td>{r?.id ?? r?.order_id ?? "—"}</td>
-                  <td>{r?.title ?? r?.product ?? "—"}</td>
+                  <td className="orders-id">{r?.id ?? r?.order_id ?? "—"}</td>
+                  <td className="orders-title">{r?.title ?? r?.product ?? "—"}</td>
                   <td>{r?.customer ?? "—"}</td>
-                  <td>{r?.qty ?? 0}</td>
-                  <td>{formatAmount(r?.amount)}</td>
-                  <td>{r?.payment ?? "—"}</td>
-                  <td>{r?.status ?? "—"}</td>
-                  <td>{r?.delivery ?? "—"}</td>
+                  <td className="orders-num">{r?.qty ?? 0}</td>
+                  <td className="orders-num">{formatAmount(r?.amount)}</td>
+                  <td>
+                    <span className={toneClass(r?.payment)}>{r?.payment ?? "—"}</span>
+                  </td>
+                  <td>
+                    <span className={toneClass(r?.status)}>{r?.status ?? "—"}</span>
+                  </td>
+                  <td>
+                    <span className={toneClass(r?.delivery)}>{r?.delivery ?? "—"}</span>
+                  </td>
                   <td>{jsAgo(r?.date)}</td>
                   <td className="orders-actions-cell">
-                    {/* <button
+                    <button
                       type="button"
-                      style={{ color: "#000" }}
                       className="orders-action-btn"
                       onClick={() => router.push(`/admin/orders/${r?.id ?? ""}?kind=${encodeURIComponent(r?.kind || "product")}`)}
                     >
                       View
-                    </button> */}
+                    </button>
                     <button
                       type="button"
                       className="orders-chat-btn"

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import "./styles.css";
 import AdminLoader from "@/src/components/admin/AdminLoader";
@@ -49,8 +48,7 @@ export default function AdminAvailabilityPage() {
   };
 
   return <main className="admin-availability-page">
-    <Link className="availability-back" href="/admin/profile">← Back to profile</Link>
-    <header><span>BOOKING SETTINGS</span><h1>Weekly availability</h1><p>Choose the days and hours customers can request appointments. Existing appointments are automatically blocked from new requests.</p></header>
+    <header><span>AVAILABILITY</span><h1>Weekly availability</h1><p>Choose the days and hours customers can request appointments. Existing appointments are automatically blocked from new requests.</p></header>
     {message && <p className={`availability-message${isError ? " error" : ""}`} role={isError ? "alert" : "status"}>{message}</p>}
     {loading ? <AdminLoader label="Loading schedule" /> : <form onSubmit={save}>
       <label className="availability-timezone"><span>Business time zone</span><select value={timezone} onChange={(event) => setTimezone(event.target.value)}><option value="Africa/Lagos">West Africa Time (Lagos)</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="America/New_York">New York</option></select></label>

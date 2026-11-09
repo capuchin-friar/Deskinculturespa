@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     IoArrowBack,
     IoCheckmarkCircle,
@@ -10,6 +10,18 @@ import {
 } from "react-icons/io5";
 import uuidV4 from "uuid-v4";
 import { api } from "../../../api/shared/config";
+import AdminMediaBackdrop, {
+    deleteCloudinaryImage,
+    extractCloudinaryPublicId,
+} from "@/src/components/admin/AdminMediaBackdrop";
+import {
+    CREATE_DRAFT_KEYS,
+    clearCreateDraft,
+    loadCreateDraft,
+    saveCreateDraft,
+} from "@/src/hooks/useCreateDraft";
+
+const DRAFT_KEY = CREATE_DRAFT_KEYS.package;
 import "../appointment/styles/xxl.css";
 import "../appointment/styles/mobile.css";
 import "../appointment/styles/tablet.css";
@@ -35,10 +47,41 @@ export default function CreatePackagePage() {
     const [uploadId, setUploadId] = useState("");
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mediaBusy, setMediaBusy] = useState(null);
+    const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+    const skipDraftSaveRef = useRef(false);
 
     useEffect(() => {
-        setUploadId(uuidV4());
+        const draft = loadCreateDraft(DRAFT_KEY);
+        if (draft) {
+            setForm({
+                name: draft.form?.name ?? "",
+                description: draft.form?.description ?? "",
+                duration_months: draft.form?.duration_months ?? "3",
+                price: draft.form?.price ?? "",
+            });
+            setIncludes(
+                Array.isArray(draft.includes) && draft.includes.length
+                    ? draft.includes
+                    : [""]
+            );
+            setImage(draft.image?.url ? draft.image : null);
+            setUploadId(draft.uploadId || uuidV4());
+        } else {
+            setUploadId(uuidV4());
+        }
+        setIsDraftLoaded(true);
     }, []);
+
+    useEffect(() => {
+        if (!isDraftLoaded || !uploadId || skipDraftSaveRef.current) return;
+        saveCreateDraft(DRAFT_KEY, {
+            uploadId,
+            form,
+            includes,
+            image,
+        });
+    }, [isDraftLoaded, uploadId, form, includes, image]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -96,8 +139,11 @@ export default function CreatePackagePage() {
         }
 
         try {
-            setIsSubmitting(true);
+            setMediaBusy("upload");
             setErrors((prev) => ({ ...prev, image: "" }));
+
+            const previousPublicId =
+                image?.publicId || extractCloudinaryPublicId(image?.url);
 
             const formData = new FormData();
             formData.append("file", file);
@@ -111,15 +157,47 @@ export default function CreatePackagePage() {
                 throw new Error(data?.error || "Failed to upload image.");
             }
 
-            setImage({ url: data.url, name: file.name });
+            setImage({
+                url: data.url,
+                publicId: data.publicId || extractCloudinaryPublicId(data.url),
+                name: file.name,
+            });
+
+            if (previousPublicId) {
+                try {
+                    await deleteCloudinaryImage(previousPublicId);
+                } catch {
+                    /* keep the new image even if the old Cloudinary asset cannot be removed */
+                }
+            }
         } catch (error) {
             setErrors((prev) => ({
                 ...prev,
                 image: error?.message || "Image upload failed.",
             }));
         } finally {
-            setIsSubmitting(false);
+            setMediaBusy(null);
             e.target.value = "";
+        }
+    };
+
+    const handleRemoveImage = async () => {
+        if (!image) return;
+        const publicId = image.publicId || extractCloudinaryPublicId(image.url);
+        try {
+            setMediaBusy("delete");
+            setErrors((prev) => ({ ...prev, image: "" }));
+            if (publicId) {
+                await deleteCloudinaryImage(publicId);
+            }
+            setImage(null);
+        } catch (error) {
+            setErrors((prev) => ({
+                ...prev,
+                image: error?.message || "Failed to delete image.",
+            }));
+        } finally {
+            setMediaBusy(null);
         }
     };
 
@@ -140,6 +218,8 @@ export default function CreatePackagePage() {
             if (!data?.success) {
                 throw new Error(data?.message || "Failed to create package.");
             }
+            skipDraftSaveRef.current = true;
+            clearCreateDraft(DRAFT_KEY);
             window.location.href = "/admin/catalog";
         } catch (error) {
             setErrors({
@@ -159,6 +239,7 @@ export default function CreatePackagePage() {
 
     return (
         <>
+            <AdminMediaBackdrop mode={mediaBusy} />
             <div className="appointment-layout">
                 <section className="left-column">
                     <form id="package-form" className="appointment-card" onSubmit={handleSubmit}>
@@ -298,6 +379,7 @@ export default function CreatePackagePage() {
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
                                     hidden
+                                    disabled={Boolean(mediaBusy) || isSubmitting}
                                     onChange={handleImageUpload}
                                 />
                                 <IoCloudUploadOutline />
@@ -312,6 +394,7 @@ export default function CreatePackagePage() {
                                         type="file"
                                         accept="image/jpeg,image/png,image/webp"
                                         hidden
+                                        disabled={Boolean(mediaBusy) || isSubmitting}
                                         onChange={handleImageUpload}
                                     />
                                 </label>
@@ -322,7 +405,8 @@ export default function CreatePackagePage() {
                                     <button
                                         type="button"
                                         className="package-image-remove"
-                                        onClick={() => setImage(null)}
+                                        onClick={handleRemoveImage}
+                                        disabled={Boolean(mediaBusy)}
                                     >
                                         Remove
                                     </button>
@@ -357,7 +441,7 @@ export default function CreatePackagePage() {
 
                     <div className="appointment-header">
                         <div className="header-actions">
-                            <button
+                            {/* <button
                                 type="button"
                                 className="draft-button"
                                 onClick={() => {
@@ -365,12 +449,12 @@ export default function CreatePackagePage() {
                                 }}
                             >
                                 <IoArrowBack /> Cancel
-                            </button>
+                            </button> */}
                             <button
                                 type="submit"
                                 form="package-form"
                                 className="publish-button"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || Boolean(mediaBusy)}
                             >
                                 {isSubmitting ? "Publishing..." : "Publish Package"}
                             </button>

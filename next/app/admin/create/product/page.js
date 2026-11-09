@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     IoSettingsOutline,
     IoTrashBin
@@ -14,6 +14,7 @@ import {
 } from "../../../api/shared/config";
 import Select from "react-select";
 import uuidV4 from "uuid-v4";
+import AdminMediaBackdrop from "@/src/components/admin/AdminMediaBackdrop";
 
 const DRAFT_KEY = "deskinculture_create_product_draft";
 
@@ -29,6 +30,7 @@ export default function CreateProductPage() {
 
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mediaBusy, setMediaBusy] = useState(null);
 
     const [price, setPrice] = useState("");
     const [discount, setDiscount] = useState("");
@@ -60,6 +62,7 @@ export default function CreateProductPage() {
      * an existing localStorage draft with empty initial values.
      */
     const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+    const skipDraftSaveRef = useRef(false);
 
 
 
@@ -249,7 +252,7 @@ export default function CreateProductPage() {
          * Otherwise the initial empty React state could overwrite
          * the existing localStorage draft.
          */
-        if (!isDraftLoaded || !productId) {
+        if (!isDraftLoaded || !productId || skipDraftSaveRef.current) {
             return;
         }
 
@@ -386,7 +389,7 @@ export default function CreateProductPage() {
 
         try {
 
-            setIsSubmitting(true);
+            setMediaBusy("upload");
 
             setErrors((prev) => ({
                 ...prev,
@@ -533,7 +536,7 @@ export default function CreateProductPage() {
 
         } finally {
 
-            setIsSubmitting(false);
+            setMediaBusy(null);
 
             /*
              * Allows the user to select the same file again.
@@ -699,7 +702,7 @@ export default function CreateProductPage() {
 
         try {
 
-            setIsSubmitting(true);
+            setMediaBusy("delete");
 
             setErrors((prev) => ({
                 ...prev,
@@ -812,7 +815,7 @@ export default function CreateProductPage() {
 
         } finally {
 
-            setIsSubmitting(false);
+            setMediaBusy(null);
 
         }
 
@@ -1148,6 +1151,7 @@ export default function CreateProductPage() {
              * Only clear the draft AFTER the product
              * has successfully been saved to the database.
              */
+            skipDraftSaveRef.current = true;
             localStorage.removeItem(
                 DRAFT_KEY
             );
@@ -1204,7 +1208,8 @@ export default function CreateProductPage() {
 
 
     return (
-
+        <>
+        <AdminMediaBackdrop mode={mediaBusy} />
         <form
             className="product-create-form"
             onSubmit={handleSubmit}
@@ -1360,6 +1365,7 @@ export default function CreateProductPage() {
                                 }
                                 disabled={
                                     isSubmitting ||
+                                    Boolean(mediaBusy) ||
                                     !isDraftLoaded
                                 }
                             />
@@ -1404,7 +1410,7 @@ export default function CreateProductPage() {
                                                 )
                                             }
                                             disabled={
-                                                isSubmitting
+                                                isSubmitting || Boolean(mediaBusy)
                                             }
                                         >
 
@@ -1940,6 +1946,7 @@ export default function CreateProductPage() {
                         className="save-product-btn"
                         disabled={
                             isSubmitting ||
+                            Boolean(mediaBusy) ||
                             !isDraftLoaded
                         }
                     >
@@ -1956,7 +1963,7 @@ export default function CreateProductPage() {
             </div>
 
         </form>
-
+        </>
     );
 }
 

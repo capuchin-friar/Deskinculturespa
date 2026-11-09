@@ -15,13 +15,40 @@ import { withErrorHandling } from "../utils/errHandler";
 
 export class AppointmentModel {
 
+    static ensureSchema = withErrorHandling(async () => {
+        await query(`ALTER TABLE consultations ALTER COLUMN thumbnail_url TYPE TEXT`);
+        await query(`ALTER TABLE consultations ALTER COLUMN slug TYPE TEXT`);
+        await query(`ALTER TABLE consultations ADD COLUMN IF NOT EXISTS description TEXT`);
+    });
+
     static createAppointmentDoc = withErrorHandling(
         async (payload: NewAppointmentDoc) => {
+            await AppointmentModel.ensureSchema();
             const {
-                admin_id, mode, price, duration_minutes
+                admin_id, mode, price, duration_minutes, slug, thumbnail_url, description
             } = payload;
-            const columns = ["consultant_id", "mode", "duration_minutes", "price", "is_active", "created_at"];
-            const values = [admin_id, mode, duration_minutes, price, true, new Date()];
+            const columns = [
+                "consultant_id",
+                "slug",
+                "thumbnail_url",
+                "mode",
+                "duration_minutes",
+                "price",
+                "description",
+                "is_active",
+                "created_at",
+            ];
+            const values = [
+                admin_id,
+                slug,
+                thumbnail_url,
+                mode,
+                duration_minutes,
+                price,
+                description || null,
+                true,
+                new Date(),
+            ];
             const placeholders = values.map((_, i) => `$${i + 1}`).join(",");
 
             const sql = `INSERT INTO consultations (${columns.join(",")}) VALUES (${placeholders}) RETURNING *`;
@@ -47,7 +74,12 @@ export class AppointmentModel {
     );
 
     static updateAppointmentDoc = withErrorHandling(
-        async (payload: Omit<NewAppointmentDoc, "admin_id"> & { appointment_id: string }) => {
+        async (payload: {
+            appointment_id: string;
+            mode: string;
+            price: number;
+            duration_minutes: number;
+        }) => {
             const {
                 appointment_id, mode, price, duration_minutes
             } = payload;

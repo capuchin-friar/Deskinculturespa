@@ -90,20 +90,26 @@ export default function InventoryPage() {
                 <h5>Users</h5>
                 {["customer", "admin"].length > 0 ? (
                     <div className="inventory-shop-select">
-                        <select aria-label="Role" value={role} onChange={(e) => {setRole(e.target.value)}}>
-                            {["customer", "admin"].map((role, index) => {
-                                return (
-                                    <option key={index} value={role}>
-                                        {role ?? "—"}
-                                    </option>
-                                )
-                            })}
+                        <select
+                            id="users-role"
+                            aria-label="Role"
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                        >
+                            {[
+                                { name: "Customer", value: "customer" },
+                                { name: "Admin", value: "admin" },
+                            ].map(({ name, value }) => (
+                                <option key={value} value={value}>
+                                    {name}
+                                </option>
+                            ))}
                         </select>
                     </div>
                 ) : null}
             </div>
 
-            {loading ? <AdminLoader label="Loading customers" /> : null}
+            {loading ? <AdminLoader label="Loading users" /> : null}
             {!loading && error ? <p style={{ color: "#c00" }}>{error}</p> : null}
 
             <div className="inventory-table-wrap">
@@ -123,17 +129,27 @@ export default function InventoryPage() {
                         </tr>
                     </thead>
                     <tbody>
+                        {!loading && rows.length === 0 ? (
+                            <tr>
+                                <td className="inventory-empty" colSpan={6}>
+                                    No {role}s yet.
+                                </td>
+                            </tr>
+                        ) : null}
                         {!loading &&
-                            rows.map((r, index) => (
-                                <tr key={index}>
-                                    <td>{r?.id ?? "—"}</td>
-                                    <td>{`${r?.fname} ${r?.lname}` ?? "—"}</td>
+                            rows.map((r, index) => {
+                                const name = [r?.fname, r?.lname].filter(Boolean).join(" ").trim();
+                                return (
+                                <tr key={r?.id ?? index}>
+                                    <td className="inventory-id">{r?.id ?? "—"}</td>
+                                    <td className="inventory-name">{name || "—"}</td>
                                     <td>{r?.email ?? "—"}</td>
                                     <td>{r?.phone ?? "—"}</td>
-                                    <td>{formatLocation(r?.location) ?? "—"}</td>
-                                    <td>{jsAgo(r?.createdat ?? r?.createdAt)}</td>
+                                    <td>{formatLocation(r?.location)}</td>
+                                    <td className="inventory-muted">{jsAgo(r?.createdat ?? r?.createdAt)}</td>
                                 </tr>
-                            ))}
+                                );
+                            })}
                     </tbody>
                 </table>
             </div>

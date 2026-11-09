@@ -9,6 +9,27 @@ import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
 
+const CONSULTATION_MODES: Record<string, "physical" | "video" | "audio" | "chat"> = {
+    physical: "physical",
+    "in-person": "physical",
+    inperson: "physical",
+    online: "video",
+    video: "video",
+    phone: "audio",
+    audio: "audio",
+    chat: "chat",
+};
+
+function slugify(value: string) {
+    const base = value
+        .toLowerCase()
+        .normalize("NFKD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .slice(0, 80);
+    return base || `consultation-${Date.now().toString(36)}`;
+}
 
 export const POST = async (req: NextRequest) => {
 
@@ -17,19 +38,50 @@ export const POST = async (req: NextRequest) => {
         const {
             mode,
             duration_minutes,
-            price
+            duration,
+            price,
+            thumbnail_url,
+            slug,
+            title,
+            description,
         } = body;
 
         // Validate all fields
 
         const appointmentMode =
-            typeof mode === "string" ? mode.trim() : false;
+            typeof mode === "string"
+                ? CONSULTATION_MODES[mode.trim().toLowerCase()] || false
+                : false;
 
         const appointmentDurationMins =
-            typeof duration_minutes === "number" ? duration_minutes : false;
+            typeof duration_minutes === "number"
+                ? duration_minutes
+                : typeof duration === "number"
+                    ? duration
+                    : false;
 
         const appointmentPrice =
             typeof price === "number" ? price : false;
+
+        const appointmentThumbnail =
+            typeof thumbnail_url === "string" ? thumbnail_url.trim() : false;
+
+        const appointmentTitle =
+            typeof title === "string"
+                ? title.trim()
+                : typeof slug === "string"
+                    ? slug.trim()
+                    : "";
+
+        const appointmentSlug =
+            typeof slug === "string" && slug.trim()
+                ? slugify(slug.trim())
+                : appointmentTitle
+                    ? slugify(appointmentTitle)
+                    : false;
+
+        const appointmentDescription =
+            typeof description === "string" ? description.trim() : "";
 
 
         if (!appointmentMode) {
@@ -42,6 +94,14 @@ export const POST = async (req: NextRequest) => {
 
         if (!appointmentPrice) {
             throw new Error("Appointment price is required");
+        }
+
+        if (!appointmentThumbnail) {
+            throw new Error("Appointment image is required");
+        }
+
+        if (!appointmentSlug) {
+            throw new Error("Appointment title is required");
         }
 
         // Extract the admin id from the JWT
@@ -60,12 +120,15 @@ export const POST = async (req: NextRequest) => {
 
 
         // Final validation 
-        if (appointmentMode && appointmentDurationMins && appointmentPrice) {
+        if (appointmentMode && appointmentDurationMins && appointmentPrice && appointmentThumbnail && appointmentSlug) {
             // Create appointment
             const response = await AppointmentModel.createAppointmentDoc({
                 mode: appointmentMode,
                 duration_minutes: appointmentDurationMins,
                 price: appointmentPrice,
+                slug: appointmentSlug,
+                thumbnail_url: appointmentThumbnail,
+                description: appointmentDescription,
                 admin_id
             });
 

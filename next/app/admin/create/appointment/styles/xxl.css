@@ -623,3 +623,34 @@
       grid-template-columns: 1fr;
     }
   }
+
+.package-image-preview {
+  position: relative;
+  margin-top: 10px;
+  overflow: hidden;
+  border: 1px solid #e1e8e3;
+  border-radius: 7px;
+  background: #f5f8f5;
+}
+
+.package-image-preview img {
+  display: block;
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+.package-image-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #8a3a3a;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
     IoCloudUploadOutline,
     IoTimeOutline,
@@ -16,6 +16,15 @@ import "./styles/ipad.css";
 import _SERVICES from "../../../../src/json/services.json";
 import uuidV4 from "uuid-v4";
 import { api } from "../../../api/shared/config";
+import AdminMediaBackdrop from "@/src/components/admin/AdminMediaBackdrop";
+import {
+    CREATE_DRAFT_KEYS,
+    clearCreateDraft,
+    loadCreateDraft,
+    saveCreateDraft,
+} from "@/src/hooks/useCreateDraft";
+
+const DRAFT_KEY = CREATE_DRAFT_KEYS.service;
 
 const MAX_DESCRIPTION_LENGTH = 500;
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
@@ -49,12 +58,44 @@ export default function AddServicePage() {
     const [image, setImage] = useState([]);
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mediaBusy, setMediaBusy] = useState(null);
 
     const [productId, setProductId] = useState("");
+    const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+    const skipDraftSaveRef = useRef(false);
 
     useEffect(() => {
-        setProductId(uuidV4());
+        const draft = loadCreateDraft(DRAFT_KEY);
+        if (draft) {
+            setForm({
+                description: draft.form?.description ?? "",
+                service: draft.form?.service ?? "",
+                subService: draft.form?.subService ?? "",
+                price: draft.form?.price ?? "",
+                duration: draft.form?.duration ?? "",
+                imageUrl: draft.form?.imageUrl ?? "",
+                featured: Boolean(draft.form?.featured),
+            });
+            setService(draft.service ?? "");
+            setSubService(draft.subService ?? "");
+            setImage(Array.isArray(draft.image) ? draft.image.filter(Boolean) : []);
+            setProductId(draft.productId || uuidV4());
+        } else {
+            setProductId(uuidV4());
+        }
+        setIsDraftLoaded(true);
     }, []);
+
+    useEffect(() => {
+        if (!isDraftLoaded || !productId || skipDraftSaveRef.current) return;
+        saveCreateDraft(DRAFT_KEY, {
+            productId,
+            form,
+            service,
+            subService,
+            image,
+        });
+    }, [isDraftLoaded, productId, form, service, subService, image]);
 
     /*
     |--------------------------------------------------------------------------
@@ -94,13 +135,6 @@ export default function AddServicePage() {
         }));
 
         setServiceSubList(subserviceList);
-
-        setSubService("");
-
-        setErrors((prev) => ({
-            ...prev,
-            subService: "",
-        }));
     }, [service]);
 
     /*
@@ -143,7 +177,7 @@ export default function AddServicePage() {
         }
 
         try {
-            setIsSubmitting(true);
+            setMediaBusy("upload");
 
             setErrors((prev) => ({
                 ...prev,
@@ -249,7 +283,7 @@ export default function AddServicePage() {
                     "Image upload failed.",
             }));
         } finally {
-            setIsSubmitting(false);
+            setMediaBusy(null);
 
             /*
              * Allows the user to select the same
@@ -369,7 +403,7 @@ export default function AddServicePage() {
                 : selectedImage.publicId;
 
         try {
-            setIsSubmitting(true);
+            setMediaBusy("delete");
 
             setErrors((prev) => ({
                 ...prev,
@@ -409,7 +443,7 @@ export default function AddServicePage() {
                     "Failed to delete image.",
             }));
         } finally {
-            setIsSubmitting(false);
+            setMediaBusy(null);
         }
     };
 
@@ -759,6 +793,7 @@ export default function AddServicePage() {
             selected?.value || "";
 
         setService(value);
+        setSubService("");
 
         if (errors.service) {
             setErrors((prev) => ({
@@ -842,9 +877,8 @@ export default function AddServicePage() {
                 );
             }
 
-            alert(
-                "Service created successfully!"
-            );
+            skipDraftSaveRef.current = true;
+            clearCreateDraft(DRAFT_KEY);
 
             window.location.href =
                 "/admin/catalog";
@@ -917,6 +951,7 @@ export default function AddServicePage() {
 
     return (
         <>
+            <AdminMediaBackdrop mode={mediaBusy} />
             <div className="service-layout">
 
                 {/* =====================================================
@@ -1235,6 +1270,7 @@ export default function AddServicePage() {
                                     onChange={
                                         handleImageUpload
                                     }
+                                    disabled={Boolean(mediaBusy) || isSubmitting}
                                     hidden
                                 />
 
@@ -1273,6 +1309,7 @@ export default function AddServicePage() {
                                         onChange={
                                             handleImageUpload
                                         }
+                                        disabled={Boolean(mediaBusy) || isSubmitting}
                                         hidden
                                     />
 
@@ -1408,7 +1445,7 @@ export default function AddServicePage() {
                                                             )
                                                         }
                                                         disabled={
-                                                            isSubmitting
+                                                            isSubmitting || Boolean(mediaBusy)
                                                         }
                                                         aria-label={`Delete image ${index + 1}`}
                                                         style={{
@@ -1431,7 +1468,7 @@ export default function AddServicePage() {
                                                             lineHeight:
                                                                 "1",
                                                             cursor:
-                                                                isSubmitting
+                                                                isSubmitting || Boolean(mediaBusy)
                                                                     ? "not-allowed"
                                                                     : "pointer",
                                                             display:
@@ -1579,7 +1616,7 @@ export default function AddServicePage() {
                                 form="service-form"
                                 className="publish-button"
                                 disabled={
-                                    isSubmitting
+                                    isSubmitting || Boolean(mediaBusy)
                                 }
                             >
 

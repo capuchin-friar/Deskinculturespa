@@ -31,13 +31,15 @@ function firstImageUrl(images) {
       return list.trim() || null
     }
   }
-  if (!Array.isArray(list) || list.length === 0) return null
-  const raw = list[0]
-  if (typeof raw !== "string" || !raw.trim()) return null
-  const u = raw.trim()
-  if (/^https?:\/\//i.test(u)) return u
-  if (u.startsWith("/")) return `/api/backend${u}`
-  return u
+  const candidates = Array.isArray(list) ? list : [list]
+  for (const raw of candidates) {
+    if (typeof raw !== "string" || !raw.trim()) continue
+    const u = raw.trim()
+    if (/^https?:\/\//i.test(u)) return u
+    if (u.startsWith("/")) return `/api/backend${u}`
+    return u
+  }
+  return null
 }
 
 function formatCreatedAt(value) {
@@ -79,8 +81,14 @@ function ProductTableRow({
   type
 }) {
   const productId = item?.id ?? item?.product_id
-  const name = String(item?.name ?? item?.mode ?? item?.subcategory ?? "—")
-  const status = item?.status ?? item?.is_active ? "active" : "inactive" ?? "_"
+  const name = String(item?.name ?? item?.slug ?? item?.mode ?? item?.subcategory ?? "—")
+    .replace(/[-_]+/g, " ")
+    .trim()
+  const mode = String(item?.mode ?? "").toLowerCase()
+  const status = String(
+    item?.status ??
+      (item?.is_active === false ? "inactive" : item?.is_active ? "active" : "—")
+  ).toLowerCase()
   const duration = type === "packages"
     ? `${item?.duration_months ?? "_"} months`
     : `${item?.duration_minutes ?? "_"} minutes`
@@ -88,7 +96,11 @@ function ProductTableRow({
   const totalSales = item?.total_sales ?? item?.totalSales
   const price = item?.price ?? "_"
   const currency = "₦"
-  const thumb = firstImageUrl(item?.images ?? [item.image_url])
+  const thumb = firstImageUrl(
+    Array.isArray(item?.images) && item.images.length
+      ? item.images
+      : [item?.image_url, item?.thumbnail_url]
+  )
   const menuOpen = productId != null && menuOpenId === productId
   const editHref =
     productId != null
@@ -98,7 +110,7 @@ function ProductTableRow({
 
   return (
     <tr>
-      <td>{s_n}</td>
+      <td className="product-list-sn">{s_n}</td>
 
       <td>
         <div className="product-list-cell-product">
@@ -106,8 +118,7 @@ function ProductTableRow({
             // eslint-disable-next-line @next/next/no-img-element
             <img className="product-list-thumb" src={thumb} alt="" width={44} height={44} />
           ) : (
-            null
-            // <span className="product-list-thumb-placeholder" aria-hidden />
+            <span className="product-list-thumb-placeholder" aria-hidden />
           )}
 
           <span className="product-list-title">
@@ -116,18 +127,18 @@ function ProductTableRow({
             {
               type === "appointment" &&
               <span
-                className={`appointment-mode-label ${name === "video" ? "online" : "in-person"
+                className={`appointment-mode-label ${mode === "physical" ? "in-person" : "online"
                   }`}
               >
-                {name === "video" ? (
-                  <>
-                    <IoVideocamOutline />
-                    Online
-                  </>
-                ) : (
+                {mode === "physical" ? (
                   <>
                     <IoLocationOutline />
                     In-person
+                  </>
+                ) : (
+                  <>
+                    <IoVideocamOutline />
+                    {mode === "audio" ? "Phone" : "Online"}
                   </>
                 )}
               </span>
@@ -135,7 +146,19 @@ function ProductTableRow({
           </span>
         </div>
       </td>
-      <td>{type === "appointment" || type === "packages" ? duration : status}</td>
+      <td>
+        {type === "appointment" || type === "packages" ? (
+          duration
+        ) : (
+          <span
+            className={`product-list-pill${
+              status === "active" ? " product-list-pill--ok" : status === "inactive" ? " product-list-pill--bad" : ""
+            }`}
+          >
+            {status}
+          </span>
+        )}
+      </td>
       <td className="product-list-num">{formatRevenue(price, "NGN")}</td>
       <td className="product-list-num">{formatSalesCount(totalSales)}</td>
       <td className="product-list-num">{formatCreatedAt(createdAt)}</td>
@@ -342,8 +365,9 @@ export default function ProductListPage() {
       overflow: "auto"
     }}>
       <div className="product-list-header">
-        <span>
-          <select aria-label="Type" value={type} onChange={e => setType(e.target.value)}>
+        <div className="catalog-type-filter">
+          <label htmlFor="catalog-type">Type</label>
+          <select id="catalog-type" aria-label="Type" value={type} onChange={e => setType(e.target.value)}>
             {[
               {
                 name: "Products",
@@ -369,10 +393,15 @@ export default function ProductListPage() {
               )
             })}
           </select>
-        </span>
+        </div>
 
         <span className="add_btn">
-          <button onClick={e => window.location.href = `/admin/create/${type === "appointment" ? "appointment" : type === "packages" ? "package" : type.slice(0, type.length - 1)}`}>
+          <button
+            type="button"
+            onClick={() => {
+              window.location.href = `/admin/create/${type === "appointment" ? "appointment" : type === "packages" ? "package" : type.slice(0, type.length - 1)}`;
+            }}
+          >
             + Add {`${type.charAt(0).toUpperCase()}${type.slice(1)}`}
           </button>
         </span>
@@ -406,7 +435,9 @@ export default function ProductListPage() {
                 if (!Array.isArray(data) || data.length === 0) {
                   return (
                     <tr>
-                      <td colSpan={7}>No {type} in the catalog yet.</td>
+                      <td className="product-list-empty" colSpan={7}>
+                        No {type} in the catalog yet.
+                      </td>
                     </tr>
                   );
                 }

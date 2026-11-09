@@ -23,10 +23,8 @@
     }
 
     .orders-shop-select select {
-        padding: 5px 10px;
-        border-radius: 5px;
-        background: #fff;
-        outline: none;
+        min-width: 0;
+        width: 148px;
         max-width: 170px;
     }
 
@@ -34,70 +32,22 @@
         color: #c00;
     }
 
-    .orders-table-wrap {
-        width: 100%;
-        overflow-x: auto;
-    }
-
     .orders-table {
-        width: 100%;
-        min-width: 980px;
-        border-collapse: collapse;
-        text-align: left;
         font-size: 13px;
     }
 
-    .orders-table th,
-    .orders-table td {
-        padding: 8px 10px;
-        border-bottom: 1px solid #eee;
-        white-space: nowrap;
-        vertical-align: middle;
-    }
-
-    .orders-table th {
-        color: #444;
-        font-weight: 600;
-    }
-
-    .orders-action-btn {
-        padding: 4px 10px;
-        border: 1px solid #d4d4d4;
-        background: #fff;
-        border-radius: 6px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+    .orders-table thead th,
+    .orders-table tbody td {
+        padding: 10px 12px;
     }
 
     .orders-actions-cell {
-        display: flex;
-        flex-wrap: wrap;
         gap: 6px;
-        align-items: center;
     }
 
     .orders-chat-btn {
-        padding: 4px 10px;
-        border: 1px solid #93c5fd;
-        background: #eff6ff;
-        color: #1d4ed8;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        white-space: nowrap;
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
-    }
-
-    .orders-chat-btn:hover:not(:disabled) {
-        background: #dbeafe;
-    }
-
-    .orders-chat-btn:disabled {
-        opacity: 0.45;
-        cursor: not-allowed;
     }
 
     .orders-chat-btn--block {

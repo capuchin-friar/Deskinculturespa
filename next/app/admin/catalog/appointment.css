@@ -2,15 +2,12 @@
     display: inline-flex;
     align-items: center;
     gap: 5px;
-
-    padding: 4px 9px;
-
-    border-radius: 6px;
-
+    height: 24px;
+    padding: 0 9px;
+    border-radius: 999px;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1;
-
     white-space: nowrap;
 }
 
@@ -19,11 +16,11 @@
 }
 
 .appointment-mode-label.online {
-    color: #2563eb;
-    background: #eff6ff;
+    color: #0b3b1a;
+    background: #eef4ee;
 }
 
 .appointment-mode-label.in-person {
-    color: #16a34a;
-    background: #f0fdf4;
+    color: #278a3d;
+    background: #e6f4ea;
 }

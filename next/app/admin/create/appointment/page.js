@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     IoArrowBack,
     IoCloudUploadOutline,
@@ -11,6 +11,20 @@ import {
     IoCheckmarkCircle,
     IoBulbOutline,
 } from "react-icons/io5";
+import uuidV4 from "uuid-v4";
+import { api } from "../../../api/shared/config";
+import AdminMediaBackdrop, {
+    deleteCloudinaryImage,
+    extractCloudinaryPublicId,
+} from "@/src/components/admin/AdminMediaBackdrop";
+import {
+    CREATE_DRAFT_KEYS,
+    clearCreateDraft,
+    loadCreateDraft,
+    saveCreateDraft,
+} from "@/src/hooks/useCreateDraft";
+
+const DRAFT_KEY = CREATE_DRAFT_KEYS.appointment;
 
 import "./styles/xxl.css";
 import "./styles/mobile.css";
@@ -41,9 +55,6 @@ const APPOINTMENT_MODES = [
     },
 ];
 
-const DEFAULT_IMAGE =
-    "https://images.pexels.com/photos/3764014/pexels-photo-3764014.jpeg";
-
 export default function CreateAppointmentPage() {
     const [form, setForm] = useState({
         title: "",
@@ -54,8 +65,39 @@ export default function CreateAppointmentPage() {
     });
 
     const [image, setImage] = useState(null);
+    const [uploadId, setUploadId] = useState("");
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [mediaBusy, setMediaBusy] = useState(null);
+    const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+    const skipDraftSaveRef = useRef(false);
+
+    useEffect(() => {
+        const draft = loadCreateDraft(DRAFT_KEY);
+        if (draft) {
+            setForm({
+                title: draft.form?.title ?? "",
+                description: draft.form?.description ?? "",
+                mode: draft.form?.mode || "online",
+                duration: draft.form?.duration ?? "30",
+                price: draft.form?.price ?? "",
+            });
+            setImage(draft.image?.url ? draft.image : null);
+            setUploadId(draft.uploadId || uuidV4());
+        } else {
+            setUploadId(uuidV4());
+        }
+        setIsDraftLoaded(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isDraftLoaded || !uploadId || skipDraftSaveRef.current) return;
+        saveCreateDraft(DRAFT_KEY, {
+            uploadId,
+            form,
+            image,
+        });
+    }, [isDraftLoaded, uploadId, form, image]);
 
     /* ============================
        HANDLE INPUT
@@ -98,7 +140,7 @@ export default function CreateAppointmentPage() {
        IMAGE UPLOAD
     ============================ */
 
-    const handleImageUpload = (e) => {
+    const handleImageUpload = async (e) => {
         const file = e.target.files?.[0];
 
         if (!file) return;
@@ -115,7 +157,7 @@ export default function CreateAppointmentPage() {
                 image:
                     "Only JPG, PNG, and WebP images are allowed.",
             }));
-
+            e.target.value = "";
             return;
         }
 
@@ -124,16 +166,71 @@ export default function CreateAppointmentPage() {
                 ...prev,
                 image: "Image size must not exceed 5MB.",
             }));
-
+            e.target.value = "";
             return;
         }
 
-        setImage(file);
+        try {
+            setMediaBusy("upload");
+            setErrors((prev) => ({ ...prev, image: "" }));
 
-        setErrors((prev) => ({
-            ...prev,
-            image: "",
-        }));
+            const previousPublicId =
+                image?.publicId || extractCloudinaryPublicId(image?.url);
+
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("product_id", uploadId || uuidV4());
+
+            const { data, status } = await api.post("upload", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            });
+
+            if (status !== 200 || !data?.url) {
+                throw new Error(data?.error || "Failed to upload image.");
+            }
+
+            setImage({
+                url: data.url,
+                publicId: data.publicId || extractCloudinaryPublicId(data.url),
+                name: file.name,
+            });
+
+            if (previousPublicId) {
+                try {
+                    await deleteCloudinaryImage(previousPublicId);
+                } catch {
+                    /* keep the new image even if the old Cloudinary asset cannot be removed */
+                }
+            }
+        } catch (error) {
+            setErrors((prev) => ({
+                ...prev,
+                image: error?.message || "Image upload failed.",
+            }));
+        } finally {
+            setMediaBusy(null);
+            e.target.value = "";
+        }
+    };
+
+    const handleRemoveImage = async () => {
+        if (!image) return;
+        const publicId = image.publicId || extractCloudinaryPublicId(image.url);
+        try {
+            setMediaBusy("delete");
+            setErrors((prev) => ({ ...prev, image: "" }));
+            if (publicId) {
+                await deleteCloudinaryImage(publicId);
+            }
+            setImage(null);
+        } catch (error) {
+            setErrors((prev) => ({
+                ...prev,
+                image: error?.message || "Failed to delete image.",
+            }));
+        } finally {
+            setMediaBusy(null);
+        }
     };
 
     /* ============================
@@ -196,7 +293,7 @@ export default function CreateAppointmentPage() {
         }
 
         // Image
-        if (!image) {
+        if (!image?.url) {
             newErrors.image =
                 "Please upload an appointment image.";
         }
@@ -220,54 +317,28 @@ export default function CreateAppointmentPage() {
         try {
             setIsSubmitting(true);
 
-            const appointmentData = {
+            const { data } = await api.post("appointment_offerings/add", {
                 title: form.title.trim(),
                 description: form.description.trim(),
                 mode: form.mode,
-                duration: Number(form.duration),
+                duration_minutes: Number(form.duration),
                 price: Number(form.price),
-            };
+                thumbnail_url: image.url,
+            });
 
-            console.log("Appointment:", appointmentData);
-            console.log("Image:", image);
+            if (!data?.success) {
+                throw new Error(data?.message || data?.data || "Failed to create appointment.");
+            }
 
-            /*
-              Example API integration:
-      
-              const formData = new FormData();
-      
-              formData.append("title", appointmentData.title);
-              formData.append(
-                "description",
-                appointmentData.description
-              );
-              formData.append("mode", appointmentData.mode);
-              formData.append(
-                "duration",
-                appointmentData.duration
-              );
-              formData.append("price", appointmentData.price);
-      
-              if (image) {
-                formData.append("image", image);
-              }
-      
-              await api.post(
-                "/admin/appointments",
-                formData
-              );
-            */
-
-            await new Promise((resolve) =>
-                setTimeout(resolve, 1000)
-            );
-
-            alert("Appointment type created successfully!");
+            skipDraftSaveRef.current = true;
+            clearCreateDraft(DRAFT_KEY);
+            window.location.href = "/admin/catalog";
         } catch (error) {
-            console.error(error);
-
             setErrors({
                 submit:
+                    error?.response?.data?.message ||
+                    error?.response?.data?.data ||
+                    error?.message ||
                     "Something went wrong. Please try again.",
             });
         } finally {
@@ -279,23 +350,6 @@ export default function CreateAppointmentPage() {
        PREVIEW
     ============================ */
 
-    const previewImage = image
-        ? URL.createObjectURL(image)
-        : DEFAULT_IMAGE;
-
-    const selectedMode =
-        APPOINTMENT_MODES.find(
-            (item) => item.value === form.mode
-        ) || APPOINTMENT_MODES[1];
-
-    const ModeIcon = selectedMode.icon;
-
-    const formattedPrice = form.price
-        ? `₦${new Intl.NumberFormat("en-NG").format(
-            Number(form.price)
-        )}`
-        : "—";
-
     return (
         // <main className="appointment-page">
 
@@ -303,8 +357,7 @@ export default function CreateAppointmentPage() {
         // </main>
 
         <>
-
-
+            <AdminMediaBackdrop mode={mediaBusy} />
 
             <div className="appointment-layout">
 
@@ -557,7 +610,7 @@ export default function CreateAppointmentPage() {
                         <div className="form-group image-section">
 
                             <label>
-                                Image <small>(Optional)</small>
+                                Image <span>*</span>
                             </label>
 
                             <label className="upload-container">
@@ -566,6 +619,7 @@ export default function CreateAppointmentPage() {
                                     type="file"
                                     accept="image/jpeg,image/png,image/webp"
                                     hidden
+                                    disabled={Boolean(mediaBusy) || isSubmitting}
                                     onChange={handleImageUpload}
                                 />
 
@@ -596,12 +650,27 @@ export default function CreateAppointmentPage() {
                                         type="file"
                                         accept="image/jpeg,image/png,image/webp"
                                         hidden
+                                        disabled={Boolean(mediaBusy) || isSubmitting}
                                         onChange={handleImageUpload}
                                     />
 
                                 </label>
 
                             </div>
+
+                            {image?.url ? (
+                                <div className="package-image-preview">
+                                    <img src={image.url} alt={image.name || "Appointment image"} />
+                                    <button
+                                        type="button"
+                                        className="package-image-remove"
+                                        onClick={handleRemoveImage}
+                                        disabled={Boolean(mediaBusy)}
+                                    >
+                                        Remove
+                                    </button>
+                                </div>
+                            ) : null}
 
                             {errors.image && (
                                 <p className="error-message">
@@ -688,7 +757,7 @@ export default function CreateAppointmentPage() {
                                 type="submit"
                                 form="appointment-form"
                                 className="publish-button"
-                                disabled={isSubmitting}
+                                disabled={isSubmitting || Boolean(mediaBusy)}
                             >
                                 {isSubmitting
                                     ? "Publishing..."

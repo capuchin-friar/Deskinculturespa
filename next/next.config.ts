@@ -17,7 +17,19 @@ const nextConfig: NextConfig = {
       permanent: true,
     }));
 
-    return apiRouteRedirects;
+    return [
+      ...apiRouteRedirects,
+      {
+        source: "/admin/customers",
+        destination: "/admin/users",
+        permanent: true,
+      },
+      {
+        source: "/admin/customers/:path*",
+        destination: "/admin/users/:path*",
+        permanent: true,
+      },
+    ];
   },
 };
 
