@@ -1,8 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { baseApi } from "../api/shared/config";
 import _CONSULTATIONS from "../../src/json/consultations.json";
 import "../services/styles/xxl.css";
 import "./styles/xxl.css";
@@ -10,38 +8,7 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 
-const modeNames = {
-  physical: "In person",
-  video: "Video call",
-  audio: "Phone call",
-  chat: "Chat",
-  online: "Video call",
-  phone: "Phone call",
-};
-
 export default function Consultation() {
-  const [types, setTypes] = useState(
-    _CONSULTATIONS.map((consultation) => ({ ...consultation, offers: [] })),
-  );
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let mounted = true;
-    baseApi
-      .get("customers/consultations")
-      .then(({ data }) => {
-        if (!data?.success || !Array.isArray(data.data)) return;
-        if (mounted) setTypes(data.data);
-      })
-      .catch(() => {})
-      .finally(() => {
-        if (mounted) setLoading(false);
-      });
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
   return (
     <main className="consultation-catalog">
       <section className="consultation-catalog-inner" aria-labelledby="consultations-title">
@@ -50,7 +17,7 @@ export default function Consultation() {
         <p className="catalog-intro">Talk through your goals with a specialist and find a routine or treatment plan that works for you.</p>
 
         <div className="consultation-list" aria-label="Consultation services">
-          {types.map(({ id, name, subtitle, description, image, offers = [] }, index) => (
+          {_CONSULTATIONS.map(({ id, name, subtitle, description, image }, index) => (
             <section className="consultation-type" key={id}>
               <Link className="consultation-card" href={`/consultation/${id}`}>
                 <span className="consultation-card-image">
@@ -66,38 +33,6 @@ export default function Consultation() {
                   </span>
                 </span>
               </Link>
-
-              <div className="consultation-created" aria-label={`${name} sessions`}>
-                {loading ? (
-                  <p className="consultation-created-empty">Loading available sessions…</p>
-                ) : offers.length === 0 ? (
-                  <p className="consultation-created-empty">No bookable sessions for this consultation yet.</p>
-                ) : (
-                  offers.map((offer) => (
-                    <Link
-                      key={offer.id}
-                      className="consultation-created-item"
-                      href={`/consultation/${id}`}
-                    >
-                      {offer.thumbnail_url ? (
-                        <img src={offer.thumbnail_url} alt="" />
-                      ) : (
-                        <span className="consultation-created-thumb" aria-hidden="true" />
-                      )}
-                      <span>
-                        <strong>{offer.duration_minutes} minute session</strong>
-                        <small>
-                          {modeNames[offer.mode] || offer.mode}
-                          {offer.description ? ` · ${String(offer.description).slice(0, 72)}` : ""}
-                        </small>
-                      </span>
-                      <em>
-                        ₦{Number(offer.price || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
-                      </em>
-                    </Link>
-                  ))
-                )}
-              </div>
             </section>
           ))}
         </div>
