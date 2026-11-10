@@ -85,7 +85,7 @@ export default function ConsultationDetailPage() {
               return (
                 <article className="consultation-offer-card" key={offer.id}>
                   {offer.thumbnail_url ? <img src={offer.thumbnail_url} alt="" /> : null}
-                  <div>
+                  <div className="consultation-offer-copy">
                     <span className="consultation-offer-mode">{modeNames[offer.mode] || offer.mode}</span>
                     <h3>{offer.duration_minutes} minute session</h3>
                     <p>{offer.description || "With a De Skin Culture specialist"}</p>
