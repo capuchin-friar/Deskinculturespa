@@ -608,22 +608,20 @@ export function Header({
                     />
                 </button>
 
-                {accountNav.enabled && (
-                    <button
-                        type="button"
-                        className="customer-account-nav-trigger"
-                        aria-label={accountNav.open ? "Close account menu" : "Open account menu"}
-                        aria-expanded={accountNav.open}
-                        aria-controls="customer-account-nav"
-                        onClick={() => {
-                            onCloseStoreFilter?.();
-                            closeMobileMenu();
-                            accountNav.toggle();
-                        }}
-                    >
-                        <IoListOutline size={22} aria-hidden="true" />
-                    </button>
-                )}
+                <button
+                    type="button"
+                    className="customer-account-nav-trigger"
+                    aria-label={accountNav.open ? "Close account menu" : "Open account menu"}
+                    aria-expanded={accountNav.open}
+                    aria-controls="customer-account-nav"
+                    onClick={() => {
+                        onCloseStoreFilter?.();
+                        closeMobileMenu();
+                        accountNav.toggle();
+                    }}
+                >
+                    <IoListOutline size={22} aria-hidden="true" />
+                </button>
 
             </div>
 

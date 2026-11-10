@@ -1,69 +1,9 @@
 @media screen and (min-width: 1024px){
   .customer-account-page {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 24px;
-    width: min(1180px, calc(100% - 48px));
-    margin: 28px auto;
-    align-items: start;
-  }
-
-  .customer-account-nav-trigger,
-  .customer-account-nav-backdrop,
-  .customer-account-nav__top,
-  .customer-account-nav__close {
-    display: none !important;
-  }
-
-  .customer-account-nav {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    height: fit-content;
-    width: 300px;
-    gap: 6px;
-    padding: 12px;
-    overflow: visible;
-    border: 1px solid #e7e7e7;
-    border-radius: 8px;
-    background: #fff;
-    box-shadow: none;
-    transform: none;
-  }
-
-  .customer-account-nav a {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 12px 14px;
-    height: fit-content;
-    border-radius: 6px;
-    color: #555;
-    font-size: 15px;
-    font-weight: 600;
-    text-decoration: none;
-    transition: background-color 160ms ease, color 160ms ease;
-  }
-
-  .customer-account-nav a svg {
-    flex: 0 0 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  .customer-account-nav hr {
+    display: block;
     width: 100%;
-    margin: 4px 0;
-    border-color: #ededed;
-  }
-
-  .customer-account-nav a:hover,
-  .customer-account-nav a:focus-visible,
-  .customer-account-nav a[aria-current="page"] {
-    background: var(--soft-green);
-    color: var(--brand-green);
-    outline: none;
+    min-width: 0;
+    margin: 0;
   }
 
   .customer-orders {

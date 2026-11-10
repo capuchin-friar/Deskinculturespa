@@ -3,9 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { IoArrowBackOutline, IoClose } from "react-icons/io5";
+import { IoArrowBackOutline } from "react-icons/io5";
 import { baseApi } from "@/app/api/shared/config";
-import { useAccountNav } from "@/src/components/customer/AccountNavContext";
 import { formatOrderPrice, mapCustomerOrder } from "./orderUtils";
 import { appointmentTypeName, resolveAppointmentType } from "@/src/utils/appointmentTypes";
 import {
@@ -18,7 +17,6 @@ import {
   FiHeadphones,
   FiMapPin,
   FiPackage,
-  FiUser,
   FiVideo,
 } from "react-icons/fi";
 import "./styles/laptop.css";
@@ -54,7 +52,6 @@ export default function Page() {
 
   return (
     <div className="customer-account-page">
-      <Aside section={section} />
       {section === "appointments" ? (
         <Appointments />
       ) : section === "bookings" ? (
@@ -67,68 +64,6 @@ export default function Page() {
         <Orders />
       )}
     </div>
-  );
-}
-
-function Aside({ section }) {
-  const { open, close } = useAccountNav();
-
-  return (
-    <>
-      <button
-        type="button"
-        className={`customer-account-nav-backdrop${open ? " is-open" : ""}`}
-        aria-label="Close account menu"
-        aria-hidden={!open}
-        tabIndex={open ? 0 : -1}
-        onClick={close}
-      />
-      <aside
-        id="customer-account-nav"
-        className={`customer-account-nav${open ? " is-open" : ""}`}
-        aria-label="Account navigation"
-      >
-        <div className="customer-account-nav__top">
-          <p>Account</p>
-          <button
-            type="button"
-            className="customer-account-nav__close"
-            aria-label="Close account menu"
-            onClick={close}
-          >
-            <IoClose size={22} aria-hidden="true" />
-          </button>
-        </div>
-        <Link
-          href="/customer/account"
-          aria-current={section === "account" ? "page" : undefined}
-          onClick={close}
-        >
-          <FiUser aria-hidden="true" />
-          My Account
-        </Link>
-        <hr />
-        {[
-          { name: "Appointments", id: "appointments", Icon: FiCalendar },
-          { name: "Bookings", id: "bookings", Icon: FiBookmark },
-          { name: "Packages", id: "packages", Icon: FiPackage },
-          { name: "Orders", id: "orders", Icon: FiPackage },
-        ].map((o, i) => {
-          const Icon = o.Icon;
-          return (
-            <Link
-              href={`/customer/${o.id}`}
-              key={i}
-              aria-current={section === o.id ? "page" : undefined}
-              onClick={close}
-            >
-              <Icon aria-hidden="true" />
-              {o.name}
-            </Link>
-          );
-        })}
-      </aside>
-    </>
   );
 }
 

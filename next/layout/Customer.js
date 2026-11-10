@@ -21,7 +21,9 @@ import "./styles/customer/mobile.css"
 import "./styles/customer/tablet.css"
 import "./styles/customer/ipad.css"
 import "./styles/customer/mobile-menu.css"
+import "./styles/customer/account-nav.css"
 import { Aside } from "@/src/components/customer/Aside";
+import { AccountNav } from "@/src/components/customer/AccountNav";
 import { AccountNavProvider } from "@/src/components/customer/AccountNavContext";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -128,6 +130,7 @@ export default function Customer({ children }) {
                                 </>
                             )
                         }
+                        <AccountNav />
                         <Main>{children}</Main>
                     </div>
                     <Footer />
