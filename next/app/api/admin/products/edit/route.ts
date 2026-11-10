@@ -103,7 +103,7 @@ export const PATCH = async (req: NextRequest) => {
 
 
         // Final validation 
-        if (productName && parsedPrice !== false && thumbnailUrl && productImages && productCategory) {
+        if (admin_id && productName && thumbnailUrl && productImages && productCategory) {
             const response = await ProductModel.updateProductDoc({
                 name: productName,
                 price: parsedPrice,

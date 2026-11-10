@@ -89,7 +89,7 @@ export const PATCH = async (req: NextRequest) => {
         const decoded = decodeAdminPayload(token);
         const admin_id = decoded.id;
 
-        if (admin_id && serviceImageUrl && serviceDescription && parsedDuration !== false && servicePrice !== false && serviceService) {
+        if (admin_id) {
             const response = await ServiceModel.updateServiceDoc({
                 description: serviceDescription,
                 price: servicePrice,

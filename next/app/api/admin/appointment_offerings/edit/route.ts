@@ -103,7 +103,7 @@ export const PATCH = async (req: NextRequest) => {
         const decoded = decodeAdminPayload(token);
         const admin_id = decoded.id;
 
-        if (admin_id && appointmentMode && parsedDuration !== false && appointmentPrice !== false && appointmentThumbnail && appointmentSlug) {
+        if (admin_id) {
             const response = await AppointmentModel.updateAppointmentDoc({
                 mode: appointmentMode,
                 duration_minutes: parsedDuration,

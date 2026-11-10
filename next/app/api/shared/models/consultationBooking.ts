@@ -6,6 +6,7 @@ function formatOffer(row: Record<string, unknown>) {
   const type = resolveAppointmentType(row.slug);
   return {
     ...row,
+    id: row.id,
     type: type?.id || null,
     type_name: type?.name || null,
     description: row.description || "",

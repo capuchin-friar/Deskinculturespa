@@ -64,7 +64,7 @@ export const PATCH = async (req: NextRequest) => {
         return NextResponse.json({
             success: true,
             message: "Package updated successfully",
-            package_id: response?.id,
+            package_id: response && "id" in response ? response.id : packageId,
         });
     } catch (err) {
         console.error("err: ", err);

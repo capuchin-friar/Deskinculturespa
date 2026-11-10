@@ -29,6 +29,7 @@ export function formatPackageRow(row: Record<string, unknown> | null | undefined
     const image = String(row.image_url || "").trim();
     return {
         ...row,
+        id: row.id,
         includes: asIncludes(row.includes),
         duration_months: durationMonths,
         duration: durationMonths > 0
