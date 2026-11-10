@@ -47,14 +47,14 @@ export class ServiceModel {
     )
 
     static updateServiceDoc = withErrorHandling(
-        async (payload: Pick<NewServiceDoc, "description" | "price" | "duration_minutes" | "image_url"> & { service_id: string }) => {
+        async (payload: Pick<NewServiceDoc, "description" | "price" | "duration_minutes" | "image_url" | "service" | "sub_service" | "specifications"> & { service_id: string }) => {
             const {
-                service_id, description, price, duration_minutes, image_url
+                service_id, description, price, duration_minutes, image_url, service, sub_service, specifications
             } = payload;
 
             const { rows } = await query(
-                `UPDATE services SET description=$1, price=$2, duration_minutes=$3, image_url=$4, updated_at=NOW() WHERE id = $5 RETURNING *`,
-                [description, price, duration_minutes, image_url, service_id]
+                `UPDATE services SET description=$1, price=$2, duration_minutes=$3, image_url=$4, category=$5, subcategory=$6, specifications=$7, updated_at=NOW() WHERE id = $8 RETURNING *`,
+                [description, price, duration_minutes, image_url, service, sub_service, specifications, service_id]
             );
 
             return rows[0];

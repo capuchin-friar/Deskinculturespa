@@ -1,10 +1,12 @@
 .customer-orders.customer-orders--detail,
-.customer-bookings.customer-bookings--detail {
+.customer-bookings.customer-bookings--detail,
+.customer-appointments.customer-appointments--detail {
   overflow: auto;
 }
 
 .customer-orders .customer-order-detail,
-.customer-bookings .customer-order-detail {
+.customer-bookings .customer-order-detail,
+.customer-appointments .customer-order-detail {
   width: 100%;
   margin: 0;
   color: #363636;
@@ -220,9 +222,18 @@
   text-decoration: underline;
 }
 
+.customer-package-includes {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: #555;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
 @media screen and (max-width: 760px) {
   .customer-orders .customer-order-detail,
-  .customer-bookings .customer-order-detail {
+  .customer-bookings .customer-order-detail,
+  .customer-appointments .customer-order-detail {
     width: 100%;
     margin: 0;
   }

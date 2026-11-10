@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     IoSettingsOutline,
     IoTrashBin
@@ -15,10 +16,14 @@ import {
 import Select from "react-select";
 import uuidV4 from "uuid-v4";
 import AdminMediaBackdrop from "@/src/components/admin/AdminMediaBackdrop";
+import { fetchAdminCatalogItem, toMediaList } from "@/src/utils/catalogItem";
 
 const DRAFT_KEY = "deskinculture_create_product_draft";
 
 export default function CreateProductPage() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get("id") || searchParams.get("product");
+    const isEdit = Boolean(editId);
 
     const [productName, setProductName] = useState("");
 
@@ -83,6 +88,10 @@ export default function CreateProductPage() {
      * If no draft exists, a new product ID is generated.
      */
     useEffect(() => {
+        if (editId) {
+            skipDraftSaveRef.current = true;
+            return;
+        }
 
         try {
 
@@ -230,7 +239,77 @@ export default function CreateProductPage() {
 
         }
 
-    }, []);
+    }, [editId]);
+
+    useEffect(() => {
+        if (!editId) return;
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const item = await fetchAdminCatalogItem("products", editId);
+                if (cancelled) return;
+                if (!item) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit: "This product could not be found.",
+                    }));
+                    return;
+                }
+
+                let specs = item.specifications;
+                if (typeof specs === "string") {
+                    try {
+                        specs = JSON.parse(specs);
+                    } catch {
+                        specs = {};
+                    }
+                }
+                const discountInfo =
+                    specs && typeof specs === "object" ? specs.discount : null;
+
+                setProductName(item.name ?? "");
+                setDescription(item.description ?? "");
+                setPrice(item.price != null ? String(item.price) : "");
+                setQuantity(item.stock != null ? String(item.stock) : "");
+                setCategory(item.category ?? "");
+                setSubCategory(item.subcategory ?? "");
+                setBrand(item.brand ?? "");
+                setDiscountType(discountInfo?.discountType ?? "");
+                setDiscount(
+                    discountInfo?.discount != null
+                        ? String(discountInfo.discount)
+                        : ""
+                );
+
+                const restoredImages = toMediaList(
+                    item.images?.length ? item.images : item.thumbnail_url
+                );
+                setImages(restoredImages);
+                setSelectedImage(0);
+                setProductId(
+                    (typeof specs?.hash === "string" && specs.hash) ||
+                    restoredImages[0]?.publicId?.split("/").slice(-2, -1)[0] ||
+                    uuidV4()
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit:
+                            error?.message ||
+                            "Could not load this product for editing.",
+                    }));
+                }
+            } finally {
+                if (!cancelled) setIsDraftLoaded(true);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [editId]);
 
 
     /*
@@ -1126,20 +1205,30 @@ export default function CreateProductPage() {
             const {
                 data,
                 status
-            } = await api.post(
-                "products/add",
-                productData
-            );
+            } = isEdit
+                ? await api.patch(
+                    "products/edit",
+                    {
+                        ...productData,
+                        product_id: String(editId),
+                    }
+                )
+                : await api.post(
+                    "products/add",
+                    productData
+                );
 
 
             if (
-                status !== 200 ||
+                (status !== 200 && status !== 201) ||
                 !data?.success
             ) {
 
                 throw new Error(
                     data?.message ||
-                    "Failed to create product."
+                    (isEdit
+                        ? "Failed to update product."
+                        : "Failed to create product.")
                 );
 
             }
@@ -1953,7 +2042,9 @@ export default function CreateProductPage() {
 
                         {isSubmitting
                             ? "Saving..."
-                            : "Save Product"
+                            : isEdit
+                                ? "Save Changes"
+                                : "Save Product"
                         }
 
                     </button>

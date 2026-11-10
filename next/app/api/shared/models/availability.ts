@@ -30,7 +30,7 @@ type CustomerBookingForSlot = AvailabilityBookingContext & {
 };
 type RawOccupiedBooking = OccupiedBooking & { user_id: string };
 
-const supportedTimezones = new Set(["Africa/Lagos", "UTC", "Europe/London", "America/New_York"]);
+const supportedTimezones = new Set(["Africa/Lagos"]);
 
 function parseClock(value: string) {
   const match = /^(\d{2}):(\d{2})/.exec(value);

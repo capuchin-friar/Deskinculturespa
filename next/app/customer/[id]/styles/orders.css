@@ -1,5 +1,6 @@
 .customer-orders .customer-order,
-.customer-bookings .customer-order {
+.customer-bookings .customer-order,
+.customer-appointments .customer-order {
   display: block;
   min-height: 0;
   padding: 16px;
@@ -9,7 +10,8 @@
 }
 
 .customer-orders .customer-order__details,
-.customer-bookings .customer-order__details {
+.customer-bookings .customer-order__details,
+.customer-appointments .customer-order__details {
   display: block;
   width: 100%;
   margin-top: 16px;
@@ -20,7 +22,8 @@
 }
 
 .customer-orders .customer-order__details-content,
-.customer-bookings .customer-order__details-content {
+.customer-bookings .customer-order__details-content,
+.customer-appointments .customer-order__details-content {
   width: 100%;
   max-width: none;
 }

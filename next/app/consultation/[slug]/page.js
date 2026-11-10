@@ -84,8 +84,18 @@ export default function ConsultationDetailPage() {
               const booked = isBooked(offer.id);
               return (
                 <article className="consultation-offer-card" key={offer.id}>
-                  <div><span className="consultation-offer-mode">{modeNames[offer.mode] || offer.mode}</span><h3>{offer.duration_minutes} minute session</h3><p>With a De Skin Culture specialist</p></div>
-                  <div className="consultation-offer-action"><strong>₦{Number(offer.price).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong><button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook(offer)}>{busyOfferId === String(offer.id) ? "Updating…" : booked ? "Remove" : "Add to appointments"}</button></div>
+                  {offer.thumbnail_url ? <img src={offer.thumbnail_url} alt="" /> : null}
+                  <div>
+                    <span className="consultation-offer-mode">{modeNames[offer.mode] || offer.mode}</span>
+                    <h3>{offer.duration_minutes} minute session</h3>
+                    <p>{offer.description || "With a De Skin Culture specialist"}</p>
+                  </div>
+                  <div className="consultation-offer-action">
+                    <strong>₦{Number(offer.price).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong>
+                    <button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook(offer)}>
+                      {busyOfferId === String(offer.id) ? "Updating…" : booked ? "Remove" : "Add to appointments"}
+                    </button>
+                  </div>
                 </article>
               );
             })}

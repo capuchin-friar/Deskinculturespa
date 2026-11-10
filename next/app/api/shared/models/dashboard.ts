@@ -114,6 +114,22 @@ export class DashboardModel {
                     FROM appointments a
                     LEFT JOIN consultations c ON c.id = a.offering_id
                     LEFT JOIN users u ON u.id = a.customer_id
+
+                    UNION ALL
+
+                    SELECT
+                        'package',
+                        pb.id,
+                        COALESCE(NULLIF(p.name, ''), 'Package'),
+                        pb.price,
+                        pb.payment_status,
+                        TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')),
+                        pb.created_at,
+                        pb.scheduled_at,
+                        p.image_url
+                    FROM package_bookings pb
+                    LEFT JOIN packages p ON p.id = pb.package_id
+                    LEFT JOIN users u ON u.id = pb.user_id
                 ) activity
                 ORDER BY created_at DESC
                 LIMIT 12

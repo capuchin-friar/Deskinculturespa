@@ -8,18 +8,19 @@ import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
+import {
+    catalogItemHasPaidPurchase,
+    paidCatalogItemMessage,
+} from "@/app/api/shared/models/catalogDeleteGuard";
 
 
 export const DELETE = async (req: NextRequest) => {
 
     try {
         const body = await readJsonObject(req);
-        const {
-            appointment_id
-        } = body;
+        const appointment_id = body.appointment_id ?? body.id;
 
-        // Validate all fields
-        if (typeof appointment_id !== "string" || !appointment_id.trim()) {
+        if (appointment_id == null || String(appointment_id).trim() === "") {
             return NextResponse.json(
                 { message: "Appointment ID is required" },
                 { status: 400 }
@@ -43,9 +44,16 @@ export const DELETE = async (req: NextRequest) => {
 
         // Final validation 
         if (admin_id) {
-            // Create appointment
+            const id = String(appointment_id).trim();
+            if (await catalogItemHasPaidPurchase("appointment", id)) {
+                return NextResponse.json(
+                    { success: false, message: paidCatalogItemMessage("appointment") },
+                    { status: 409 }
+                );
+            }
+
             await AppointmentModel.deleteAppointmentDoc({
-                id: appointment_id.trim()
+                id
             });
 
             return NextResponse.json({

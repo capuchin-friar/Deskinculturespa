@@ -8,7 +8,7 @@ import {
     IoCartOutline,
     IoPricetagsOutline,
     IoCalendarOutline,
-    IoSettingsOutline,
+    IoTimeOutline,
 } from "react-icons/io5";
 
 const navs = [
@@ -17,7 +17,7 @@ const navs = [
     { name: "Orders", svg: IoCartOutline, path: "orders" },
     { name: "Users", svg: IoPeopleOutline, path: "users" },
     { name: "Availability", svg: IoCalendarOutline, path: "availability" },
-    { name: "Settings", svg: IoSettingsOutline, path: "profile" },
+    { name: "Slots", svg: IoTimeOutline, path: "slots" },
 ];
 
 function hrefFor(path) {
@@ -32,7 +32,7 @@ function isNavActive(pathname, path) {
     if (path === "orders") return pathname.startsWith("/admin/orders");
     if (path === "users") return pathname.startsWith("/admin/users");
     if (path === "availability") return pathname.startsWith("/admin/availability");
-    if (path === "profile") return pathname.startsWith("/admin/profile");
+    if (path === "slots") return pathname.startsWith("/admin/slots");
     return pathname === `/admin/${path}` || pathname.startsWith(`/admin/${path}/`);
 }
 

@@ -5,11 +5,11 @@ import "./styles.css";
 import AdminLoader from "@/src/components/admin/AdminLoader";
 
 const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const initialDays = weekdays.map((label, day_of_week) => ({ day_of_week, label, is_available: false, start_time: "", end_time: "", slot_interval_minutes: 30, timezone: "Africa/Lagos" }));
+const LAGOS_TIMEZONE = "Africa/Lagos";
+const initialDays = weekdays.map((label, day_of_week) => ({ day_of_week, label, is_available: false, start_time: "", end_time: "", slot_interval_minutes: 30, timezone: LAGOS_TIMEZONE }));
 
 export default function AdminAvailabilityPage() {
   const [days, setDays] = useState(initialDays);
-  const [timezone, setTimezone] = useState("Africa/Lagos");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -23,8 +23,7 @@ export default function AdminAvailabilityPage() {
         if (!response.ok || !result.success) throw new Error(result.message || "Could not load your availability.");
         const rules = new Map(result.data.map((rule) => [Number(rule.day_of_week), rule]));
         if (mounted) {
-          if (result.data[0]?.timezone) setTimezone(result.data[0].timezone);
-          setDays(initialDays.map((day) => ({ ...day, ...(rules.get(day.day_of_week) || {}), is_available: rules.has(day.day_of_week) })));
+          setDays(initialDays.map((day) => ({ ...day, ...(rules.get(day.day_of_week) || {}), timezone: LAGOS_TIMEZONE, is_available: rules.has(day.day_of_week) })));
         }
       })
       .catch((error) => { if (mounted) { setMessage(error.message); setIsError(true); } })
@@ -38,7 +37,7 @@ export default function AdminAvailabilityPage() {
     event.preventDefault();
     setSaving(true); setMessage(""); setIsError(false);
     try {
-      const rules = days.filter((day) => day.is_available).map(({ day_of_week, start_time, end_time, slot_interval_minutes }) => ({ day_of_week, start_time, end_time, slot_interval_minutes: Number(slot_interval_minutes), timezone }));
+      const rules = days.filter((day) => day.is_available).map(({ day_of_week, start_time, end_time, slot_interval_minutes }) => ({ day_of_week, start_time, end_time, slot_interval_minutes: Number(slot_interval_minutes), timezone: LAGOS_TIMEZONE }));
       const response = await fetch("/api/admin/availability", { method: "PUT", credentials: "include", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ rules }) });
       const result = await response.json();
       if (!response.ok || !result.success) throw new Error(result.message || "Could not save availability.");
@@ -51,7 +50,7 @@ export default function AdminAvailabilityPage() {
     <header><span>AVAILABILITY</span><h1>Weekly availability</h1><p>Choose the days and hours customers can request appointments. Existing appointments are automatically blocked from new requests.</p></header>
     {message && <p className={`availability-message${isError ? " error" : ""}`} role={isError ? "alert" : "status"}>{message}</p>}
     {loading ? <AdminLoader label="Loading schedule" /> : <form onSubmit={save}>
-      <label className="availability-timezone"><span>Business time zone</span><select value={timezone} onChange={(event) => setTimezone(event.target.value)}><option value="Africa/Lagos">West Africa Time (Lagos)</option><option value="UTC">UTC</option><option value="Europe/London">London</option><option value="America/New_York">New York</option></select></label>
+      <p className="availability-timezone">Times are always West Africa Time (Lagos, Nigeria).</p>
       <div className="availability-day-list">{days.map((day, index) => <section className={`availability-day${day.is_available ? " enabled" : ""}`} key={day.day_of_week}>
         <label className="availability-toggle"><input type="checkbox" checked={Boolean(day.is_available)} onChange={(event) => updateDay(index, "is_available", event.target.checked)} /><span>{day.label}</span></label>
         {day.is_available && <div className="availability-fields">

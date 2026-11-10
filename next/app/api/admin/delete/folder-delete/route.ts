@@ -109,9 +109,17 @@ export async function DELETE(request: NextRequest) {
         // DELETE EMPTY FOLDER
         // ============================================
 
-        await cloudinary.api.delete_folder(
-            folderPath
-        );
+        try {
+            await cloudinary.api.delete_folder(folderPath);
+        } catch (folderErr) {
+            const message =
+                folderErr instanceof Error
+                    ? folderErr.message
+                    : String(folderErr ?? "");
+            if (!/not found|can't find|does not exist/i.test(message)) {
+                throw folderErr;
+            }
+        }
 
 
         // ============================================

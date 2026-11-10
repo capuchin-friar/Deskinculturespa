@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     IoArrowBack,
     IoCheckmarkCircle,
@@ -20,6 +21,7 @@ import {
     loadCreateDraft,
     saveCreateDraft,
 } from "@/src/hooks/useCreateDraft";
+import { fetchAdminCatalogItem, toMediaItem } from "@/src/utils/catalogItem";
 
 const DRAFT_KEY = CREATE_DRAFT_KEYS.package;
 import "../appointment/styles/xxl.css";
@@ -36,6 +38,10 @@ const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
 export default function CreatePackagePage() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get("id");
+    const isEdit = Boolean(editId);
+
     const [form, setForm] = useState({
         name: "",
         description: "",
@@ -52,6 +58,11 @@ export default function CreatePackagePage() {
     const skipDraftSaveRef = useRef(false);
 
     useEffect(() => {
+        if (editId) {
+            skipDraftSaveRef.current = true;
+            return;
+        }
+
         const draft = loadCreateDraft(DRAFT_KEY);
         if (draft) {
             setForm({
@@ -71,7 +82,60 @@ export default function CreatePackagePage() {
             setUploadId(uuidV4());
         }
         setIsDraftLoaded(true);
-    }, []);
+    }, [editId]);
+
+    useEffect(() => {
+        if (!editId) return;
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const item = await fetchAdminCatalogItem("packages", editId);
+                if (cancelled) return;
+                if (!item) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit: "This package could not be found.",
+                    }));
+                    return;
+                }
+
+                const media = toMediaItem(item.image_url || item.thumbnail_url);
+                setForm({
+                    name: item.name ?? "",
+                    description: item.description ?? "",
+                    duration_months:
+                        item.duration_months != null
+                            ? String(item.duration_months)
+                            : "3",
+                    price: item.price != null ? String(item.price) : "",
+                });
+                setIncludes(
+                    Array.isArray(item.includes) && item.includes.length
+                        ? item.includes
+                        : [""]
+                );
+                setImage(media);
+                setUploadId(
+                    media?.publicId?.split("/").slice(-2, -1)[0] || uuidV4()
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    setErrors({
+                        submit:
+                            error?.message ||
+                            "Could not load this package for editing.",
+                    });
+                }
+            } finally {
+                if (!cancelled) setIsDraftLoaded(true);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [editId]);
 
     useEffect(() => {
         if (!isDraftLoaded || !uploadId || skipDraftSaveRef.current) return;
@@ -207,16 +271,25 @@ export default function CreatePackagePage() {
 
         try {
             setIsSubmitting(true);
-            const { data } = await api.post("packages/add", {
+            const payload = {
                 name: form.name.trim(),
                 description: form.description.trim(),
                 duration_months: Number(form.duration_months),
                 price: Number(form.price),
                 includes: includes.map((entry) => entry.trim()).filter(Boolean),
                 image_url: image.url,
-            });
+            };
+            const { data } = isEdit
+                ? await api.patch("packages/edit", {
+                    ...payload,
+                    package_id: String(editId),
+                })
+                : await api.post("packages/add", payload);
             if (!data?.success) {
-                throw new Error(data?.message || "Failed to create package.");
+                throw new Error(
+                    data?.message ||
+                    (isEdit ? "Failed to update package." : "Failed to create package.")
+                );
             }
             skipDraftSaveRef.current = true;
             clearCreateDraft(DRAFT_KEY);
@@ -454,9 +527,13 @@ export default function CreatePackagePage() {
                                 type="submit"
                                 form="package-form"
                                 className="publish-button"
-                                disabled={isSubmitting || Boolean(mediaBusy)}
+                                disabled={isSubmitting || Boolean(mediaBusy) || !isDraftLoaded}
                             >
-                                {isSubmitting ? "Publishing..." : "Publish Package"}
+                                {isSubmitting
+                                    ? "Saving..."
+                                    : isEdit
+                                        ? "Save Changes"
+                                        : "Publish Package"}
                             </button>
                         </div>
                     </div>

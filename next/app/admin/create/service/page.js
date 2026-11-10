@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     IoCloudUploadOutline,
     IoTimeOutline,
@@ -23,6 +24,7 @@ import {
     loadCreateDraft,
     saveCreateDraft,
 } from "@/src/hooks/useCreateDraft";
+import { fetchAdminCatalogItem, toMediaList } from "@/src/utils/catalogItem";
 
 const DRAFT_KEY = CREATE_DRAFT_KEYS.service;
 
@@ -39,6 +41,10 @@ const DEFAULT_PREVIEW_IMAGE =
     "https://images.pexels.com/photos/3757952/pexels-photo-3757952.jpeg";
 
 export default function AddServicePage() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get("id");
+    const isEdit = Boolean(editId);
+
     const [form, setForm] = useState({
         description: "",
         service: "",
@@ -65,6 +71,11 @@ export default function AddServicePage() {
     const skipDraftSaveRef = useRef(false);
 
     useEffect(() => {
+        if (editId) {
+            skipDraftSaveRef.current = true;
+            return;
+        }
+
         const draft = loadCreateDraft(DRAFT_KEY);
         if (draft) {
             setForm({
@@ -84,7 +95,74 @@ export default function AddServicePage() {
             setProductId(uuidV4());
         }
         setIsDraftLoaded(true);
-    }, []);
+    }, [editId]);
+
+    useEffect(() => {
+        if (!editId) return;
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const item = await fetchAdminCatalogItem("services", editId);
+                if (cancelled) return;
+                if (!item) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit: "This service could not be found.",
+                    }));
+                    return;
+                }
+
+                let specs = item.specifications;
+                if (typeof specs === "string") {
+                    try {
+                        specs = JSON.parse(specs);
+                    } catch {
+                        specs = {};
+                    }
+                }
+
+                const media = toMediaList(
+                    item.image_url || item.images || item.thumbnail_url
+                );
+                setForm({
+                    description: item.description ?? "",
+                    service: item.category ?? item.service ?? "",
+                    subService: item.subcategory ?? item.sub_service ?? "",
+                    price: item.price != null ? String(item.price) : "",
+                    duration:
+                        item.duration_minutes != null
+                            ? String(item.duration_minutes)
+                            : "",
+                    imageUrl: media[0]?.url ?? "",
+                    featured: Boolean(item.featured),
+                });
+                setService(item.category ?? item.service ?? "");
+                setSubService(item.subcategory ?? item.sub_service ?? "");
+                setImage(media);
+                setProductId(
+                    (typeof specs?.hash === "string" && specs.hash) ||
+                    media[0]?.publicId?.split("/").slice(-2, -1)[0] ||
+                    uuidV4()
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit:
+                            error?.message ||
+                            "Could not load this service for editing.",
+                    }));
+                }
+            } finally {
+                if (!cancelled) setIsDraftLoaded(true);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [editId]);
 
     useEffect(() => {
         if (!isDraftLoaded || !productId || skipDraftSaveRef.current) return;
@@ -864,16 +942,19 @@ export default function AddServicePage() {
                 image_url: image[0].url,
             };
 
-            const { data } =
-                await api.post(
-                    "services/add",
-                    serviceData
-                );
+            const { data } = isEdit
+                ? await api.patch("services/edit", {
+                    ...serviceData,
+                    service_id: String(editId),
+                })
+                : await api.post("services/add", serviceData);
 
             if (!data?.success) {
                 throw new Error(
                     data?.message ||
-                        "Failed to create service."
+                        (isEdit
+                            ? "Failed to update service."
+                            : "Failed to create service.")
                 );
             }
 
@@ -1616,13 +1697,15 @@ export default function AddServicePage() {
                                 form="service-form"
                                 className="publish-button"
                                 disabled={
-                                    isSubmitting || Boolean(mediaBusy)
+                                    isSubmitting || Boolean(mediaBusy) || !isDraftLoaded
                                 }
                             >
 
                                 {isSubmitting
-                                    ? "Publishing..."
-                                    : "Publish Service"}
+                                    ? "Saving..."
+                                    : isEdit
+                                        ? "Save Changes"
+                                        : "Publish Service"}
 
                             </button>
 

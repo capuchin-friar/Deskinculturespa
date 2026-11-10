@@ -79,14 +79,21 @@ export class AppointmentModel {
             mode: string;
             price: number;
             duration_minutes: number;
+            slug?: string;
+            thumbnail_url?: string;
+            description?: string | null;
         }) => {
+            await AppointmentModel.ensureSchema();
             const {
-                appointment_id, mode, price, duration_minutes
+                appointment_id, mode, price, duration_minutes, slug, thumbnail_url, description
             } = payload;
 
             const { rows } = await query(
-                `UPDATE consultations SET mode=$1, duration_minutes=$2, price=$3, is_active=$4, updated_at=NOW()  WHERE id = $5 RETURNING *`,
-                [mode, duration_minutes, price, true, appointment_id]
+                `UPDATE consultations
+                 SET mode=$1, duration_minutes=$2, price=$3, slug=$4, thumbnail_url=$5, description=$6, is_active=$7, updated_at=NOW()
+                 WHERE id = $8
+                 RETURNING *`,
+                [mode, duration_minutes, price, slug, thumbnail_url, description || null, true, appointment_id]
             );
 
             return rows[0];

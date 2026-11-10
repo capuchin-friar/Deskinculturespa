@@ -1,14 +1,39 @@
 import { db, query } from "../database";
+import { resolveAppointmentType } from "@/src/utils/appointmentTypes";
+import { AppointmentModel } from "./appointment";
+
+function formatOffer(row: Record<string, unknown>) {
+  const type = resolveAppointmentType(row.slug);
+  return {
+    ...row,
+    type: type?.id || null,
+    type_name: type?.name || null,
+    description: row.description || "",
+    thumbnail_url: row.thumbnail_url || null,
+  };
+}
 
 export class ConsultationBookingModel {
-  static getOffers(slugs: string[]) {
-    return query(
-      `SELECT id, slug, consultant_id, mode, duration_minutes, price, thumbnail_url
+  static async getActiveOffers() {
+    await AppointmentModel.ensureSchema();
+    const { rows } = await query(
+      `SELECT id, slug, consultant_id, mode, duration_minutes, price, thumbnail_url, description, is_active
        FROM consultations
-       WHERE slug = ANY($1::text[]) AND is_active = TRUE
+       WHERE COALESCE(is_active, TRUE) = TRUE
        ORDER BY duration_minutes, price, id`,
-      [slugs],
-    ).then(({ rows }) => rows);
+    );
+    return rows.map((row) => formatOffer(row));
+  }
+
+  static getOffers(slugs: string[]) {
+    const wanted = new Set(
+      (slugs || [])
+        .map((slug) => resolveAppointmentType(slug)?.id)
+        .filter(Boolean),
+    );
+    return ConsultationBookingModel.getActiveOffers().then((rows) =>
+      rows.filter((row) => row.type && wanted.has(row.type)),
+    );
   }
 
   static getCustomerAppointments(customerId: string) {
@@ -16,7 +41,7 @@ export class ConsultationBookingModel {
       `SELECT a.id, a.customer_id, a.consultant_id, a.offering_id, a.appointment_date,
               a.start_time, a.end_time, a.scheduled_at, a.amount, a.status,
               a.payment_status, a.notes, a.consultation_name, a.created_at,
-              c.slug, c.mode, c.duration_minutes
+              c.slug, c.mode, c.duration_minutes, c.thumbnail_url, c.description
        FROM appointments a
        JOIN consultations c ON c.id = a.offering_id
        WHERE a.customer_id = $1

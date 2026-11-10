@@ -1,0 +1,14 @@
+@media (max-width: 1199px) {
+    .slots-header {
+        align-items: flex-start;
+    }
+
+    .slots-grid {
+        min-width: 860px;
+    }
+
+    .slots-grid__head,
+    .slots-grid__row {
+        grid-template-columns: 180px repeat(7, minmax(96px, 1fr));
+    }
+}

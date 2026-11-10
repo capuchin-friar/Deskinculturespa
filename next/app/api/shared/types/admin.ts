@@ -18,7 +18,7 @@ export interface NewProductDoc {
     brand: string,
     images: string[],
     thumbnail_url: string,
-    specifications: Record<string, string>,
+    specifications: Record<string, JsonValue>,
     admin_id: string | number
 }
 

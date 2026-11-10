@@ -175,12 +175,19 @@
     line-height: 1.4;
   }
 
-  .customer-appointment__details {
+  .customer-appointment__details,
+  .customer-appointment .customer-order__details-link {
     min-width: 94px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
     color: var(--brand-green);
     font-size: 14px;
     font-weight: 600;
     text-align: right;
+    text-decoration: none;
+    cursor: pointer;
   }
 
   .customer-appointment__details summary {
@@ -193,7 +200,8 @@
     display: none;
   }
 
-  .customer-appointment__details summary:hover {
+  .customer-appointment__details summary:hover,
+  .customer-appointment .customer-order__details-link:hover {
     color: var(--brand-dark);
     text-decoration: underline;
   }

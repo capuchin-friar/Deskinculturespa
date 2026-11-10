@@ -25,9 +25,10 @@ export async function GET() {
         id,
         name,
         thumbnail_url,
-       price
+        price
       FROM products
-      ORDER BY MAX(p.created_at) DESC
+      WHERE COALESCE(is_published, true) = true
+      ORDER BY created_at DESC
       LIMIT 10
     `);
 

@@ -119,21 +119,10 @@
 }
 
 .availability-timezone {
-    display: grid;
-    gap: 7px;
-    max-width: 360px;
     margin: 0 0 18px;
     color: var(--text-muted);
-    font-size: 11px;
-}
-
-.availability-timezone select {
-    min-height: 42px;
-    padding: 8px;
-    border: 1px solid var(--border);
-    background: #fff;
-    color: var(--text-dark);
-    font: inherit;
+    font-size: 13px;
+    line-height: 1.5;
 }
 
 @media (max-width: 680px) {

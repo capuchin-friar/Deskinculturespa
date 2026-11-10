@@ -10,6 +10,12 @@ import "./styles/s.css"
 import { api } from "../../api/shared/config"
 import AdminLoader from "@/src/components/admin/AdminLoader"
 import {
+  deleteCloudinaryImage,
+  extractCloudinaryPublicId,
+} from "@/src/components/admin/AdminMediaBackdrop"
+import { catalogCreatePath } from "@/src/utils/catalogItem"
+import { appointmentTypeName } from "@/src/utils/appointmentTypes"
+import {
   IoVideocamOutline,
   IoLocationOutline
 } from "react-icons/io5";
@@ -21,7 +27,84 @@ function shopRowId(s) {
   return s?.id ?? s?.shop_id
 }
 
-/** @param {unknown} images */
+function parseJsonValue(value) {
+  if (typeof value !== "string") return value
+  try {
+    return JSON.parse(value)
+  } catch {
+    return value
+  }
+}
+
+function collectMediaValues(item) {
+  const values = []
+  const push = (raw) => {
+    if (raw == null || raw === "") return
+    const parsed = parseJsonValue(raw)
+    if (Array.isArray(parsed)) {
+      parsed.forEach(push)
+      return
+    }
+    if (typeof parsed === "string" && parsed.trim()) {
+      values.push(parsed.trim())
+      return
+    }
+    if (parsed && typeof parsed === "object") {
+      if (typeof parsed.url === "string" && parsed.url.trim()) values.push(parsed.url.trim())
+      if (typeof parsed.publicId === "string" && parsed.publicId.trim()) {
+        values.push(parsed.publicId.trim())
+      }
+    }
+  }
+  push(item?.images)
+  push(item?.image_url)
+  push(item?.thumbnail_url)
+  return values
+}
+
+function toCloudinaryPublicId(value) {
+  if (typeof value !== "string" || !value.trim()) return null
+  const trimmed = value.trim()
+  if (/^https?:\/\//i.test(trimmed)) return extractCloudinaryPublicId(trimmed)
+  if (trimmed.includes("Deskinculture/")) return trimmed.replace(/\.[^/.]+$/, "")
+  return extractCloudinaryPublicId(trimmed)
+}
+
+function collectCloudinaryPublicIds(item) {
+  const ids = new Set()
+  for (const value of collectMediaValues(item)) {
+    const publicId = toCloudinaryPublicId(value)
+    if (publicId) ids.add(publicId)
+  }
+  return [...ids]
+}
+
+function collectCloudinaryFolderHashes(item, publicIds) {
+  const hashes = new Set()
+  const specs = parseJsonValue(item?.specifications)
+  const specHash =
+    specs && typeof specs === "object" && !Array.isArray(specs)
+      ? specs.hash
+      : null
+  if (typeof specHash === "string" && specHash.trim()) hashes.add(specHash.trim())
+
+  for (const publicId of publicIds) {
+    const match = publicId.match(/Deskinculture\/products\/([^/]+)/)
+    if (match?.[1]) hashes.add(match[1])
+  }
+  return [...hashes]
+}
+
+function catalogRequestError(err, fallback) {
+  return (
+    err?.response?.data?.message ||
+    err?.response?.data?.error ||
+    (typeof err?.response?.data?.data === "string" ? err.response.data.data : null) ||
+    err?.message ||
+    fallback
+  )
+}
+
 function firstImageUrl(images) {
   let list = images
   if (typeof list === "string") {
@@ -81,7 +164,14 @@ function ProductTableRow({
   type
 }) {
   const productId = item?.id ?? item?.product_id
-  const name = String(item?.name ?? item?.slug ?? item?.mode ?? item?.subcategory ?? "—")
+  const name = String(
+    (type === "appointment" && appointmentTypeName(item?.slug || item?.name)) ||
+      item?.name ||
+      item?.slug ||
+      item?.mode ||
+      item?.subcategory ||
+      "—"
+  )
     .replace(/[-_]+/g, " ")
     .trim()
   const mode = String(item?.mode ?? "").toLowerCase()
@@ -104,10 +194,8 @@ function ProductTableRow({
   const menuOpen = productId != null && menuOpenId === productId
   const editHref =
     productId != null
-      ? `/admin/create?product=${encodeURIComponent(String(productId))}&type=${encodeURIComponent(type)}&edit=${encodeURIComponent(true)}`
+      ? `/admin/create/${catalogCreatePath(type)}?id=${encodeURIComponent(String(productId))}&edit=true`
       : "#"
-  const folderPath = item.specifications?.hash ?? null;
-
   return (
     <tr>
       <td className="product-list-sn">{s_n}</td>
@@ -196,7 +284,7 @@ function ProductTableRow({
                 className="product-list-actions-item product-list-actions-item-danger"
                 role="menuitem"
                 onClick={() => {
-                  if (type === "packages" || folderPath != null) onDeleteProduct(folderPath, productId)
+                  if (productId != null) onDeleteProduct(item)
                 }}
               >
                 Delete
@@ -297,66 +385,84 @@ export default function ProductListPage() {
   }
 
   const onDeleteProduct = useCallback(
-    async (hash, productId) => {
+    async (item) => {
+      const productId = item?.id ?? item?.product_id
+      if (productId == null) return
+
+      const label =
+        type === "packages"
+          ? "package"
+          : type === "services"
+            ? "service"
+            : type === "appointment"
+              ? "appointment"
+              : "product"
+      const confirmMessage =
+        type === "products"
+          ? "Delete this product? Inventory for this product will be removed. This cannot be undone."
+          : `Delete this ${label}? This cannot be undone.`
+
       setDeleteError("")
-      if (type === "packages") {
-        if (!window.confirm("Delete this package? This cannot be undone.")) {
-          return
-        }
-        try {
-          const { data } = await api.delete("packages/delete", {
-            data: { package_id: productId },
-          })
-          if (!data.success) {
-            throw new Error(data.message || "Could not delete package.")
-          }
-          setPackages((prev) =>
-            prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
-          )
-          setMenuOpenId(null)
-        } catch (err) {
-          setDeleteError(err?.message || "Could not delete package.")
-        }
-        return
-      }
-      if (!window.confirm("Delete this product? Inventory for this product will be removed. This cannot be undone.")) {
-        return
-      }
+      if (!window.confirm(confirmMessage)) return
+
+      const id = String(productId)
+      const publicIds = collectCloudinaryPublicIds(item)
+      const folderHashes = collectCloudinaryFolderHashes(item, publicIds)
+
       try {
-        api.delete("delete/folder-delete", {
-          data: {
-            product_id: hash
+        let data
+        if (type === "packages") {
+          ;({ data } = await api.delete("packages/delete", {
+            data: { package_id: id },
+          }))
+        } else if (type === "services") {
+          ;({ data } = await api.delete("services/delete", {
+            data: { service_id: id },
+          }))
+        } else if (type === "appointment") {
+          ;({ data } = await api.delete("appointment_offerings/delete", {
+            data: { appointment_id: id },
+          }))
+        } else {
+          ;({ data } = await api.delete("products/delete", {
+            data: { product_id: id },
+          }))
+        }
+
+        if (!data?.success) {
+          throw new Error(data?.message || data?.data || `Could not delete ${label}.`)
+        }
+
+        for (const publicId of publicIds) {
+          try {
+            await deleteCloudinaryImage(publicId)
+          } catch (mediaErr) {
+            console.warn("Cloudinary image delete skipped:", publicId, mediaErr)
           }
-        }).then(async (response) => {
-          if (response.data.success) {
-            const {
-              data
-            } = await api.delete("products/delete", {
-              data: {
-                product_id: productId
-              }
-            });
-            if (!data.success) {
-              throw new Error("Error: ", data.message);
-              return;
-            }
-            setProds((prev) =>
-              prev.filter((p) => String(p?.id ?? p?.product_id) !== String(productId))
-            )
-          } else {
-            throw new Error(response.data.message);
+        }
+
+        for (const hash of folderHashes) {
+          try {
+            await api.delete("delete/folder-delete", {
+              data: { product_id: hash },
+            })
+          } catch (folderErr) {
+            console.warn("Cloudinary folder delete skipped:", hash, folderErr)
           }
-        }).catch(err => {
-          console.log(err);
-          alert("Error: ", err);
-        })
+        }
+
+        const stillListed = (entry) => String(entry?.id ?? entry?.product_id) !== id
+        if (type === "packages") setPackages((prev) => prev.filter(stillListed))
+        else if (type === "services") setServices((prev) => prev.filter(stillListed))
+        else if (type === "appointment") setAppointments((prev) => prev.filter(stillListed))
+        else setProds((prev) => prev.filter(stillListed))
 
         setMenuOpenId(null)
       } catch (err) {
-        setDeleteError(err?.message || "Could not delete product.")
+        setDeleteError(catalogRequestError(err, `Could not delete ${label}.`))
       }
     },
-    [admin_id, type]
+    [type]
   )
 
   return (

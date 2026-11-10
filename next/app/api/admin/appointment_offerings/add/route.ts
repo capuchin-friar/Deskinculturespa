@@ -8,6 +8,7 @@ import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
+import { resolveAppointmentType } from "@/src/utils/appointmentTypes";
 
 const CONSULTATION_MODES: Record<string, "physical" | "video" | "audio" | "chat"> = {
     physical: "physical",
@@ -19,17 +20,6 @@ const CONSULTATION_MODES: Record<string, "physical" | "video" | "audio" | "chat"
     audio: "audio",
     chat: "chat",
 };
-
-function slugify(value: string) {
-    const base = value
-        .toLowerCase()
-        .normalize("NFKD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-+|-+$/g, "")
-        .slice(0, 80);
-    return base || `consultation-${Date.now().toString(36)}`;
-}
 
 export const POST = async (req: NextRequest) => {
 
@@ -66,19 +56,9 @@ export const POST = async (req: NextRequest) => {
         const appointmentThumbnail =
             typeof thumbnail_url === "string" ? thumbnail_url.trim() : false;
 
-        const appointmentTitle =
-            typeof title === "string"
-                ? title.trim()
-                : typeof slug === "string"
-                    ? slug.trim()
-                    : "";
+        const appointmentType = resolveAppointmentType(slug) || resolveAppointmentType(title);
 
-        const appointmentSlug =
-            typeof slug === "string" && slug.trim()
-                ? slugify(slug.trim())
-                : appointmentTitle
-                    ? slugify(appointmentTitle)
-                    : false;
+        const appointmentSlug = appointmentType?.id || false;
 
         const appointmentDescription =
             typeof description === "string" ? description.trim() : "";
@@ -101,7 +81,7 @@ export const POST = async (req: NextRequest) => {
         }
 
         if (!appointmentSlug) {
-            throw new Error("Appointment title is required");
+            throw new Error("Choose Skincare Consultation or Body Treatment Consultation.");
         }
 
         // Extract the admin id from the JWT

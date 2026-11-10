@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import {
     IoArrowBack,
     IoCloudUploadOutline,
@@ -23,6 +24,15 @@ import {
     loadCreateDraft,
     saveCreateDraft,
 } from "@/src/hooks/useCreateDraft";
+import {
+    appointmentFormMode,
+    fetchAdminCatalogItem,
+    toMediaItem,
+} from "@/src/utils/catalogItem";
+import {
+    APPOINTMENT_TYPES,
+    resolveAppointmentType,
+} from "@/src/utils/appointmentTypes";
 
 const DRAFT_KEY = CREATE_DRAFT_KEYS.appointment;
 
@@ -56,8 +66,12 @@ const APPOINTMENT_MODES = [
 ];
 
 export default function CreateAppointmentPage() {
+    const searchParams = useSearchParams();
+    const editId = searchParams.get("id");
+    const isEdit = Boolean(editId);
+
     const [form, setForm] = useState({
-        title: "",
+        type: "",
         description: "",
         mode: "online",
         duration: "30",
@@ -73,10 +87,15 @@ export default function CreateAppointmentPage() {
     const skipDraftSaveRef = useRef(false);
 
     useEffect(() => {
+        if (editId) {
+            skipDraftSaveRef.current = true;
+            return;
+        }
+
         const draft = loadCreateDraft(DRAFT_KEY);
         if (draft) {
             setForm({
-                title: draft.form?.title ?? "",
+                type: resolveAppointmentType(draft.form?.type || draft.form?.title)?.id ?? "",
                 description: draft.form?.description ?? "",
                 mode: draft.form?.mode || "online",
                 duration: draft.form?.duration ?? "30",
@@ -88,7 +107,59 @@ export default function CreateAppointmentPage() {
             setUploadId(uuidV4());
         }
         setIsDraftLoaded(true);
-    }, []);
+    }, [editId]);
+
+    useEffect(() => {
+        if (!editId) return;
+        let cancelled = false;
+
+        (async () => {
+            try {
+                const item = await fetchAdminCatalogItem(
+                    "appointment_offerings",
+                    editId
+                );
+                if (cancelled) return;
+                if (!item) {
+                    setErrors((prev) => ({
+                        ...prev,
+                        submit: "This appointment could not be found.",
+                    }));
+                    return;
+                }
+
+                const media = toMediaItem(item.thumbnail_url || item.image_url);
+                setForm({
+                    type: resolveAppointmentType(item.slug || item.title)?.id ?? "",
+                    description: item.description ?? "",
+                    mode: appointmentFormMode(item.mode),
+                    duration:
+                        item.duration_minutes != null
+                            ? String(item.duration_minutes)
+                            : "30",
+                    price: item.price != null ? String(item.price) : "",
+                });
+                setImage(media);
+                setUploadId(
+                    media?.publicId?.split("/").slice(-2, -1)[0] || uuidV4()
+                );
+            } catch (error) {
+                if (!cancelled) {
+                    setErrors({
+                        submit:
+                            error?.message ||
+                            "Could not load this appointment for editing.",
+                    });
+                }
+            } finally {
+                if (!cancelled) setIsDraftLoaded(true);
+            }
+        })();
+
+        return () => {
+            cancelled = true;
+        };
+    }, [editId]);
 
     useEffect(() => {
         if (!isDraftLoaded || !uploadId || skipDraftSaveRef.current) return;
@@ -240,15 +311,9 @@ export default function CreateAppointmentPage() {
     const validate = () => {
         const newErrors = {};
 
-        // Title
-        if (!form.title.trim()) {
-            newErrors.title = "Appointment title is required.";
-        } else if (form.title.trim().length < 3) {
-            newErrors.title =
-                "Appointment title must be at least 3 characters.";
-        } else if (form.title.trim().length > 100) {
-            newErrors.title =
-                "Appointment title cannot exceed 100 characters.";
+        if (!resolveAppointmentType(form.type)) {
+            newErrors.type =
+                "Choose Skincare Consultation or Body Treatment Consultation.";
         }
 
         // Description
@@ -317,17 +382,31 @@ export default function CreateAppointmentPage() {
         try {
             setIsSubmitting(true);
 
-            const { data } = await api.post("appointment_offerings/add", {
-                title: form.title.trim(),
+            const selectedType = resolveAppointmentType(form.type);
+            const payload = {
+                slug: selectedType.id,
+                title: selectedType.name,
                 description: form.description.trim(),
                 mode: form.mode,
                 duration_minutes: Number(form.duration),
                 price: Number(form.price),
                 thumbnail_url: image.url,
-            });
+            };
+            const { data } = isEdit
+                ? await api.patch("appointment_offerings/edit", {
+                    ...payload,
+                    appointment_id: String(editId),
+                })
+                : await api.post("appointment_offerings/add", payload);
 
             if (!data?.success) {
-                throw new Error(data?.message || data?.data || "Failed to create appointment.");
+                throw new Error(
+                    data?.message ||
+                    data?.data ||
+                    (isEdit
+                        ? "Failed to update appointment."
+                        : "Failed to create appointment.")
+                );
             }
 
             skipDraftSaveRef.current = true;
@@ -376,30 +455,37 @@ export default function CreateAppointmentPage() {
                         </div>
 
 
-                        {/* TITLE */}
-
                         <div className="form-group">
 
                             <label>
-                                Title <span>*</span>
+                                Consultation type <span>*</span>
                             </label>
 
-                            <input
-                                type="text"
-                                name="title"
-                                value={form.title}
-                                onChange={handleChange}
-                                placeholder="e.g. Skincare Consultation"
-                                className={
-                                    errors.title
-                                        ? "input-error"
-                                        : ""
-                                }
-                            />
+                            <div className="select-input-wrapper">
+                                <select
+                                    name="type"
+                                    value={form.type}
+                                    onChange={handleChange}
+                                    className={
+                                        errors.type
+                                            ? "input-error"
+                                            : ""
+                                    }
+                                >
+                                    <option value="" disabled>
+                                        Select a consultation type
+                                    </option>
+                                    {APPOINTMENT_TYPES.map((type) => (
+                                        <option key={type.id} value={type.id}>
+                                            {type.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
 
-                            {errors.title && (
+                            {errors.type && (
                                 <p className="error-message">
-                                    {errors.title}
+                                    {errors.type}
                                 </p>
                             )}
 
@@ -757,11 +843,13 @@ export default function CreateAppointmentPage() {
                                 type="submit"
                                 form="appointment-form"
                                 className="publish-button"
-                                disabled={isSubmitting || Boolean(mediaBusy)}
+                                disabled={isSubmitting || Boolean(mediaBusy) || !isDraftLoaded}
                             >
                                 {isSubmitting
-                                    ? "Publishing..."
-                                    : "Publish Appointment"}
+                                    ? "Saving..."
+                                    : isEdit
+                                        ? "Save Changes"
+                                        : "Publish Appointment"}
                             </button>
 
                         </div>

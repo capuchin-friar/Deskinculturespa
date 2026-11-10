@@ -1,3 +1,6 @@
-@media (max-width: 480px) {
-
+@media (max-width: 760px) {
+  .consultation-type {
+    flex-basis: 100%;
+    min-width: 0;
+  }
 }

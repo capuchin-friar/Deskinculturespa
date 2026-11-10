@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { readJsonObject } from "@/app/api/shared/utils/request";
 import { getRequestAdminId } from "@/app/api/shared/adminAuth";
 import { PackageModel } from "@/app/api/shared/models/package";
+import {
+    catalogItemHasPaidPurchase,
+    paidCatalogItemMessage,
+} from "@/app/api/shared/models/catalogDeleteGuard";
 
 export const DELETE = async (req: NextRequest) => {
     try {
@@ -17,7 +21,15 @@ export const DELETE = async (req: NextRequest) => {
             return NextResponse.json({ success: false, data: "Authentication required" }, { status: 401 });
         }
 
-        await PackageModel.deletePackageDoc({ id: String(package_id).trim() });
+        const id = String(package_id).trim();
+        if (await catalogItemHasPaidPurchase("package", id)) {
+            return NextResponse.json(
+                { success: false, message: paidCatalogItemMessage("package") },
+                { status: 409 },
+            );
+        }
+
+        await PackageModel.deletePackageDoc({ id });
 
         return NextResponse.json({
             success: true,

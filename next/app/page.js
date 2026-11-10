@@ -116,9 +116,12 @@ export default function Home() {
               they are subject to availability.
             </p>
             <br />
-            <button className="customer-hero-btn">
+            <Link style={{
+              textDecoration: "none",
+              color: "#fff"
+            }} href="/consultation" className="customer-hero-btn">
               Book An Appointment Now
-            </button>
+            </Link>
           </div>
         </div>
         <div className="customer-value-proposition">

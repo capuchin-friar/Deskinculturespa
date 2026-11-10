@@ -99,6 +99,39 @@ export class PackageModel {
         },
     );
 
+    static updatePackageDoc = withErrorHandling(
+        async (payload: Omit<NewPackageDoc, "admin_id"> & { package_id: string | number }) => {
+            await PackageModel.ensureTable();
+            const {
+                package_id,
+                name,
+                description,
+                price,
+                duration_months,
+                includes,
+                image_url,
+            } = payload;
+
+            const { rows } = await query(
+                `UPDATE packages
+                 SET name=$1, description=$2, price=$3, duration_months=$4, includes=$5::jsonb, image_url=$6, updated_at=NOW()
+                 WHERE id = $7
+                 RETURNING *`,
+                [
+                    name,
+                    description,
+                    price,
+                    duration_months,
+                    JSON.stringify(asIncludes(includes)),
+                    image_url,
+                    package_id,
+                ],
+            );
+
+            return formatPackageRow(rows[0]);
+        },
+    );
+
     static deletePackageDoc = withErrorHandling(
         async (payload: { id: string | number }) => {
             await PackageModel.ensureTable();

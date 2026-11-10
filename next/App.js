@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 
 import Customer from "@/layout/Customer";
 import Admin from "@/layout/Admin";
+import ProcessBackdrop from "@/src/components/ProcessBackdrop";
 
 export default function App({ children }) {
     const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function App({ children }) {
                 <Admin>
                     {children}
                 </Admin>
+                <ProcessBackdrop />
             </Provider>
         );
     }
@@ -28,6 +30,7 @@ export default function App({ children }) {
             <Customer>
                 {children}
             </Customer>
+            <ProcessBackdrop />
         </Provider>
     );
 }

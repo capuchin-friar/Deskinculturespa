@@ -8,18 +8,19 @@ import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ProductModel } from "@/app/api/shared/models/product";
+import {
+    catalogItemHasPaidPurchase,
+    paidCatalogItemMessage,
+} from "@/app/api/shared/models/catalogDeleteGuard";
 
 
 export const DELETE = async (req: NextRequest) => {
 
     try {
         const body = await readJsonObject(req);
-        const {
-            product_id
-        } = body;
+        const product_id = body.product_id ?? body.id;
 
-        // Validate all fields
-        if (typeof product_id !== "string" || !product_id.trim()) {
+        if (product_id == null || String(product_id).trim() === "") {
             return NextResponse.json(
                 { message: "Product ID is required" },
                 { status: 400 }
@@ -43,9 +44,16 @@ export const DELETE = async (req: NextRequest) => {
 
         // Final validation 
         if (admin_id) {
-            // Create product
+            const id = String(product_id).trim();
+            if (await catalogItemHasPaidPurchase("product", id)) {
+                return NextResponse.json(
+                    { success: false, message: paidCatalogItemMessage("product") },
+                    { status: 409 }
+                );
+            }
+
             await ProductModel.deleteProductDoc({
-                id: product_id.trim()
+                id
             });
 
             return NextResponse.json({

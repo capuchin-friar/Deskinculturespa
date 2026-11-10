@@ -1,0 +1,13 @@
+@media (max-width: 900px) {
+    .slots-header h1 {
+        font-size: 20px;
+    }
+
+    .slots-week-nav strong {
+        min-width: 0;
+    }
+
+    .slots-grid {
+        min-width: 760px;
+    }
+}

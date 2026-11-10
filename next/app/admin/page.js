@@ -237,7 +237,15 @@ function OrderBreakdown({
     const activities = useMemo(() => {
         const rows = Array.isArray(metrics?.recentActivity) ? metrics.recentActivity : [];
         if (activityKind === "all") return rows;
-        const match = activityKind === "products" ? "product" : activityKind === "services" ? "service" : "appointment";
+        const match = {
+            products: "product",
+            services: "service",
+            appointment: "appointment",
+            appointments: "appointment",
+            packages: "package",
+            package: "package",
+        }[activityKind];
+        if (!match) return rows;
         return rows.filter((row) => row.kind === match);
     }, [metrics?.recentActivity, activityKind]);
 
@@ -339,11 +347,12 @@ function OrderBreakdown({
                 <section className="activity-cnt">
                     <div className="activity-headline">
                         <div className="input-cnt">
-                            <label htmlFor="activity-kind">Offers</label>
+                            <label htmlFor="activity-kind">Paid Orders</label>
                             <select id="activity-kind" value={activityKind} onChange={(event) => setActivityKind(event.target.value)}>
                                 <option value="products">Products</option>
                                 <option value="services">Services</option>
                                 <option value="appointments">Appointments</option>
+                                <option value="packages">Packages</option>
                             </select>
                         </div>
                         <button className="view-all" type="button" onClick={() => router.push("/admin/orders")}>
@@ -428,16 +437,19 @@ const PaidItemCard = ({
     const isAppointment = type === "appointment";
     const isProduct = type === "product";
     const isService = type === "service";
+    const isPackage = type === "package";
 
     const getIcon = () => {
         if (isAppointment) return <IoCalendarOutline />;
         if (isProduct) return <IoBagHandleOutline />;
+        if (isPackage) return <IoSparklesOutline />;
         return <IoBriefcaseOutline />;
     };
 
     const getLabel = () => {
         if (isAppointment) return "Appointment";
         if (isProduct) return "Product";
+        if (isPackage) return "Package";
         return "Service";
     };
 

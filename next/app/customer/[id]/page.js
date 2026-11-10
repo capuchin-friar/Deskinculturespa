@@ -7,6 +7,7 @@ import { IoArrowBackOutline, IoClose } from "react-icons/io5";
 import { baseApi } from "@/app/api/shared/config";
 import { useAccountNav } from "@/src/components/customer/AccountNavContext";
 import { formatOrderPrice, mapCustomerOrder } from "./orderUtils";
+import { appointmentTypeName, resolveAppointmentType } from "@/src/utils/appointmentTypes";
 import {
   FiBookmark,
   FiCalendar,
@@ -406,11 +407,126 @@ function Orders() {
   );
 }
 
+const appointmentModeNames = {
+  physical: "In person",
+  video: "Video call",
+  audio: "Phone call",
+  chat: "Chat",
+  online: "Video call",
+  phone: "Phone call",
+};
+
+function appointmentTitle(appointment) {
+  return (
+    appointmentTypeName(appointment?.slug || appointment?.consultation_name) ||
+    appointment?.consultation_name ||
+    "Consultation"
+  );
+}
+
+function AppointmentDetailView({ appointment, onBack }) {
+  const scheduledLabel = formatBookingWhen(appointment.scheduled_at);
+  const title = appointmentTitle(appointment);
+  const mode = String(appointment.mode || "consultation");
+  const browseHref = `/consultation/${resolveAppointmentType(appointment.slug || appointment.consultation_name)?.id || ""}`.replace(/\/$/, "") || "/consultation";
+
+  return (
+    <div className="customer-order-detail">
+      <header className="customer-order-detail__header">
+        <button className="customer-order-detail__back" type="button" onClick={onBack}>
+          <IoArrowBackOutline aria-hidden="true" />
+          <span>Appointment Details</span>
+        </button>
+      </header>
+
+      <section className="customer-order-detail__summary">
+        <h1 id="customer-appointment-detail-title">Appointment nº {appointment.id}</h1>
+        <p>{title}</p>
+        {scheduledLabel ? <p>{scheduledLabel}</p> : <p>No appointment time has been saved yet.</p>}
+        <p>Total: ₦{formatOrderPrice(appointment.amount)}</p>
+      </section>
+
+      <section className="customer-order-detail__items" aria-labelledby="appointment-items-title">
+        <h2 id="appointment-items-title">Your consultation</h2>
+        <ul>
+          <li className="customer-order-detail__item">
+            <div className="customer-order-detail__item-copy">
+              <div className="customer-order-detail__badges">
+                <span className={`customer-order__status customer-order__status--${appointment.payment_status === "paid" ? "paid" : "pending"}`}>
+                  {formatStatus(appointment.status)}
+                </span>
+              </div>
+              {scheduledLabel ? (
+                <p className="customer-order-detail__item-date">{scheduledLabel}</p>
+              ) : null}
+              <div className="customer-order-detail__item-body">
+                <div className="customer-order-detail__image">
+                  {appointment.thumbnail_url ? (
+                    <img src={appointment.thumbnail_url} alt="" />
+                  ) : (
+                    <FiCalendar aria-hidden="true" />
+                  )}
+                </div>
+                <div>
+                  <h3>{title}</h3>
+                  <p>
+                    {appointmentModeNames[mode] || mode}
+                    {appointment.duration_minutes ? ` · ${appointment.duration_minutes} min` : ""}
+                  </p>
+                  <strong>₦{formatOrderPrice(appointment.amount)}</strong>
+                </div>
+              </div>
+              {appointment.description ? (
+                <p className="customer-order-detail__item-date">{appointment.description}</p>
+              ) : null}
+            </div>
+            <Link className="customer-order-detail__again" href={browseHref}>
+              Book again
+            </Link>
+          </li>
+        </ul>
+      </section>
+
+      <div className="customer-order-detail__info">
+        <section aria-labelledby="appointment-payment-title">
+          <h2 id="appointment-payment-title">Payment information</h2>
+          <h3>Payment method</h3>
+          <p>Paystack · Card, bank transfer or USSD</p>
+          <h3>Payment details</h3>
+          <p>
+            <strong>Total: ₦{formatOrderPrice(appointment.amount)}</strong>
+          </p>
+          <p>Status: {formatStatus(appointment.payment_status)}</p>
+        </section>
+
+        <section aria-labelledby="appointment-visit-title">
+          <h2 id="appointment-visit-title">Visit information</h2>
+          <h3>Appointment time</h3>
+          <p>{scheduledLabel || "Choose a time to schedule this consultation"}</p>
+          <h3>Duration</h3>
+          <p>
+            {appointment.duration_minutes
+              ? `${appointment.duration_minutes} minutes`
+              : "Duration not set"}
+          </p>
+          <h3>Mode</h3>
+          <p>{appointmentModeNames[mode] || mode}</p>
+          <h3>Status</h3>
+          <p>{formatStatus(appointment.status)}</p>
+          <h3>Notes</h3>
+          <p>{appointment.notes || "No notes added"}</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -445,12 +561,22 @@ function Appointments() {
       !["pending", "confirmed"].includes(String(appointment.status).toLowerCase()),
   );
   const shownAppointments = activeTab === "upcoming" ? upcoming : past;
+  const selectedAppointment = appointments.find(
+    (appointment) => String(appointment.id) === String(selectedAppointmentId),
+  );
 
   return (
     <section
-      className="customer-appointments"
-      aria-labelledby="customer-appointments-title"
+      className={`customer-appointments${selectedAppointment ? " customer-appointments--detail" : ""}`}
+      aria-labelledby={selectedAppointment ? "customer-appointment-detail-title" : "customer-appointments-title"}
     >
+      {selectedAppointment ? (
+        <AppointmentDetailView
+          appointment={selectedAppointment}
+          onBack={() => setSelectedAppointmentId(null)}
+        />
+      ) : (
+        <>
       <header className="customer-appointments__header">
         <h1 id="customer-appointments-title">Appointments</h1>
         <p>Review your consultation appointments and their details.</p>
@@ -526,7 +652,7 @@ function Appointments() {
                   </div>
                   <div className="customer-appointment__main">
                     <h2 className="customer-appointment__title">
-                      {appointment.consultation_name || "Consultation"}
+                      {appointmentTitle(appointment)}
                     </h2>
                     <p className="customer-appointment__id">
                       Appointment #{appointment.id}
@@ -569,25 +695,21 @@ function Appointments() {
                         : "Appointment time not scheduled"}
                     </p>
                   </div>
-                  <details className="customer-appointment__details">
-                    <summary>See details</summary>
-                    <div className="customer-appointment__details-content">
-                      <p>
-                        Payment:{" "}
-                        <strong>{formatStatus(appointment.payment_status)}</strong>
-                      </p>
-                      <p>
-                        Notes:{" "}
-                        <strong>{appointment.notes || "No notes added"}</strong>
-                      </p>
-                    </div>
-                  </details>
+                  <button
+                    className="customer-order__details-link"
+                    type="button"
+                    onClick={() => setSelectedAppointmentId(appointment.id)}
+                  >
+                    See details
+                  </button>
                 </article>
               );
             })
           )}
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 }
@@ -763,11 +885,136 @@ function BookingDetailView({ visit, onBack }) {
   );
 }
 
+function packageIncludes(value) {
+  if (Array.isArray(value)) {
+    return value.map((entry) => String(entry || "").trim()).filter(Boolean);
+  }
+  if (typeof value === "string") {
+    try {
+      return packageIncludes(JSON.parse(value));
+    } catch {
+      return value.trim() ? [value.trim()] : [];
+    }
+  }
+  return [];
+}
+
+function PackageDetailView({ booking, onBack }) {
+  const scheduledLabel = booking.scheduled_at
+    ? new Date(booking.scheduled_at).toLocaleString(undefined, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : "";
+  const includes = packageIncludes(booking.includes);
+
+  return (
+    <div className="customer-order-detail">
+      <header className="customer-order-detail__header">
+        <button className="customer-order-detail__back" type="button" onClick={onBack}>
+          <IoArrowBackOutline aria-hidden="true" />
+          <span>Package Details</span>
+        </button>
+      </header>
+
+      <section className="customer-order-detail__summary">
+        <h1 id="customer-package-detail-title">Package nº {booking.id}</h1>
+        <p>{booking.name || "Package"}</p>
+        {scheduledLabel ? <p>{scheduledLabel}</p> : <p>No start time has been saved yet.</p>}
+        <p>Total: ₦{formatOrderPrice(booking.price)}</p>
+      </section>
+
+      <section className="customer-order-detail__items" aria-labelledby="package-items-title">
+        <h2 id="package-items-title">Your package</h2>
+        <ul>
+          <li className="customer-order-detail__item">
+            <div className="customer-order-detail__item-copy">
+              <div className="customer-order-detail__badges">
+                <span className={`customer-order__status customer-order__status--${booking.payment_status === "paid" ? "paid" : "pending"}`}>
+                  {formatStatus(booking.status)}
+                </span>
+              </div>
+              {scheduledLabel ? (
+                <p className="customer-order-detail__item-date">{scheduledLabel}</p>
+              ) : null}
+              <div className="customer-order-detail__item-body">
+                <div className="customer-order-detail__image">
+                  {booking.image_url ? (
+                    <img src={booking.image_url} alt="" />
+                  ) : (
+                    <FiPackage aria-hidden="true" />
+                  )}
+                </div>
+                <div>
+                  <h3>{booking.name || "Package"}</h3>
+                  <p>
+                    {booking.duration_months
+                      ? `${booking.duration_months} month${Number(booking.duration_months) === 1 ? "" : "s"}`
+                      : "Duration not set"}
+                  </p>
+                  <strong>₦{formatOrderPrice(booking.price)}</strong>
+                </div>
+              </div>
+              {booking.description ? (
+                <p className="customer-order-detail__item-date">{booking.description}</p>
+              ) : null}
+              {includes.length > 0 ? (
+                <ul className="customer-package-includes">
+                  {includes.map((entry) => (
+                    <li key={entry}>{entry}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+            <Link className="customer-order-detail__again" href="/packages">
+              Browse packages
+            </Link>
+          </li>
+        </ul>
+      </section>
+
+      <div className="customer-order-detail__info">
+        <section aria-labelledby="package-payment-title">
+          <h2 id="package-payment-title">Payment information</h2>
+          <h3>Payment method</h3>
+          <p>Paystack · Card, bank transfer or USSD</p>
+          <h3>Payment details</h3>
+          <p>
+            <strong>Total: ₦{formatOrderPrice(booking.price)}</strong>
+          </p>
+          <p>Status: {formatStatus(booking.payment_status)}</p>
+        </section>
+
+        <section aria-labelledby="package-visit-title">
+          <h2 id="package-visit-title">Visit information</h2>
+          <h3>Start time</h3>
+          <p>{scheduledLabel || "Choose a time to start this package"}</p>
+          <h3>Duration</h3>
+          <p>
+            {booking.duration_months
+              ? `${booking.duration_months} month${Number(booking.duration_months) === 1 ? "" : "s"}`
+              : "Duration not set"}
+          </p>
+          <h3>Status</h3>
+          <p>{formatStatus(booking.status)}</p>
+          <h3>Notes</h3>
+          <p>{booking.notes || "No notes added"}</p>
+        </section>
+      </div>
+    </div>
+  );
+}
+
 function Packages() {
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("upcoming");
+  const [selectedPackageId, setSelectedPackageId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -797,9 +1044,17 @@ function Packages() {
   const upcoming = bookings.filter((booking) => ["pending", "confirmed"].includes(String(booking.status || "")));
   const past = bookings.filter((booking) => !["pending", "confirmed"].includes(String(booking.status || "")));
   const shown = activeTab === "upcoming" ? upcoming : past;
+  const selectedBooking = bookings.find((booking) => String(booking.id) === String(selectedPackageId));
 
   return (
-    <section className="customer-appointments" aria-labelledby="customer-packages-title">
+    <section
+      className={`customer-appointments${selectedBooking ? " customer-appointments--detail" : ""}`}
+      aria-labelledby={selectedBooking ? "customer-package-detail-title" : "customer-packages-title"}
+    >
+      {selectedBooking ? (
+        <PackageDetailView booking={selectedBooking} onBack={() => setSelectedPackageId(null)} />
+      ) : (
+        <>
       <header className="customer-appointments__header">
         <h1 id="customer-packages-title">Packages</h1>
         <p>Review your booked packages separately from consultations.</p>
@@ -859,12 +1114,21 @@ function Packages() {
                       ) : null}
                     </div>
                   </div>
+                  <button
+                    className="customer-order__details-link"
+                    type="button"
+                    onClick={() => setSelectedPackageId(booking.id)}
+                  >
+                    See details
+                  </button>
                 </div>
               </article>
             ))
           )}
         </div>
       </div>
+        </>
+      )}
     </section>
   );
 }

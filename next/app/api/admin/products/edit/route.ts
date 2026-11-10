@@ -8,7 +8,7 @@ import { readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { ProductModel } from "@/app/api/shared/models/product";
-import { isStringArray, isStringRecord } from "@/app/api/shared/utils/request";
+import { isJsonRecord, isStringArray } from "@/app/api/shared/utils/request";
 
 
 export const PATCH = async (req: NextRequest) => {
@@ -28,7 +28,9 @@ export const PATCH = async (req: NextRequest) => {
             product_id
         } = body;
 
-        if (typeof product_id !== "string" || !product_id.trim()) {
+        const productId = product_id == null ? "" : String(product_id).trim();
+
+        if (!productId) {
             return NextResponse.json(
                 { message: "Product ID is required" },
                 { status: 400 }
@@ -41,7 +43,8 @@ export const PATCH = async (req: NextRequest) => {
             typeof name === "string" ? name.trim() : false;
 
         const productPrice =
-            typeof price === "number" ? price : false;
+            typeof price === "number" ? price : Number(price);
+        const parsedPrice = Number.isFinite(productPrice) ? productPrice : false;
 
 
         const productDescription =
@@ -62,13 +65,13 @@ export const PATCH = async (req: NextRequest) => {
         const productBrand =
             typeof brand === "string" ? brand.trim() : "";
 
-        const productSpecifications = isStringRecord(specifications) ? specifications : {};
+        const productSpecifications = isJsonRecord(specifications) ? specifications : {};
 
         if (!productName) {
             throw new Error("Product name is required");
         }
 
-        if (productPrice === false) {
+        if (parsedPrice === false) {
             throw new Error("Product price is required");
         }
 
@@ -100,11 +103,10 @@ export const PATCH = async (req: NextRequest) => {
 
 
         // Final validation 
-        if (productName && productPrice && thumbnailUrl && productImages && productCategory) {
-            // Create product
+        if (productName && parsedPrice !== false && thumbnailUrl && productImages && productCategory) {
             const response = await ProductModel.updateProductDoc({
                 name: productName,
-                price: productPrice,
+                price: parsedPrice,
                 description: productDescription,
                 category: productCategory,
                 subcategory: productSubcategory,
@@ -112,7 +114,7 @@ export const PATCH = async (req: NextRequest) => {
                 images: (productImages),
                 thumbnail_url: thumbnailUrl,
                 specifications: productSpecifications,
-                product_id: product_id.trim()
+                product_id: productId
             });
 
             return NextResponse.json({
