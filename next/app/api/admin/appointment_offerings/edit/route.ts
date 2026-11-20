@@ -4,7 +4,7 @@
  * @module app/api/admin/appointments/edit/route
  */
 
-import { readJsonObject } from "@/app/api/shared/utils/request";
+import { isJsonRecord, readJsonObject } from "@/app/api/shared/utils/request";
 import { NextRequest, NextResponse } from "next/server";
 import { decodeAdminPayload } from "@/app/api/shared/jwt";
 import { AppointmentModel } from "@/app/api/shared/models/appointment";
@@ -112,7 +112,7 @@ export const PATCH = async (req: NextRequest) => {
                 slug: appointmentSlug,
                 thumbnail_url: appointmentThumbnail,
                 description: appointmentDescription,
-                specifications: specifications && typeof specifications === "object" ? specifications : {},
+                specifications: isJsonRecord(specifications) ? specifications : {},
                 appointment_id: appointmentId,
             });
 
