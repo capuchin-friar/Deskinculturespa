@@ -10,6 +10,7 @@ import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
 import _CONSULTATIONS from "../../../src/json/consultations.json";
+import { OfferPrice } from "../../../src/components/customer/OfferPrice";
 
 const modeNames = { physical: "In person", video: "Video call", audio: "Phone call", chat: "Chat" };
 
@@ -91,7 +92,7 @@ export default function ConsultationDetailPage() {
                     <p>{offer.description || "With a De Skin Culture specialist"}</p>
                   </div>
                   <div className="consultation-offer-action">
-                    <strong>₦{Number(offer.price).toLocaleString("en-NG", { maximumFractionDigits: 2 })}</strong>
+                    <strong><OfferPrice item={offer} /></strong>
                     <button type="button" disabled={Boolean(busyOfferId)} onClick={() => handleBook(offer)}>
                       {busyOfferId === String(offer.id) ? "Updating…" : booked ? "Remove" : "Add to appointments"}
                     </button>

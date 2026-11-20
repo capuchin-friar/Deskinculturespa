@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { IoCalendarOutline, IoChevronBack, IoChevronForward, IoClose } from "react-icons/io5";
+import { IoCalendarOutline, IoCallOutline, IoChevronBack, IoChevronForward, IoClose, IoLogoWhatsapp } from "react-icons/io5";
 import AdminLoader from "@/src/components/admin/AdminLoader";
 import "./styles/xxl.css";
 import "./styles/tablet.css";
@@ -108,6 +108,37 @@ function orderKind(kind) {
     if (kind === "consultation") return "appointment";
     if (kind === "package") return "package";
     return "service";
+}
+
+function customerPhone(slot) {
+    const raw = slot?.customer_phone ?? slot?.phone ?? "";
+    const digits = String(raw).replace(/[^\d]/g, "");
+    if (!digits) return "";
+    if (digits.startsWith("234")) return digits;
+    if (digits.startsWith("0")) return `234${digits.slice(1)}`;
+    if (digits.length === 10) return `234${digits}`;
+    return digits;
+}
+
+function whatsappHref(slot) {
+    const phone = customerPhone(slot);
+    if (!phone) return "";
+    const name = String(slot?.customer || "").trim();
+    const title = String(slot?.title || kindLabel(slot?.kind)).trim();
+    const when = [formatSlotDate(slot?.slot_date), formatClock(slot?.slot_time)]
+        .filter(Boolean)
+        .join(" at ");
+    const text = encodeURIComponent(
+        name
+            ? `Hello ${name}, this is Deskinculture regarding your ${title}${when ? ` on ${when}` : ""}.`
+            : `Hello, this is Deskinculture regarding your ${title}${when ? ` on ${when}` : ""}.`,
+    );
+    return `https://wa.me/${phone}?text=${text}`;
+}
+
+function telHref(slot) {
+    const phone = customerPhone(slot);
+    return phone ? `tel:+${phone}` : "";
 }
 
 function resourceKey(slot) {
@@ -385,6 +416,43 @@ export default function AdminSlotsPage() {
                                 <dd>{String(selectedSlot.status || "pending")}</dd>
                             </div>
                         </dl>
+
+                        <div className="slots-modal__contact">
+                            <a
+                                className="slots-modal__chat"
+                                href={whatsappHref(selectedSlot) || undefined}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                aria-disabled={!customerPhone(selectedSlot)}
+                                onClick={(event) => {
+                                    if (!customerPhone(selectedSlot)) event.preventDefault();
+                                }}
+                                title={
+                                    customerPhone(selectedSlot)
+                                        ? "Message this customer on WhatsApp"
+                                        : "No phone number on this customer"
+                                }
+                            >
+                                <IoLogoWhatsapp aria-hidden="true" />
+                                Chat
+                            </a>
+                            <a
+                                className="slots-modal__call"
+                                href={telHref(selectedSlot) || undefined}
+                                aria-disabled={!customerPhone(selectedSlot)}
+                                onClick={(event) => {
+                                    if (!customerPhone(selectedSlot)) event.preventDefault();
+                                }}
+                                title={
+                                    customerPhone(selectedSlot)
+                                        ? "Call this customer"
+                                        : "No phone number on this customer"
+                                }
+                            >
+                                <IoCallOutline aria-hidden="true" />
+                                Call
+                            </a>
+                        </div>
 
                         <div className="slots-modal__actions">
                             <button

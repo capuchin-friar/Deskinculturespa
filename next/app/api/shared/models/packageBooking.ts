@@ -1,5 +1,6 @@
 import { db, query } from "../database";
 import { withErrorHandling } from "../utils/errHandler";
+import { productPricing } from "@/src/utils/productPrice";
 
 const CREATE_TABLE = `
     CREATE TABLE IF NOT EXISTS package_bookings (
@@ -54,13 +55,20 @@ export class PackageBookingModel {
         await client.query("COMMIT");
         return existing.rows[0];
       }
+      const catalog = await client.query(
+        `SELECT * FROM packages p WHERE p.id = $1 AND COALESCE(p.is_active, TRUE) = TRUE LIMIT 1`,
+        [package_id],
+      );
+      const pkg = catalog.rows[0];
+      if (!pkg) {
+        await client.query("COMMIT");
+        return null;
+      }
       const { rows } = await client.query(
         `INSERT INTO package_bookings (user_id, package_id, price, notes)
-         SELECT $1, p.id, p.price, $3
-         FROM packages p
-         WHERE p.id = $2 AND COALESCE(p.is_active, TRUE) = TRUE
+         VALUES ($1, $2, $3, $4)
          RETURNING *`,
-        [user_id, package_id, notes],
+        [user_id, pkg.id, productPricing(pkg).sale, notes],
       );
       await client.query("COMMIT");
       return rows[0] ?? null;

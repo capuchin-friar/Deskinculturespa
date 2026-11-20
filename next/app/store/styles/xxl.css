@@ -19,7 +19,8 @@
     padding: 10px 10px;
 
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
+    gap: 16px;
     flex-wrap: wrap;
 }
 
@@ -62,7 +63,23 @@
 }
 
 .customer-store-product-price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px;
     font-family: var(--font-body);
+}
+
+.customer-store-product-price del {
+    color: #8a9289;
+    font-size: 13px;
+    font-weight: 400;
+}
+
+.customer-store-product-price ins {
+    color: var(--brand-green, #278a3d);
+    font-weight: 700;
+    text-decoration: none;
 }
 
 .card-button {

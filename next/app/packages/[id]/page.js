@@ -8,6 +8,7 @@ import "./styles/tablet.css";
 import "./styles/ipad.css";
 
 import Formatter from "../../../src/utils/formatter";
+import { OfferPrice } from "../../../src/components/customer/OfferPrice";
 import { baseApi } from "../../api/shared/config";
 import usePackageToggler from "../../../src/hooks/packageToggler";
 
@@ -145,7 +146,7 @@ export default function PackageDetail() {
                         <h1>{packageItem.name}</h1>
 
                         <div className="package-detail-price">
-                            {formatPrice(packageItem.price)}
+                            <OfferPrice item={packageItem} />
                         </div>
 
                         {duration ? (

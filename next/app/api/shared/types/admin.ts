@@ -40,6 +40,7 @@ export interface NewAppointmentDoc {
     slug: string,
     thumbnail_url: string,
     description?: string | null,
+    specifications?: Record<string, JsonValue>,
     admin_id: string | number
 }
 
@@ -50,6 +51,7 @@ export interface NewPackageDoc {
     duration_months: number,
     includes: string[],
     image_url: string,
+    specifications?: Record<string, JsonValue>,
     admin_id: string | number
 }
 

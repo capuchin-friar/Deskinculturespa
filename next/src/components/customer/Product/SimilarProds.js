@@ -12,6 +12,7 @@ import "./similar_products.css";
 import useToggler from "../../../hooks/toggler";
 import { useRouter } from "next/navigation";
 import useProductHandler from "../../../hooks/product";
+import { productPricing } from "../../../utils/productPrice";
 
 export default function SimilarProducts({ productId, category }) {
     const carouselRef = useRef(null);
@@ -135,10 +136,18 @@ export default function SimilarProducts({ productId, category }) {
                                 <span className="similar-product-price" onClick={() => {
                                     router.push(`/store/${product.id}`)
                                 }}>
-                                    ₦
-                                    {new Intl.NumberFormat("en-NG").format(
-                                        product.price
-                                    )}
+                                    {(() => {
+                                        const { sale, original, hasDiscount } = productPricing(product);
+                                        return hasDiscount ? (
+                                            <>
+                                                ₦{new Intl.NumberFormat("en-NG").format(sale)}
+                                                {" "}
+                                                <del>₦{new Intl.NumberFormat("en-NG").format(original)}</del>
+                                            </>
+                                        ) : (
+                                            <>₦{new Intl.NumberFormat("en-NG").format(original)}</>
+                                        );
+                                    })()}
                                 </span>
 
                                 <button

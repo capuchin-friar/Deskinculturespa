@@ -48,6 +48,7 @@ function customerPhone(row) {
   if (!digits) return ""
   if (digits.startsWith("234")) return digits
   if (digits.startsWith("0")) return `234${digits.slice(1)}`
+  if (digits.length === 10) return `234${digits}`
   return digits
 }
 
@@ -76,6 +77,11 @@ function whatsappHref(row) {
       : `Hello, this is Deskinculture regarding order #${orderId}.`,
   )
   return `https://wa.me/${phone}?text=${text}`
+}
+
+function telHref(row) {
+  const phone = customerPhone(row)
+  return phone ? `tel:+${phone}` : ""
 }
 
 export default function ManageOrders() {
@@ -127,6 +133,12 @@ export default function ManageOrders() {
     const href = whatsappHref(row)
     if (!href) return
     window.open(href, "_blank", "noopener,noreferrer")
+  }
+
+  const goToOrderCall = (row) => {
+    const href = telHref(row)
+    if (!href) return
+    window.location.href = href
   }
 
   return (
@@ -234,9 +246,22 @@ export default function ManageOrders() {
                           ? "Message this customer on WhatsApp"
                           : "No phone number on this customer"
                       }
-                     onClick={() => goToOrderChat(r)}
+                      onClick={() => goToOrderChat(r)}
                     >
                       Chat
+                    </button>
+                    <button
+                      type="button"
+                      className="orders-call-btn"
+                      disabled={!customerPhone(r)}
+                      title={
+                        customerPhone(r)
+                          ? "Call this customer"
+                          : "No phone number on this customer"
+                      }
+                      onClick={() => goToOrderCall(r)}
+                    >
+                      Call
                     </button>
                   </td>
                 </tr>

@@ -1,6 +1,7 @@
 import { db, query } from "../database";
 import type { NewBookingDoc, UpdateBookingDoc } from "../types/booking";
 import { withErrorHandling } from "../utils/errHandler";
+import { productPricing } from "@/src/utils/productPrice";
 
 export class BookingModel {
   static createBookingDoc = withErrorHandling(async (payload: NewBookingDoc) => {
@@ -38,13 +39,21 @@ export class BookingModel {
         return existing.rows[0];
       }
 
+      const catalog = await client.query(
+        `SELECT * FROM services s WHERE s.id = $1 AND s.is_active = TRUE LIMIT 1`,
+        [service_id],
+      );
+      const service = catalog.rows[0];
+      if (!service) {
+        await client.query("COMMIT");
+        return null;
+      }
+
       const { rows } = await client.query(
         `INSERT INTO bookings (user_id, service_id, price, notes)
-         SELECT $1, s.id, s.price, $3
-         FROM services s
-         WHERE s.id = $2 AND s.is_active = TRUE
+         VALUES ($1, $2, $3, $4)
          RETURNING *`,
-        [user_id, service_id, notes],
+        [user_id, service.id, productPricing(service).sale, notes],
       );
 
       await client.query("COMMIT");

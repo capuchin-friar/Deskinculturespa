@@ -6,6 +6,7 @@ import Image from "next/image";
 import { IoChevronBack, IoChevronForward, IoCubeOutline, IoImageOutline } from "react-icons/io5";
 import { baseApi } from "@/app/api/shared/config";
 import useToggler from "@/src/hooks/toggler";
+import { productPricing } from "@/src/utils/productPrice";
 
 const getImageUrl = (image) => {
   if (typeof image === "string") return image.trim();
@@ -166,7 +167,15 @@ export default function Product({ item }) {
 
           <h1 className="dsc-pdp__title" id="dsc-pdp-title">{productName}</h1>
 
-          <p className="dsc-pdp__price">₦{formatPrice(item?.price)}</p>
+          {(() => {
+            const { sale, original, hasDiscount } = productPricing(item);
+            return (
+              <p className={`dsc-pdp__price${hasDiscount ? " has-discount" : ""}`}>
+                <ins>₦{formatPrice(sale)}</ins>
+                {hasDiscount ? <del>₦{formatPrice(original)}</del> : null}
+              </p>
+            );
+          })()}
 
           {item?.description && <p className="dsc-pdp__intro">{item.description}</p>}
 

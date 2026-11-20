@@ -34,6 +34,7 @@ export const PATCH = async (req: NextRequest) => {
             slug,
             title,
             description,
+            specifications,
         } = body;
 
         const appointmentId = appointment_id == null ? "" : String(appointment_id).trim();
@@ -111,6 +112,7 @@ export const PATCH = async (req: NextRequest) => {
                 slug: appointmentSlug,
                 thumbnail_url: appointmentThumbnail,
                 description: appointmentDescription,
+                specifications: specifications && typeof specifications === "object" ? specifications : {},
                 appointment_id: appointmentId,
             });
 

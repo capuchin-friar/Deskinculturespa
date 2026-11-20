@@ -62,6 +62,7 @@ export class PackageModel {
         await query(CREATE_PACKAGES_TABLE);
         await query(`ALTER TABLE packages DROP COLUMN IF EXISTS service_ids`);
         await query(`ALTER TABLE packages DROP COLUMN IF EXISTS appointment_ids`);
+        await query(`ALTER TABLE packages ADD COLUMN IF NOT EXISTS specifications JSONB NOT NULL DEFAULT '{}'::jsonb`);
     });
 
     static createPackageDoc = withErrorHandling(
@@ -75,14 +76,15 @@ export class PackageModel {
                 duration_months,
                 includes,
                 image_url,
+                specifications = {},
             } = payload;
 
             const sql = `
                 INSERT INTO packages (
                     admin_id, name, description, price, duration_months,
-                    includes, image_url, created_at
+                    includes, image_url, specifications, created_at
                 )
-                VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, NOW())
+                VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7, $8::jsonb, NOW())
                 RETURNING *
             `;
 
@@ -94,6 +96,7 @@ export class PackageModel {
                 duration_months,
                 JSON.stringify(asIncludes(includes)),
                 image_url,
+                JSON.stringify(specifications || {}),
             ]);
 
             return rows[0];
@@ -111,12 +114,13 @@ export class PackageModel {
                 duration_months,
                 includes,
                 image_url,
+                specifications = {},
             } = payload;
 
             const { rows } = await query(
                 `UPDATE packages
-                 SET name=$1, description=$2, price=$3, duration_months=$4, includes=$5::jsonb, image_url=$6, updated_at=NOW()
-                 WHERE id = $7
+                 SET name=$1, description=$2, price=$3, duration_months=$4, includes=$5::jsonb, image_url=$6, specifications=$7::jsonb, updated_at=NOW()
+                 WHERE id = $8
                  RETURNING *`,
                 [
                     name,
@@ -125,6 +129,7 @@ export class PackageModel {
                     duration_months,
                     JSON.stringify(asIncludes(includes)),
                     image_url,
+                    JSON.stringify(specifications || {}),
                     package_id,
                 ],
             );

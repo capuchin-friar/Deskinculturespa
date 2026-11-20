@@ -147,7 +147,8 @@
 }
 
 .orders-action-btn,
-.orders-chat-btn {
+.orders-chat-btn,
+.orders-call-btn {
     appearance: none;
     display: inline-flex;
     align-items: center;
@@ -172,17 +173,20 @@
     background: #f5f8f5;
 }
 
-.orders-chat-btn {
+.orders-chat-btn,
+.orders-call-btn {
     border: 0;
     background: var(--brand-green, #278a3d);
     color: #fff;
 }
 
-.orders-chat-btn:hover:not(:disabled) {
+.orders-chat-btn:hover:not(:disabled),
+.orders-call-btn:hover:not(:disabled) {
     background: var(--brand-dark, #0b3b1a);
 }
 
-.orders-chat-btn:disabled {
+.orders-chat-btn:disabled,
+.orders-call-btn:disabled {
     opacity: 0.45;
     cursor: not-allowed;
 }

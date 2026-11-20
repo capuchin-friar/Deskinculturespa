@@ -25,6 +25,12 @@ import {
     saveCreateDraft,
 } from "@/src/hooks/useCreateDraft";
 import { fetchAdminCatalogItem, toMediaList } from "@/src/utils/catalogItem";
+import { DiscountFields } from "@/src/components/admin/DiscountFields";
+import {
+    collectDiscountErrors,
+    discountFieldValues,
+    mergeDiscountSpec,
+} from "@/src/utils/productPrice";
 
 const DRAFT_KEY = CREATE_DRAFT_KEYS.service;
 
@@ -67,6 +73,8 @@ export default function AddServicePage() {
     const [mediaBusy, setMediaBusy] = useState(null);
 
     const [productId, setProductId] = useState("");
+    const [discount, setDiscount] = useState("");
+    const [discountType, setDiscountType] = useState("");
     const [isDraftLoaded, setIsDraftLoaded] = useState(false);
     const skipDraftSaveRef = useRef(false);
 
@@ -91,6 +99,8 @@ export default function AddServicePage() {
             setSubService(draft.subService ?? "");
             setImage(Array.isArray(draft.image) ? draft.image.filter(Boolean) : []);
             setProductId(draft.productId || uuidV4());
+            setDiscount(draft.discount ?? "");
+            setDiscountType(draft.discountType ?? "");
         } else {
             setProductId(uuidV4());
         }
@@ -140,6 +150,9 @@ export default function AddServicePage() {
                 setService(item.category ?? item.service ?? "");
                 setSubService(item.subcategory ?? item.sub_service ?? "");
                 setImage(media);
+                const discountInfo = discountFieldValues(specs);
+                setDiscount(discountInfo.discount);
+                setDiscountType(discountInfo.discountType);
                 setProductId(
                     (typeof specs?.hash === "string" && specs.hash) ||
                     media[0]?.publicId?.split("/").slice(-2, -1)[0] ||
@@ -172,8 +185,10 @@ export default function AddServicePage() {
             service,
             subService,
             image,
+            discount,
+            discountType,
         });
-    }, [isDraftLoaded, productId, form, service, subService, image]);
+    }, [isDraftLoaded, productId, form, service, subService, image, discount, discountType]);
 
     /*
     |--------------------------------------------------------------------------
@@ -759,6 +774,15 @@ export default function AddServicePage() {
                 "Price cannot exceed ₦100,000,000.";
         }
 
+        Object.assign(
+            newErrors,
+            collectDiscountErrors({
+                discount,
+                discountType,
+                price,
+            }),
+        );
+
         /*
         |--------------------------------------------------------------------------
         | DURATION
@@ -932,9 +956,11 @@ export default function AddServicePage() {
 
                 sub_service:
                     subService,
-                specifications: ({
-                    hash: productId
-                }),
+                specifications: mergeDiscountSpec(
+                    { hash: productId },
+                    discount,
+                    discountType,
+                ),
                 /*
                  * All uploaded images.
                  */
@@ -1323,6 +1349,24 @@ export default function AddServicePage() {
                             </div>
 
                         </div>
+
+                        <DiscountFields
+                            discount={discount}
+                            discountType={discountType}
+                            errors={errors}
+                            onDiscountChange={(value) => {
+                                setDiscount(value);
+                                if (errors.discount) {
+                                    setErrors((prev) => ({ ...prev, discount: "" }));
+                                }
+                            }}
+                            onTypeChange={(value) => {
+                                setDiscountType(value);
+                                if (errors.discountType) {
+                                    setErrors((prev) => ({ ...prev, discountType: "" }));
+                                }
+                            }}
+                        />
 
                         {/* IMAGE */}
 

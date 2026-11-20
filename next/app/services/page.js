@@ -1,8 +1,13 @@
 "use client";
 
-import Link from "next/link";
+import { Suspense } from "react";
+import { useRouter } from "next/navigation";
 import useServiceHandler from "../../src/hooks/service";
+import useConsultationGate from "../../src/hooks/consultationGate";
+import ConsultationGateModal from "../../src/components/customer/ConsultationGateModal";
+import { withConsultedParam } from "../../src/utils/consultationReferral";
 import "./styles/xxl.css";
+import "./styles/consultation-gate.css";
 import "./styles/mobile.css";
 import "./styles/tablet.css";
 import "./styles/ipad.css";
@@ -33,8 +38,16 @@ function groupCategories(services) {
   }));
 }
 
-export default function Services() {
+function ServicesCatalog() {
+  const router = useRouter();
   const { services, loading } = useServiceHandler();
+  const {
+    open,
+    consultedId,
+    requireConsultation,
+    close,
+    continueWithoutConsultation,
+  } = useConsultationGate();
   const categories = groupCategories(Array.isArray(services) ? services : []);
 
   return (
@@ -51,11 +64,16 @@ export default function Services() {
             <p className="catalog-intro">No treatments are listed yet.</p>
           ) : (
             categories.map(({ category, slug, count, image }, index) => (
-              <Link
+              <button
+                type="button"
                 className="catalog-card service-catalog-card"
-                href={`/services/${slug}`}
                 key={slug}
                 style={image ? { "--catalog-image": `url('${image}')` } : undefined}
+                onClick={() =>
+                  requireConsultation(() =>
+                    router.push(withConsultedParam(`/services/${slug}`, consultedId)),
+                  )
+                }
               >
                 <span className="catalog-card-count">{String(index + 1).padStart(2, "0")}</span>
                 <span className="catalog-card-copy">
@@ -63,11 +81,24 @@ export default function Services() {
                   <span className="catalog-card-detail">{count} {count === 1 ? "treatment" : "treatments"}</span>
                 </span>
                 <span className="catalog-card-arrow" aria-hidden="true">↗</span>
-              </Link>
+              </button>
             ))
           )}
         </div>
       </section>
+      <ConsultationGateModal
+        open={open}
+        onClose={close}
+        onContinueWithout={continueWithoutConsultation}
+      />
     </main>
+  );
+}
+
+export default function Services() {
+  return (
+    <Suspense fallback={<main className="services-catalog" />}>
+      <ServicesCatalog />
+    </Suspense>
   );
 }

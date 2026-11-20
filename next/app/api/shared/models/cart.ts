@@ -7,6 +7,7 @@
 import { query } from "../database";
 import type { NewCartDoc } from "../types/user";
 import { withErrorHandling } from "../utils/errHandler";
+import { productPricing } from "@/src/utils/productPrice";
 
 export class CartModel {
   static createCartDoc = withErrorHandling(async (payload: NewCartDoc) => {
@@ -71,6 +72,7 @@ export class CartModel {
          c.quantity,
          p.name,
          p.price,
+         p.specifications,
          p.thumbnail_url,
          p.stock
        FROM cart_items AS c
@@ -80,6 +82,13 @@ export class CartModel {
       [payload.id],
     );
 
-    return rows;
+    return rows.map((row) => {
+      const pricing = productPricing(row);
+      return {
+        ...row,
+        price: pricing.sale,
+        original_price: pricing.original,
+      };
+    });
   });
 }

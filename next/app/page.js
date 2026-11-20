@@ -10,6 +10,7 @@ import Link from "next/link";
 import WhyChooseUs from "@/src/components/customer/Why";
 import { useEffect, useState } from "react";
 import Formatter from "../src/utils/formatter";
+import { productPricing } from "../src/utils/productPrice";
 import useToggler from "../src/hooks/toggler";
 import useProductHandler from "../src/hooks/product";
 import { useRouter } from "next/navigation";
@@ -280,7 +281,17 @@ export default function Home() {
                   {p.name ?? "Product title"}
                 </p>
                 <div className="customer-product-price">
-                  ₦ {Formatter.formatRevenue(p.price ?? 0)}
+                  {(() => {
+                    const { sale, original, hasDiscount } = productPricing(p);
+                    return hasDiscount ? (
+                      <>
+                        <ins>₦ {Formatter.formatRevenue(sale)}</ins>
+                        <del>₦ {Formatter.formatRevenue(original)}</del>
+                      </>
+                    ) : (
+                      <>₦ {Formatter.formatRevenue(original)}</>
+                    );
+                  })()}
                 </div>
               </div>
             </div>
@@ -378,7 +389,7 @@ export default function Home() {
       </div>
 
       <div className="customer-testimonials-section">
-        <h1 className="customer-testimonials-headline">Testimonials</h1>
+        <h1 className="customer-testimonials-headline">Real Reviews</h1>
         <Testimonials />
       </div>
     </>

@@ -19,13 +19,14 @@ export class AppointmentModel {
         await query(`ALTER TABLE consultations ALTER COLUMN thumbnail_url TYPE TEXT`);
         await query(`ALTER TABLE consultations ALTER COLUMN slug TYPE TEXT`);
         await query(`ALTER TABLE consultations ADD COLUMN IF NOT EXISTS description TEXT`);
+        await query(`ALTER TABLE consultations ADD COLUMN IF NOT EXISTS specifications JSONB NOT NULL DEFAULT '{}'::jsonb`);
     });
 
     static createAppointmentDoc = withErrorHandling(
         async (payload: NewAppointmentDoc) => {
             await AppointmentModel.ensureSchema();
             const {
-                admin_id, mode, price, duration_minutes, slug, thumbnail_url, description
+                admin_id, mode, price, duration_minutes, slug, thumbnail_url, description, specifications = {}
             } = payload;
             const columns = [
                 "consultant_id",
@@ -35,6 +36,7 @@ export class AppointmentModel {
                 "duration_minutes",
                 "price",
                 "description",
+                "specifications",
                 "is_active",
                 "created_at",
             ];
@@ -46,6 +48,7 @@ export class AppointmentModel {
                 duration_minutes,
                 price,
                 description || null,
+                JSON.stringify(specifications || {}),
                 true,
                 new Date(),
             ];
@@ -82,18 +85,19 @@ export class AppointmentModel {
             slug?: string;
             thumbnail_url?: string;
             description?: string | null;
+            specifications?: Record<string, unknown>;
         }) => {
             await AppointmentModel.ensureSchema();
             const {
-                appointment_id, mode, price, duration_minutes, slug, thumbnail_url, description
+                appointment_id, mode, price, duration_minutes, slug, thumbnail_url, description, specifications = {}
             } = payload;
 
             const { rows } = await query(
                 `UPDATE consultations
-                 SET mode=$1, duration_minutes=$2, price=$3, slug=$4, thumbnail_url=$5, description=$6, is_active=$7, updated_at=NOW()
-                 WHERE id = $8
+                 SET mode=$1, duration_minutes=$2, price=$3, slug=$4, thumbnail_url=$5, description=$6, specifications=$7::jsonb, is_active=$8, updated_at=NOW()
+                 WHERE id = $9
                  RETURNING *`,
-                [mode, duration_minutes, price, slug, thumbnail_url, description || null, true, appointment_id]
+                [mode, duration_minutes, price, slug, thumbnail_url, description || null, JSON.stringify(specifications || {}), true, appointment_id]
             );
 
             return rows[0];

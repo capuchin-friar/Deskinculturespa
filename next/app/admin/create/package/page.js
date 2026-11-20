@@ -22,6 +22,12 @@ import {
     saveCreateDraft,
 } from "@/src/hooks/useCreateDraft";
 import { fetchAdminCatalogItem, toMediaItem } from "@/src/utils/catalogItem";
+import { DiscountFields } from "@/src/components/admin/DiscountFields";
+import {
+    collectDiscountErrors,
+    discountFieldValues,
+    mergeDiscountSpec,
+} from "@/src/utils/productPrice";
 
 const DRAFT_KEY = CREATE_DRAFT_KEYS.package;
 import "../appointment/styles/xxl.css";
@@ -49,6 +55,8 @@ export default function CreatePackagePage() {
         price: "",
     });
     const [includes, setIncludes] = useState([""]);
+    const [discount, setDiscount] = useState("");
+    const [discountType, setDiscountType] = useState("");
     const [image, setImage] = useState(null);
     const [uploadId, setUploadId] = useState("");
     const [errors, setErrors] = useState({});
@@ -77,6 +85,8 @@ export default function CreatePackagePage() {
                     : [""]
             );
             setImage(draft.image?.url ? draft.image : null);
+            setDiscount(draft.discount ?? "");
+            setDiscountType(draft.discountType ?? "");
             setUploadId(draft.uploadId || uuidV4());
         } else {
             setUploadId(uuidV4());
@@ -116,6 +126,9 @@ export default function CreatePackagePage() {
                         : [""]
                 );
                 setImage(media);
+                const discountInfo = discountFieldValues(item.specifications);
+                setDiscount(discountInfo.discount);
+                setDiscountType(discountInfo.discountType);
                 setUploadId(
                     media?.publicId?.split("/").slice(-2, -1)[0] || uuidV4()
                 );
@@ -144,8 +157,10 @@ export default function CreatePackagePage() {
             form,
             includes,
             image,
+            discount,
+            discountType,
         });
-    }, [isDraftLoaded, uploadId, form, includes, image]);
+    }, [isDraftLoaded, uploadId, form, includes, image, discount, discountType]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -176,6 +191,14 @@ export default function CreatePackagePage() {
         if (!image?.url) {
             nextErrors.image = "Please upload a package image.";
         }
+        Object.assign(
+            nextErrors,
+            collectDiscountErrors({
+                discount,
+                discountType,
+                price: form.price,
+            }),
+        );
         setErrors(nextErrors);
         return Object.keys(nextErrors).length === 0;
     };
@@ -278,6 +301,7 @@ export default function CreatePackagePage() {
                 price: Number(form.price),
                 includes: includes.map((entry) => entry.trim()).filter(Boolean),
                 image_url: image.url,
+                specifications: mergeDiscountSpec({}, discount, discountType),
             };
             const { data } = isEdit
                 ? await api.patch("packages/edit", {
@@ -395,6 +419,20 @@ export default function CreatePackagePage() {
                                 {errors.price ? <p className="error-message">{errors.price}</p> : null}
                             </div>
                         </div>
+
+                        <DiscountFields
+                            discount={discount}
+                            discountType={discountType}
+                            errors={errors}
+                            onDiscountChange={(value) => {
+                                setDiscount(value);
+                                if (errors.discount) setErrors((prev) => ({ ...prev, discount: "" }));
+                            }}
+                            onTypeChange={(value) => {
+                                setDiscountType(value);
+                                if (errors.discountType) setErrors((prev) => ({ ...prev, discountType: "" }));
+                            }}
+                        />
 
                         <div className="form-group">
                             <label>

@@ -77,7 +77,11 @@
   background-position: center;
   background-size: cover;
   color: #fff;
+  appearance: none;
+  text-align: left;
   text-decoration: none;
+  font: inherit;
+  cursor: pointer;
   transition: transform .2s ease, box-shadow .2s ease;
 }
 

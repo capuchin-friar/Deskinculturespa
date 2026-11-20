@@ -165,3 +165,24 @@
   justify-content: space-between;
   border-bottom: 1px solid #d8d8d8;
 }
+
+.offer-price {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.offer-price ins {
+  text-decoration: none;
+}
+
+.offer-price.has-discount ins {
+  color: var(--brand-green, #278a3d);
+}
+
+.offer-price del {
+  color: #8a9289;
+  font-size: 0.82em;
+  font-weight: 400;
+}

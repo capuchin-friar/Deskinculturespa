@@ -1,5 +1,6 @@
 import { db, query } from "../database";
 import { resolveAppointmentType } from "@/src/utils/appointmentTypes";
+import { productPricing } from "@/src/utils/productPrice";
 import { AppointmentModel } from "./appointment";
 
 function formatOffer(row: Record<string, unknown>) {
@@ -18,7 +19,7 @@ export class ConsultationBookingModel {
   static async getActiveOffers() {
     await AppointmentModel.ensureSchema();
     const { rows } = await query(
-      `SELECT id, slug, consultant_id, mode, duration_minutes, price, thumbnail_url, description, is_active
+      `SELECT id, slug, consultant_id, mode, duration_minutes, price, thumbnail_url, description, specifications, is_active
        FROM consultations
        WHERE COALESCE(is_active, TRUE) = TRUE
        ORDER BY duration_minutes, price, id`,
@@ -71,13 +72,22 @@ export class ConsultationBookingModel {
         await client.query("COMMIT");
         return existing.rows[0];
       }
+      const offering = await client.query(
+        `SELECT * FROM consultations
+         WHERE id = $1 AND slug = ANY($2::text[]) AND is_active = TRUE
+         LIMIT 1`,
+        [offeringId, slugs],
+      );
+      const catalog = offering.rows[0];
+      if (!catalog) {
+        await client.query("COMMIT");
+        return null;
+      }
       const { rows } = await client.query(
         `INSERT INTO appointments (customer_id, consultant_id, offering_id, amount, consultation_name)
-         SELECT $1, c.consultant_id, c.id, c.price, $3
-         FROM consultations c
-         WHERE c.id = $2 AND c.slug = ANY($4::text[]) AND c.is_active = TRUE
+         VALUES ($1, $2, $3, $4, $5)
          RETURNING *`,
-        [customerId, offeringId, consultationName, slugs],
+        [customerId, catalog.consultant_id, catalog.id, productPricing(catalog).sale, consultationName],
       );
       await client.query("COMMIT");
       return rows[0] ?? null;

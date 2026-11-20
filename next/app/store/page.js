@@ -6,6 +6,7 @@ import "./styles/tablet.css";
 import "./styles/ipad.css";
 import { useEffect, useState } from "react";
 import Formatter from "../../src/utils/formatter";
+import { productPricing } from "../../src/utils/productPrice";
 import useToggler from "../../src/hooks/toggler";
 import { useSelector } from "react-redux";
 import useProductHandler from "../../src/hooks/product";
@@ -41,11 +42,10 @@ export default function Store({ }) {
         let filtered = products;
 
         if (filter.price) {
-            filtered = filtered.filter(
-                (p) =>
-                    Number(p.price) >= Number(filter.price.min) &&
-                    Number(p.price) <= Number(filter.price.max)
-            );
+            filtered = filtered.filter((p) => {
+                    const amount = productPricing(p).sale;
+                    return amount >= Number(filter.price.min) && amount <= Number(filter.price.max);
+            });
         }
 
         if (filter.category && filter.category !== "") {
@@ -118,7 +118,17 @@ export default function Store({ }) {
                                         {p.name ?? "Product title"}
                                     </p>
                                     <div className="customer-store-product-price">
-                                        ₦ {Formatter.formatRevenue(p.price ?? 0)}
+                                        {(() => {
+                                            const { sale, original, hasDiscount } = productPricing(p);
+                                            return hasDiscount ? (
+                                                <>
+                                                    <ins>₦ {Formatter.formatRevenue(sale)}</ins>
+                                                    <del>₦ {Formatter.formatRevenue(original)}</del>
+                                                </>
+                                            ) : (
+                                                <>₦ {Formatter.formatRevenue(original)}</>
+                                            );
+                                        })()}
                                     </div>
                                 </div>
 

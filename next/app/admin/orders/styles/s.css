@@ -45,7 +45,8 @@
         gap: 6px;
     }
 
-    .orders-chat-btn {
+    .orders-chat-btn,
+    .orders-call-btn {
         -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
     }

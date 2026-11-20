@@ -29,6 +29,12 @@ import {
     fetchAdminCatalogItem,
     toMediaItem,
 } from "@/src/utils/catalogItem";
+import { DiscountFields } from "@/src/components/admin/DiscountFields";
+import {
+    collectDiscountErrors,
+    discountFieldValues,
+    mergeDiscountSpec,
+} from "@/src/utils/productPrice";
 import {
     APPOINTMENT_TYPES,
     resolveAppointmentType,
@@ -76,6 +82,8 @@ export default function CreateAppointmentPage() {
         mode: "online",
         duration: "30",
         price: "",
+        discount: "",
+        discountType: "",
     });
 
     const [image, setImage] = useState(null);
@@ -100,6 +108,8 @@ export default function CreateAppointmentPage() {
                 mode: draft.form?.mode || "online",
                 duration: draft.form?.duration ?? "30",
                 price: draft.form?.price ?? "",
+                discount: draft.form?.discount ?? "",
+                discountType: draft.form?.discountType ?? "",
             });
             setImage(draft.image?.url ? draft.image : null);
             setUploadId(draft.uploadId || uuidV4());
@@ -138,6 +148,7 @@ export default function CreateAppointmentPage() {
                             ? String(item.duration_minutes)
                             : "30",
                     price: item.price != null ? String(item.price) : "",
+                    ...discountFieldValues(item.specifications),
                 });
                 setImage(media);
                 setUploadId(
@@ -357,6 +368,15 @@ export default function CreateAppointmentPage() {
                 "Price cannot be negative.";
         }
 
+        Object.assign(
+            newErrors,
+            collectDiscountErrors({
+                discount: form.discount,
+                discountType: form.discountType,
+                price: form.price,
+            }),
+        );
+
         // Image
         if (!image?.url) {
             newErrors.image =
@@ -391,6 +411,7 @@ export default function CreateAppointmentPage() {
                 duration_minutes: Number(form.duration),
                 price: Number(form.price),
                 thumbnail_url: image.url,
+                specifications: mergeDiscountSpec({}, form.discount, form.discountType),
             };
             const { data } = isEdit
                 ? await api.patch("appointment_offerings/edit", {
@@ -689,6 +710,20 @@ export default function CreateAppointmentPage() {
                             </div>
 
                         </div>
+
+                        <DiscountFields
+                            discount={form.discount}
+                            discountType={form.discountType}
+                            errors={errors}
+                            onDiscountChange={(value) => {
+                                setForm((prev) => ({ ...prev, discount: value }));
+                                if (errors.discount) setErrors((prev) => ({ ...prev, discount: "" }));
+                            }}
+                            onTypeChange={(value) => {
+                                setForm((prev) => ({ ...prev, discountType: value }));
+                                if (errors.discountType) setErrors((prev) => ({ ...prev, discountType: "" }));
+                            }}
+                        />
 
 
                         {/* IMAGE */}

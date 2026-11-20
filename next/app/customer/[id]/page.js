@@ -8,6 +8,10 @@ import { baseApi } from "@/app/api/shared/config";
 import { formatOrderPrice, mapCustomerOrder } from "./orderUtils";
 import { appointmentTypeName, resolveAppointmentType } from "@/src/utils/appointmentTypes";
 import {
+  isPaidConsultation,
+  servicesFromConsultationHref,
+} from "@/src/utils/consultationReferral";
+import {
   FiBookmark,
   FiCalendar,
   FiClock,
@@ -415,9 +419,19 @@ function AppointmentDetailView({ appointment, onBack }) {
                 <p className="customer-order-detail__item-date">{appointment.description}</p>
               ) : null}
             </div>
-            <Link className="customer-order-detail__again" href={browseHref}>
-              Book again
-            </Link>
+            <div className="customer-order-detail__item-actions">
+              {isPaidConsultation(appointment) ? (
+                <Link
+                  className="customer-order-detail__again"
+                  href={servicesFromConsultationHref(appointment.id)}
+                >
+                  Choose a service
+                </Link>
+              ) : null}
+              <Link className="customer-order-detail__again customer-order-detail__again--secondary" href={browseHref}>
+                Book again
+              </Link>
+            </div>
           </li>
         </ul>
       </section>
@@ -630,13 +644,23 @@ function Appointments() {
                         : "Appointment time not scheduled"}
                     </p>
                   </div>
-                  <button
-                    className="customer-order__details-link"
-                    type="button"
-                    onClick={() => setSelectedAppointmentId(appointment.id)}
-                  >
-                    See details
-                  </button>
+                  <div className="customer-appointment__actions">
+                    {isPaidConsultation(appointment) ? (
+                      <Link
+                        className="customer-appointment__service-link"
+                        href={servicesFromConsultationHref(appointment.id)}
+                      >
+                        Choose a service
+                      </Link>
+                    ) : null}
+                    <button
+                      className="customer-order__details-link"
+                      type="button"
+                      onClick={() => setSelectedAppointmentId(appointment.id)}
+                    >
+                      See details
+                    </button>
+                  </div>
                 </article>
               );
             })

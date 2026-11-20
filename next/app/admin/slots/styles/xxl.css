@@ -368,6 +368,59 @@
     font-weight: 500;
 }
 
+.slots-modal__contact {
+    display: flex;
+    gap: 8px;
+    margin: 0 0 12px;
+}
+
+.slots-modal__chat,
+.slots-modal__call {
+    display: inline-flex;
+    flex: 1 1 0;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.slots-modal__chat svg,
+.slots-modal__call svg {
+    width: 16px;
+    height: 16px;
+}
+
+.slots-modal__chat {
+    background: #25d366;
+    color: #fff;
+}
+
+.slots-modal__chat:hover {
+    background: #1fba59;
+}
+
+.slots-modal__call {
+    background: var(--brand-green, #278a3d);
+    color: #fff;
+}
+
+.slots-modal__call:hover {
+    background: var(--brand-dark, #0b3b1a);
+}
+
+.slots-modal__chat[aria-disabled="true"],
+.slots-modal__call[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .slots-modal__actions {
     display: flex;
     justify-content: flex-end;

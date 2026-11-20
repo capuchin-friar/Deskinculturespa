@@ -34,6 +34,7 @@ export const POST = async (req: NextRequest) => {
             slug,
             title,
             description,
+            specifications,
         } = body;
 
         // Validate all fields
@@ -109,6 +110,7 @@ export const POST = async (req: NextRequest) => {
                 slug: appointmentSlug,
                 thumbnail_url: appointmentThumbnail,
                 description: appointmentDescription,
+                specifications: specifications && typeof specifications === "object" ? specifications : {},
                 admin_id
             });
 

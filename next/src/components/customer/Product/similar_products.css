@@ -255,12 +255,14 @@
   
   .similar-product-price {
     color: #147439;
-  
     font-size: 13px;
-  
     font-weight: 700;
-  
     white-space: nowrap;
+  }
+
+  .similar-product-price del {
+    color: #8a9289;
+    font-weight: 400;
   }
   
   

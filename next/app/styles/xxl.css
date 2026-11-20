@@ -98,7 +98,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 16px;
   overflow-x: auto;
   overflow-y: hidden;
 }
@@ -170,7 +171,23 @@
 }
 
 .customer-product-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
   font-family: var(--font-body);
+}
+
+.customer-product-price del {
+  color: #8a9289;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.customer-product-price ins {
+  color: var(--brand-green, #278a3d);
+  font-weight: 700;
+  text-decoration: none;
 }
 
 .customer-admin-section {
@@ -229,22 +246,24 @@
 }
 
 .customer-testimonials-section {
-  height: 100vh;
+  height: auto;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  background-color: #fff;
-  padding: 25px 25px;
+  background-color: var(--off-white);
+  padding: 72px 48px 80px;
 }
 
 .customer-testimonials-headline {
-  font-size: 5vh;
+  font-size: 42px;
   font-family: var(--font-body);
-  text-transform: uppercase;
-  margin-bottom: 145px;
-  font-weight: lighter;
+  text-transform: none;
+  letter-spacing: 0;
+  margin: 0 0 48px;
+  font-weight: 600;
+  color: var(--brand-green);
 }
 
 .customer-services-section {

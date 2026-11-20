@@ -7,6 +7,7 @@ import "./styles/tablet.css";
 import "./styles/ipad.css";
 import { useEffect, useState } from "react";
 import Formatter from "../../src/utils/formatter";
+import { OfferPrice } from "../../src/components/customer/OfferPrice";
 import { baseApi } from "../api/shared/config";
 
 export default function Packages() {
@@ -105,7 +106,7 @@ export default function Packages() {
 
                                 <div className="customer-store-package-footer">
                                     <div className="customer-store-package-price">
-                                        {formatPrice(p.price)}
+                                        <OfferPrice item={p} />
                                     </div>
                                     <button
                                         type="button"

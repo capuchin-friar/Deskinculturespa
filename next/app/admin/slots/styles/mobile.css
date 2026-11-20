@@ -33,10 +33,17 @@
         border-radius: 16px 16px 0 0;
     }
 
+    .slots-modal__contact,
+    .slots-modal__actions {
+        flex-direction: column;
+    }
+
     .slots-modal__actions {
         flex-direction: column-reverse;
     }
 
+    .slots-modal__chat,
+    .slots-modal__call,
     .slots-modal__secondary,
     .slots-modal__primary {
         width: 100%;

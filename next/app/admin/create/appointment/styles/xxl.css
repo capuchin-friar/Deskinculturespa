@@ -308,7 +308,8 @@
      TWO COLUMNS
   ================================= */
   
-  .two-column {
+  .two-column,
+  .pricing-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 13px;

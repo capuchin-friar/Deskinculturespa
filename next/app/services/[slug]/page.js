@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import "./styles/xxl.css";
 import "./styles/mobile.css";
@@ -8,6 +8,10 @@ import "./styles/tablet.css";
 import "./styles/ipad.css";
 import useServiceHandler from "../../../src/hooks/service";
 import useServiceToggler from "../../../src/hooks/serviceToggler";
+import useConsultationGate from "../../../src/hooks/consultationGate";
+import { OfferPrice } from "../../../src/components/customer/OfferPrice";
+import ConsultationGateModal from "../../../src/components/customer/ConsultationGateModal";
+import "../styles/consultation-gate.css";
 
 function LocationIcon() {
   return (
@@ -95,17 +99,25 @@ function CloseIcon() {
   );
 }
 
-export default function Page() {
+function ServiceCategoryPage() {
   const { slug } = useParams();
   const router = useRouter();
   const { services: s } = useServiceHandler();
   const { bookings, loading: bookingsLoading, loadError, getBooking, isBooked, isBusy, toggleService } = useServiceToggler();
+  const {
+    open: consultationGateOpen,
+    requireConsultation,
+    close: closeConsultationGate,
+    continueWithoutConsultation,
+  } = useConsultationGate();
   const [selectedService, setSelectedService] = useState(null);
   const [bookingMessage, setBookingMessage] = useState("");
 
   const openServiceModal = (service) => {
-    setBookingMessage("");
-    setSelectedService(service);
+    requireConsultation(() => {
+      setBookingMessage("");
+      setSelectedService(service);
+    });
   };
 
   const closeServiceModal = () => {
@@ -185,10 +197,7 @@ export default function Page() {
                         <span className="price-label">Start from</span>
 
                         <strong>
-                          ₦
-                          {Number(service.price).toLocaleString("en-NG", {
-                            maximumFractionDigits: 2,
-                          })}
+                          <OfferPrice item={service} />
                         </strong>
                       </div>
 
@@ -205,7 +214,11 @@ export default function Page() {
                       disabled={bookingsLoading || isBusy(service.id) || (isBooked(service.id) && getBooking(service.id)?.status === "confirmed")}
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleBookService(service);
+                        if (isBooked(service.id)) {
+                          handleBookService(service);
+                          return;
+                        }
+                        requireConsultation(() => handleBookService(service));
                       }}
                     >
                       {isBusy(service.id) ? "Updating…" : getBooking(service.id)?.status === "confirmed" ? "Confirmed" : isBooked(service.id) ? "UnBook" : "Book"}
@@ -358,7 +371,7 @@ export default function Page() {
                   <span className="modal-info-label">Price</span>
 
                   <strong className="modal-price">
-                    ₦{Number(selectedService.price || 0).toLocaleString("en-NG", { maximumFractionDigits: 2 })}
+                    <OfferPrice item={selectedService} />
                   </strong>
                 </div>
 
@@ -390,6 +403,19 @@ export default function Page() {
           </div>
         </div>
       )}
+      <ConsultationGateModal
+        open={consultationGateOpen}
+        onClose={closeConsultationGate}
+        onContinueWithout={continueWithoutConsultation}
+      />
     </main>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<main className="massage-page" />}>
+      <ServiceCategoryPage />
+    </Suspense>
   );
 }

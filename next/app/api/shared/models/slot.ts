@@ -25,6 +25,7 @@ function slotUnion(kind: SlotKind | "all") {
             b.id,
             COALESCE(NULLIF(s.subcategory, ''), s.category, 'Service') AS title,
             TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')) AS customer,
+            u.phone AS customer_phone,
             b.scheduled_at,
             COALESCE(s.duration_minutes, 60) AS duration_minutes,
             b.status,
@@ -49,6 +50,7 @@ function slotUnion(kind: SlotKind | "all") {
                 'Consultation'
             ) AS title,
             TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')) AS customer,
+            u.phone AS customer_phone,
             COALESCE(
                 a.scheduled_at,
                 CASE
@@ -88,6 +90,7 @@ function slotUnion(kind: SlotKind | "all") {
             pb.id,
             COALESCE(NULLIF(p.name, ''), 'Package') AS title,
             TRIM(BOTH FROM COALESCE(u.fname, '') || ' ' || COALESCE(u.lname, '')) AS customer,
+            u.phone AS customer_phone,
             pb.scheduled_at,
             60 AS duration_minutes,
             pb.status,
@@ -118,6 +121,7 @@ export class SlotModel {
                     id,
                     title,
                     customer,
+                    customer_phone,
                     scheduled_at,
                     duration_minutes,
                     status,

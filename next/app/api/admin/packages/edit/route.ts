@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonObject } from "@/app/api/shared/utils/request";
+import { isJsonRecord, readJsonObject } from "@/app/api/shared/utils/request";
 import { getRequestAdminId } from "@/app/api/shared/adminAuth";
 import { PackageModel } from "@/app/api/shared/models/package";
 
@@ -26,6 +26,7 @@ export const PATCH = async (req: NextRequest) => {
         const duration_months = Number(body.duration_months);
         const includes = asIncludes(body.includes);
         const image_url = typeof body.image_url === "string" ? body.image_url.trim() : "";
+        const specifications = isJsonRecord(body.specifications) ? body.specifications : {};
 
         if (!name) {
             return NextResponse.json({ success: false, message: "Package name is required" }, { status: 400 });
@@ -59,6 +60,7 @@ export const PATCH = async (req: NextRequest) => {
             duration_months,
             includes,
             image_url,
+            specifications,
         });
 
         return NextResponse.json({
