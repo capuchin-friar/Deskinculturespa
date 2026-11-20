@@ -172,22 +172,26 @@
 
 .customer-product-price {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  flex-wrap: nowrap;
   align-items: baseline;
   gap: 8px;
   font-family: var(--font-body);
+  white-space: nowrap;
 }
 
 .customer-product-price del {
   color: #8a9289;
   font-size: 13px;
   font-weight: 400;
+  order: 2;
 }
 
 .customer-product-price ins {
   color: var(--brand-green, #278a3d);
   font-weight: 700;
   text-decoration: none;
+  order: 1;
 }
 
 .customer-admin-section {

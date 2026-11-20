@@ -62,7 +62,23 @@
   }
 
   .customer-store-product-price {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 6px;
     font-family: var(--font-body);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  .customer-store-product-price ins {
+    order: 1;
+  }
+
+  .customer-store-product-price del {
+    font-size: 12px;
+    order: 2;
   }
 
   .card-button {

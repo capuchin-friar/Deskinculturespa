@@ -206,7 +206,13 @@
   }
 
   .customer-product-price {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 6px;
     font-family: var(--font-body);
+    white-space: nowrap;
   }
 
   .customer-admin-section {

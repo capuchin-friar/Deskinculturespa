@@ -189,7 +189,7 @@
   .customer-product-body {
     height: 100px;
     width: 100%;
-    padding: 10px 20px;
+    padding: 10px 12px;
   }
 
   .customer-product-title {
@@ -204,7 +204,25 @@
   }
 
   .customer-product-price {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: baseline;
+    gap: 6px;
     font-family: var(--font-body);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .customer-product-price ins {
+    font-size: 14px;
+    order: 1;
+  }
+
+  .customer-product-price del {
+    font-size: 11px;
+    order: 2;
   }
 
   .customer-admin-section {
